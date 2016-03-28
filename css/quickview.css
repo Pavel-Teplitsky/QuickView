@@ -304,6 +304,15 @@ Document types
 .fa-file-excel-o {
     color: #207245;
 }
+.fa-file-image-o{
+    color: #25c2d4;
+}
+.fa-file-text-o{
+    color: #D89E13;
+}
+.fa-file-code-o{
+    color: #636363;
+}
 /*
 ******************************************
 Fade annimation
