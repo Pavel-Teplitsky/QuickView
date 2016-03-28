@@ -242,15 +242,6 @@ PRIVATE FUNCTIONS
 	    var newHtml = srcHtml.replace(/(<span class="qv-highlight">|<\/span>)/igm, '');
 	    $('#qv-pages').html(newHtml);
 	}
-/*
-	function goToByScroll(id){
-		// Remove "link" from the ID
-		//id = id.replace("link", "");
-		// Scroll
-		$('html,body').animate({
-		scrollTop: $(id).offset().top
-		}, 'slow');
-	}*/
 
 	function setZoomValue(zoom_val){
 		// adapt value for css
@@ -303,6 +294,37 @@ PRIVATE FUNCTIONS
 	function clearSearch(){
 		$('#qv-nav-search-container :input').val('');
 		clearHighlightSearch();
+	}
+
+	function loadFilesTree() {
+	    var data = {path: ''};
+	    $.ajax({
+	        type: 'POST',
+	        url: 'loadFilesTree',
+	        data: JSON.stringify(data),
+	        contentType: "application/json",
+	        success: function(returnedData) {
+	            $.each(returnedData, function(index, elements) {
+	                $.each(elements, function(index, elem) {
+	                    var name = elem.name;
+	                    var path = elem.path;
+	                    var size = elem.size;
+	                    var docType = elem.docType;
+	                    $('.qv-modal-table tbody').append(
+	                    	'<tr>'+
+								'<td><i class="fa fa-file-word-o"></i></td>'+
+								'<td>' + name + '</td>'+
+								'<td>' + docType + '</td>'+
+								'<td>' + size + ' KB</td>'+
+		                	'</tr>');
+	                });
+	            });
+	        },
+	        error: function(xhr, status, error) {
+              var err = eval("(" + xhr.responseText + ")");
+              console.log(err.Message);
+            }
+	    });
 	}
 
 });
