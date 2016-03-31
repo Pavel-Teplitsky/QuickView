@@ -6,8 +6,6 @@
  * @version 1.0.0
  */
 
-var appPath;
-
 $(document).ready(function(){
 /*
 ******************************************************************
@@ -387,22 +385,19 @@ FUNCTIONS
 	        	// set total page number on navigation panel
 	        	$('#qv-page-num').text('1/' + totalPagaNumber);
 	        	$.each(returnedData, function(index, elem){
+	        		// break loop on after preloadPagesCount
+	        		if((preloadPageCount > 0) && (index > (preloadPageCount - 1))){
+	        			return false;
+	        		}
 	        		var pageNumber = elem.number;
 	        		var pageWidth = elem.width;
 	        		var pageHeight = elem.height;
-	        		console.log('width: ' + pageWidth);
-	        		console.log('height' + pageHeight);
-	        		if(index == 0){
-		        		getPageHtmlContent(documentGuid, pageNumber, function(htmlData){
-		        			$('#qv-panzoom').append(
-		        			'<div id="qv-page' + pageNumber + '" class="qv-page">'+
-								'<div class="qv-wrapper">' + htmlData + '</div>'+
-							'</div>'
-							);
-		        		});
-	        		}else{
-	        			return null;
-	        		}
+	        		// apend empty page
+	        		$('#qv-panzoom').append('<div id="qv-page' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + '; min-height: ' + pageHeight + ';"></div>');
+	        		getPageHtmlContent(documentGuid, pageNumber, function(htmlData){
+	        			// apend page content
+	        			$('#qv-page' + pageNumber).append('<div class="qv-wrapper">' + htmlData + '</div>');
+	        		});
 	        	});
 	        },
 	        error: function(xhr, status, error) {
@@ -412,6 +407,9 @@ FUNCTIONS
 	    });
 	}
 
+	//////////////////////////////////////////////////
+	// Get page html content
+	//////////////////////////////////////////////////
 	function getPageHtmlContent(documentGuid, pageNumber, htmlData){
 		// get document description
 		var data = {guid: documentGuid, page: pageNumber};
@@ -422,6 +420,7 @@ FUNCTIONS
 	        contentType: "application/json",
 	        success: function(returnedData) {
 	        	htmlData(returnedData);
+	        	$('#qv-page' + pageNumber).attr('style', '');
 	        },
 	        error: function(xhr, status, error) {
 	          var err = eval("(" + xhr.responseText + ")");
@@ -430,12 +429,15 @@ FUNCTIONS
 	    });
 	}
 
+	//////////////////////////////////////////////////
+	// Get document format (type)
+	//////////////////////////////////////////////////
 	function getDocumentFormat(filename){
 		return map[filename.split('.').pop()];
 	}
 
 	//////////////////////////////////////////////////
-	// Get css icon id for correspondent file type
+	// Get css icon id for correspondent document type
 	//////////////////////////////////////////////////
 	function getDocumentIcon(value){
 		switch(value){
@@ -500,11 +502,11 @@ FUNCTIONS
 	// Get application path for GET/POST requests
 	//////////////////////////////////////////////////
 	function getApplicationPath(context){
-		if(appPath != null){
-			if(appPath.slice(-1) == '/'){
-				return appPath + context;
+		if(applicationPath != null){
+			if(applicationPath.slice(-1) == '/'){
+				return applicationPath + context;
 			}else{
-				return appPath + "/" + context;
+				return applicationPath + "/" + context;
 			}
 		}else{
 			return context;
@@ -516,7 +518,7 @@ FUNCTIONS
 	//////////////////////////////////////////////////
 	function highlightSearch(text) {
 		clearHighlightSearch();
-		if(text.length > 0){
+		if(text.length > 1){
 			var textNodes = $('#qv-pages').find('*').contents().filter(function() { 
 				return this.nodeType === 3 
 			});
@@ -619,7 +621,8 @@ FUNCTIONS
 // END of document ready function
 });
 
-
+var applicationPath;
+var preloadPageCount;
 /*
 ******************************************************************
 ******************************************************************
@@ -645,6 +648,7 @@ METHODS
 			// set defaults
 			var defaults = {
 				applicationPath: null,
+				preloadPageCount: 1,
 				zoom : true,
 				pageSelector: true,
 				search: true,
@@ -652,11 +656,12 @@ METHODS
 			};
 			options = $.extend(defaults, options);
 
+			// set global option params
+			applicationPath = options.applicationPath;
+			preloadPageCount = options.preloadPageCount;
+
 			// assembly html base
 			this.append(getHtmlBase);
-
-			// set option params
-			appPath = options.applicationPath;
 
 			// assembly nav bar
 			if(options.zoom){
@@ -791,7 +796,7 @@ HTML MARKUP
 				'<li id="qv-btn-page-prev" class="qv-nav-btn-pages">'+
 					'<i class="fa fa-angle-left"></i>'+
 				'</li>'+
-				'<li id="qv-page-num">1/3</li>'+
+				'<li id="qv-page-num">0/0</li>'+
 				'<li id="qv-btn-page-next" class="qv-nav-btn-pages">'+
 					'<i class="fa fa-angle-right"></i>'+
 				'</li>'+

@@ -9,7 +9,7 @@ html {
 }
 body {
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 13px;
+    /* font-size: 13px; */
     background-color: #e7e7e7;
     margin: 0;
     width: 100%;
@@ -188,7 +188,6 @@ PAGES
     padding-top: 20px;
 
     /* Hides the scrollbar */
-    padding-right: 15px;
     left: 15px;
     right: 15px;
     transition:all 0.4s;
@@ -198,8 +197,10 @@ PAGES
     transform: none;
     backface-visibility: hidden;
     transform-origin: 50% 50% 0px;
+    text-align: center;
 }
 .qv-page {
+    display: inline-block;
     background-color: #ffffff;
     margin: 0 auto 20px auto;
     -webkit-box-shadow: 0px 4px 12px -4px rgba(0,0,0,0.38);
