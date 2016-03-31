@@ -6,18 +6,18 @@
  * @version 1.0.0
  */
 
+var appPath;
+
 $(document).ready(function(){
 /*
 ******************************************************************
 NAV BAR CONTROLS
 ******************************************************************
 */
-	// Clear search input
-	$('#qv-nav-search-cancel').on('click', function(e){
-		clearSearch();
-	});
 
+	//////////////////////////////////////////////////
 	// Toggle navigation dropdown menus
+	//////////////////////////////////////////////////
 	$('.qv-nav-toggle').on('click', function(e){
 		if($(this).hasClass('open')){
 			$(this).removeClass('open');
@@ -31,32 +31,33 @@ NAV BAR CONTROLS
 		$('#qv-search-input').focus();
 	});
 
+	//////////////////////////////////////////////////
 	// Open file browser event
-	$('#qv-header-logo').on('click', function(e){		
-		$('#fileBrowser')
-			.css('opacity', 0)
-			.fadeIn('fast')
-			.animate(
-				{ opacity: 1 },
-				{ queue: false, duration: 'fast' }
-			);
-		$('#fileBrowser').addClass('in');
+	//////////////////////////////////////////////////
+	$('#qv-header-logo').on('click', function(e){
+		toggleFileBrowser(true);
+		loadFileTree('');
 	});
 
-	// Close file browser event
+	//////////////////////////////////////////////////
+	// Close file tree event
+	//////////////////////////////////////////////////
 	$('.qv-modal-close-action').on('click', function(e){
-		$('#fileBrowser').removeClass('in');
-		$('#fileBrowser')
-			.css('opacity', 1)
-			.fadeIn('fast')
-			.animate(
-				{ opacity: 0 },
-				{ queue: false, duration: 'fast' }
-			)
-			.css('display', 'none');
+		toggleFileBrowser(false);
 	});
 
+	$('.qv-modal-table tbody').on('click', 'tr td:nth-child(2)', function(e){
+		var isDir = $(this).parent().find('.fa-folder').hasClass('fa-folder');
+		if(isDir){
+			console.log('dir');
+		}else{
+			console.log('file');
+		}
+	});
+
+	//////////////////////////////////////////////////
 	// Zoom values event
+	//////////////////////////////////////////////////
 	$('#qv-btn-zoom-value > li').bind('click', function(e){
 		var zoom_val = $(this).text();
 
@@ -88,7 +89,9 @@ NAV BAR CONTROLS
 		setZoomValue(zoom_val);
 	});
 
-	// zoom in event
+	//////////////////////////////////////////////////
+	// Zoom in event
+	//////////////////////////////////////////////////
 	$('#qv-btn-zoom-in').on('click', function(e){
 		var zoom_val = parseInt($('#qv-zoom-value').text().slice(0, -1));
 		if(zoom_val < 490){
@@ -97,7 +100,9 @@ NAV BAR CONTROLS
 		setZoomValue(zoom_val);
 	});
 
-	// zoom in event
+	//////////////////////////////////////////////////
+	// Zoom out event
+	//////////////////////////////////////////////////
 	$('#qv-btn-zoom-out').on('click', function(e){
 		var zoom_val = parseInt($('#qv-zoom-value').text().slice(0, -1));
 		if(zoom_val > 20){
@@ -106,7 +111,9 @@ NAV BAR CONTROLS
 		setZoomValue(zoom_val);
 	});
 
-	// page navigation events
+	//////////////////////////////////////////////////
+	// Page navigation event
+	//////////////////////////////////////////////////
 	$('.qv-nav-btn-pages').on('click', function(e){
 		var page_array = $('#qv-page-num').text().split('/');
 		var current_page = parseInt(page_array[0]);
@@ -132,7 +139,9 @@ NAV BAR CONTROLS
 		}
 	});
 
-	// set page number on page scrolling
+	//////////////////////////////////////////////////
+	// Set page number on page scrolling event
+	//////////////////////////////////////////////////
 	$('#qv-pages').scroll(function() {
 		var page_array = $('#qv-page-num').text().split('/');
 		var current_page = parseInt(page_array[0]);
@@ -149,12 +158,23 @@ NAV BAR CONTROLS
 		}
 	});
 
-	// read search input
+	//////////////////////////////////////////////////
+	// Clear search input
+	//////////////////////////////////////////////////
+	$('#qv-nav-search-cancel').on('click', function(e){
+		clearSearch();
+	});
+
+	//////////////////////////////////////////////////
+	// Read search input value on input change event
+	//////////////////////////////////////////////////
 	$('#qv-search-input').on('input', function(e){
 		highlightSearch($(this).val());
 	});
 
-	// search next/prev events
+	//////////////////////////////////////////////////
+	// Search next event
+	//////////////////////////////////////////////////
 	var search_position = 0;
 	$('#qv-nav-search-next').on('click', function(e){
 		var count = 0;
@@ -178,6 +198,9 @@ NAV BAR CONTROLS
 		});
 	});
 
+	//////////////////////////////////////////////////
+	// Search prev event
+	//////////////////////////////////////////////////
 	$('#qv-nav-search-prev').on('click', function(e){
 		var count = 1;
 		var prev;
@@ -206,10 +229,192 @@ NAV BAR CONTROLS
 
 /*
 ******************************************************************
-PRIVATE FUNCTIONS
+FUNCTIONS
 ******************************************************************
 */
 
+	var map = {};
+	// add supported formats
+	map['pdf'] = 'Portable Document Format';
+	map['doc'] = 'Microsoft Word';
+	map['docx'] = 'Microsoft Word';
+	map['docm'] = 'Microsoft Word';
+	map['dot'] = 'Microsoft Word';
+	map['dotx'] = 'Microsoft Word';
+	map['dotm'] = 'Microsoft Word';
+	map['xls'] = 'Microsoft Excel';
+	map['xlsx'] = 'Microsoft Excel';
+	map['xlsm'] = 'Microsoft Excel';
+	map['xlsb'] = 'Microsoft Excel';
+	map['ppt'] = 'Microsoft PowerPoint';
+	map['pptx'] = 'Microsoft PowerPoint';
+	map['pps'] = 'Microsoft PowerPoint';
+	map['ppsx'] = 'Microsoft PowerPoint';
+	map['vsd'] = 'Microsoft Visio';
+	map['vdx'] = 'Microsoft Visio';
+	map['vss'] = 'Microsoft Visio';
+	map['vsx'] = 'Microsoft Visio';
+	map['vst'] = 'Microsoft Visio';
+	map['vtx'] = 'Microsoft Visio';
+	map['vsdx'] = 'Microsoft Visio';
+	map['vdw'] = 'Microsoft Visio';
+	map['mpp'] = 'Microsoft Project';
+	map['mpt'] = 'Microsoft Project';
+	map['msg'] = 'Microsoft Outlook';
+	map['eml'] = 'Microsoft Outlook';
+	map['emlx'] = 'Microsoft Outlook';
+	map['odt'] = 'Open Document Text';
+	map['ott'] = 'Open Document Text Template';
+	map['ods'] = 'Open Document Spreadsheet';
+	map['odp'] = 'Open Document Presentation';
+	map['rtf'] = 'Rich Text Format';
+	map['txt'] = 'Plain Text File';
+	map['csv'] = 'Comma-Separated Values';
+	map['html'] = 'HyperText Markup Language';
+	map['mht'] = 'HyperText Markup Language';
+	map['mhtml'] = 'HyperText Markup Language';
+	map['xml'] = 'Extensible Markup Language';
+	map['xps'] = 'XML Paper Specification';
+	map['dxf'] = 'AutoCAD Drawing File Format';
+	map['dwg'] = 'AutoCAD Drawing File Format';
+	map['bmp'] = 'Bitmap Picture';
+	map['gif'] = 'Graphics Interchange Format';
+	map['jpg'] = 'Joint Photographic Experts Group';
+	map['jpe'] = 'Joint Photographic Experts Group';
+	map['jpeg'] = 'Joint Photographic Experts Group';
+	map['jfif'] = 'Joint Photographic Experts Group';
+	map['png'] = 'Portable Network Graphics';
+	map['tiff'] = 'Tagged Image File Format';
+	map['tif'] = 'Tagged Image File Format';
+	map['epub'] = 'Electronic Publication';
+	map['ico'] = 'Windows Icon';
+
+	//////////////////////////////////////////////////
+	// Load file tree from server
+	//////////////////////////////////////////////////
+	function loadFileTree(dir) {
+	    var data = {path: dir};
+	    $.ajax({
+	        type: 'POST',
+	        url: getApplicationPath('loadFileTree'),
+	        data: JSON.stringify(data),
+	        contentType: "application/json",
+	        success: function(returnedData) {
+	        	// hide loading message
+	        	$('#qv-modal-spinner').hide();
+	        	// append files to tree list
+	            $.each(returnedData, function(index, elem) {
+	                var name = elem.name;
+	                var guid = elem.guid;
+	                var size = elem.size;
+	                var new_size = size + ' Bytes';
+	                if((size / 1024 / 1024) > 1){
+	                	new_size = (Math.round((size / 1024 / 1024) * 100) / 100) + ' MB';
+	                }else if((size / 1024) > 1){
+	                	new_size = (Math.round((size / 1024) * 100) / 100) + ' KB';
+	                }
+	                var docType = elem.docType;
+	                var docFormat = (getDocumentFormat(name) == undefined)? '' : getDocumentFormat(name);
+	                $('.qv-modal-table tbody').append(
+	                	'<tr>'+
+							'<td><i class="fa ' + getDocumentIcon(docType) + '"></i></td>'+
+							'<td>' + name + '</td>'+
+							'<td>' + docFormat + '</td>'+
+							'<td>' + new_size + '</td>'+
+	                	'</tr>');
+	            });
+	        },
+	        error: function(xhr, status, error) {
+	          var err = eval("(" + xhr.responseText + ")");
+	          console.log(err.Message);
+	        }
+	    });
+	}
+
+	function getDocumentFormat(filename){
+		return map[filename.split('.').pop()];
+	}
+
+	//////////////////////////////////////////////////
+	// Get css icon id for correspondent file type
+	//////////////////////////////////////////////////
+	function getDocumentIcon(value){
+		switch(value){
+			case 'Cells':
+				return 'fa-file-excel-o';
+			break;
+			case 'Words':
+				return 'fa-file-word-o';
+			break;
+			case 'Slides':
+				return 'fa-file-powerpoint-o';
+			break;
+			case 'Pdf':
+				return 'fa-file-pdf-o';
+			break;
+			case 'Image':
+				return 'fa-file-image-o';
+			break;
+			case 'Email':
+				return 'fa-file-text-o';
+			break;
+			case 'Diagram':
+				return 'fa-file-code-o';
+			break;
+			case 'Project':
+				return 'fa-file-text';
+			break;
+			default:
+				return 'fa-folder';
+			break;
+		}
+	}
+
+	//////////////////////////////////////////////////
+	// Toggle file browser modal
+	//////////////////////////////////////////////////
+	function toggleFileBrowser(open){
+		if(open){
+			$('#fileBrowser')
+				.css('opacity', 0)
+				.fadeIn('fast')
+				.animate(
+					{ opacity: 1 },
+					{ queue: false, duration: 'fast' }
+				);
+			$('#fileBrowser').addClass('in');
+			$('#qv-modal-spinner').show();
+		}else{
+			$('#fileBrowser').removeClass('in');
+			$('#fileBrowser')
+				.css('opacity', 1)
+				.fadeIn('fast')
+				.animate(
+					{ opacity: 0 },
+					{ queue: false, duration: 'fast' }
+				)
+				.css('display', 'none');
+			}
+	}
+
+	//////////////////////////////////////////////////
+	// Get application path for GET/POST requests
+	//////////////////////////////////////////////////
+	function getApplicationPath(context){
+		if(appPath != null){
+			if(appPath.slice(-1) == '/'){
+				return appPath + context;
+			}else{
+				return appPath + "/" + context;
+			}
+		}else{
+			return context;
+		}
+	}
+
+	//////////////////////////////////////////////////
+	// Highlight search
+	//////////////////////////////////////////////////
 	function highlightSearch(text) {
 		clearHighlightSearch();
 		if(text.length > 0){
@@ -235,6 +440,9 @@ PRIVATE FUNCTIONS
   		}
 	}
 
+	//////////////////////////////////////////////////
+	// Clear previously highlighted search
+	//////////////////////////////////////////////////
 	function clearHighlightSearch(){
 		// get src html
 	    var srcHtml = $('#qv-pages').html();
@@ -243,6 +451,9 @@ PRIVATE FUNCTIONS
 	    $('#qv-pages').html(newHtml);
 	}
 
+	//////////////////////////////////////////////////
+	// Set zoom value and zoom document
+	//////////////////////////////////////////////////
 	function setZoomValue(zoom_val){
 		// adapt value for css
 		var zoom_val_non_webkit = zoom_val / 100;
@@ -259,6 +470,9 @@ PRIVATE FUNCTIONS
 		$('#qv-panzoom').attr('style', style);
 	}
 
+	//////////////////////////////////////////////////
+	// Search for element by class (recursive)
+	//////////////////////////////////////////////////
 	function getElementByClass(target, class_id){
 		var elem = target.find(class_id);
 		if(!elem.hasClass(class_id.slice(1))){
@@ -268,6 +482,9 @@ PRIVATE FUNCTIONS
 		}
 	}
 
+	//////////////////////////////////////////////////
+	// Toggle top navigation menus (zoom values, search)
+	//////////////////////////////////////////////////
 	function toggleNavDropdown(target){
 		var isOpened = target.hasClass('opened');
 		if(!isOpened){
@@ -291,43 +508,18 @@ PRIVATE FUNCTIONS
 		}
 	}
 
+	//////////////////////////////////////////////////
+	// Clear search input
+	//////////////////////////////////////////////////
 	function clearSearch(){
 		$('#qv-nav-search-container :input').val('');
 		clearHighlightSearch();
 	}
 
-	function loadFilesTree() {
-	    var data = {path: ''};
-	    $.ajax({
-	        type: 'POST',
-	        url: 'loadFilesTree',
-	        data: JSON.stringify(data),
-	        contentType: "application/json",
-	        success: function(returnedData) {
-	            $.each(returnedData, function(index, elements) {
-	                $.each(elements, function(index, elem) {
-	                    var name = elem.name;
-	                    var path = elem.path;
-	                    var size = elem.size;
-	                    var docType = elem.docType;
-	                    $('.qv-modal-table tbody').append(
-	                    	'<tr>'+
-								'<td><i class="fa fa-file-word-o"></i></td>'+
-								'<td>' + name + '</td>'+
-								'<td>' + docType + '</td>'+
-								'<td>' + size + ' KB</td>'+
-		                	'</tr>');
-	                });
-	            });
-	        },
-	        error: function(xhr, status, error) {
-              var err = eval("(" + xhr.responseText + ")");
-              console.log(err.Message);
-            }
-	    });
-	}
-
+//
+// END of document ready function
 });
+
 
 /*
 ******************************************************************
@@ -344,7 +536,6 @@ STATIC VALUES
 */
 	var qv_navbar = '#qv-navbar';
 
-
 /*
 ******************************************************************
 METHODS
@@ -354,6 +545,7 @@ METHODS
 		init : function( options ) {
 			// set defaults
 			var defaults = {
+				applicationPath: null,
 				zoom : true,
 				pageSelector: true,
 				search: true,
@@ -363,6 +555,9 @@ METHODS
 
 			// assembly html base
 			this.append(getHtmlBase);
+
+			// set option params
+			appPath = options.applicationPath;
 
 			// assembly nav bar
 			if(options.zoom){
@@ -436,6 +631,7 @@ HTML MARKUP
 			            '<h4 class="qv-modal-title">Open Document</h4>'+
 			          '</div>'+
 			          '<div class="qv-modal-body">'+
+			          	'<div id="qv-modal-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
 			            '<table class="qv-modal-table">'+
 			              '<thead>'+
 			                '<tr>'+

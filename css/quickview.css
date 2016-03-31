@@ -287,6 +287,15 @@ MODAL
     cursor: pointer;
     font-size: 12px;
 }
+#qv-modal-spinner{
+    position: absolute;
+    background-color: #ffffff;
+    width: 560px;
+    height: 50px;
+    text-align: center;
+    font-size: 16px;
+    display: none;
+}
 /*
 ******************************************
 Document types
@@ -335,6 +344,11 @@ Fade annimation
     transform: translate(0, 0);
 }
 
+/*
+******************************************
+Search highlight
+******************************************
+*/
 .qv-highlight{
     background-color: yellow;
 }
