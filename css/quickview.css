@@ -210,6 +210,9 @@ PAGES
 .qv-page .qv-wrapper {
     padding: 0;
 }
+.qv-page-spinner{
+    margin-top: 150px;
+}
 /*
 ******************************************
 MODAL
@@ -276,7 +279,7 @@ MODAL
 }
 
 .qv-modal-footer{
-    height: 67px;
+    height: 25px;
 }
 .qv-modal-footer > .btn{
     float: right;

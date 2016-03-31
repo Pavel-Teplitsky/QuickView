@@ -393,10 +393,13 @@ FUNCTIONS
 	        		var pageWidth = elem.width;
 	        		var pageHeight = elem.height;
 	        		// apend empty page
-	        		$('#qv-panzoom').append('<div id="qv-page' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + '; min-height: ' + pageHeight + ';"></div>');
+	        		$('#qv-panzoom').append('<div id="qv-page' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + '; min-height: ' + pageHeight + ';">'+
+	        			'<div class="qv-page-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
+	        			'</div>');
 	        		getPageHtmlContent(documentGuid, pageNumber, function(htmlData){
 	        			// apend page content
 	        			$('#qv-page' + pageNumber).append('<div class="qv-wrapper">' + htmlData + '</div>');
+	        			$('#qv-page' + pageNumber).find('.qv-page-spinner').hide();
 	        		});
 	        	});
 	        },
@@ -751,8 +754,7 @@ HTML MARKUP
 			            '</table>'+
 			          '</div>'+
 			          '<div class="qv-modal-footer">'+
-			            '<div class="btn qv-modal-close-action">Cancel</div>'+
-			            '<div class="btn qv-modal-close-action">Open</div>'+
+			            
 			          '</div>'+
 			        '</div><!-- /.modal-content -->'+
 			      '</div><!-- /.modal-dialog -->'+
