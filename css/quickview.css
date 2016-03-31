@@ -127,10 +127,6 @@ NAV BUTTONS
     background-color: #e5e5e5;
     padding: 0 !important;
 }
-#qv-navbar .open{
-    color: #ffffff;
-}
-
 #qv-zoom-val-container{
     min-width: 50px;
 }
@@ -147,7 +143,7 @@ SEARCH
     display: none;
     right: 0px;
     float: left;
-    top: 50px;
+    top: 49px;
     z-index: 1;
 }
 #qv-nav-search-container input[type='text']{
@@ -156,6 +152,9 @@ SEARCH
     height: 20px;
     width: 215px;
     padding: 5px;
+}
+#qv-nav-search-container input[type='text']:focus{
+    outline: none;
 }
 #qv-nav-search-cancel{
     color: #676767;
