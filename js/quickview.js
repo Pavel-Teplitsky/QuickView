@@ -46,13 +46,33 @@ NAV BAR CONTROLS
 		toggleFileBrowser(false);
 	});
 
-	$('.qv-modal-table tbody').on('click', 'tr td:nth-child(2)', function(e){
+	//////////////////////////////////////////////////
+	// File or directory click event from file tree
+	//////////////////////////////////////////////////
+	$('.qv-modal-table').on('click', '.qv-filetree-name', function(e){
 		var isDir = $(this).parent().find('.fa-folder').hasClass('fa-folder');
 		if(isDir){
-			console.log('dir');
+			// if directory -> browse
+			if(currentDirectory.length > 0){
+				currentDirectory = currentDirectory + "/" + $(this).text();
+			}else{
+				currentDirectory = $(this).text();
+			}
+			loadFileTree(currentDirectory);
 		}else{
-			console.log('file');
+			// if document -> open
+			toggleFileBrowser(false);
+			openDocument($(this).attr('data-guid'));
 		}
+	});
+
+	$('.qv-modal-table').on('click', '.qv-filetree-up', function(e){
+		if(currentDirectory.length > 0 && currentDirectory.indexOf('/') == -1){
+			currentDirectory = '';
+		}else{
+			currentDirectory = currentDirectory.replace(/\/[^\/]+\/?$/, '');	
+		}
+		loadFileTree(currentDirectory);
 	});
 
 	//////////////////////////////////////////////////
@@ -233,6 +253,10 @@ FUNCTIONS
 ******************************************************************
 */
 
+	//////////////////////////////////////////////////
+	// Load file tree from server
+	//////////////////////////////////////////////////
+	var currentDirectory;
 	var map = {};
 	// add supported formats
 	map['pdf'] = 'Portable Document Format';
@@ -289,11 +313,9 @@ FUNCTIONS
 	map['epub'] = 'Electronic Publication';
 	map['ico'] = 'Windows Icon';
 
-	//////////////////////////////////////////////////
-	// Load file tree from server
-	//////////////////////////////////////////////////
 	function loadFileTree(dir) {
 	    var data = {path: dir};
+	    currentDirectory = dir;
 	    $.ajax({
 	        type: 'POST',
 	        url: getApplicationPath('loadFileTree'),
@@ -302,27 +324,104 @@ FUNCTIONS
 	        success: function(returnedData) {
 	        	// hide loading message
 	        	$('#qv-modal-spinner').hide();
+	        	// clear tree list from previous data
+	        	$('.qv-modal-table tbody').html(
+        			'<tr>'+
+						'<td class="text-center"><i class="fa fa-level-up"></i></td>'+
+						'<td class="qv-filetree-up">...</td>'+
+						'<td></td>'+
+						'<td></td>'+
+	                '</tr>');
 	        	// append files to tree list
-	            $.each(returnedData, function(index, elem) {
+	            $.each(returnedData, function(index, elem){
+	            	// document name
 	                var name = elem.name;
+	                // document guid
 	                var guid = elem.guid;
+	                // document size
 	                var size = elem.size;
+	                // document size in bytes, kb and mb
 	                var new_size = size + ' Bytes';
 	                if((size / 1024 / 1024) > 1){
 	                	new_size = (Math.round((size / 1024 / 1024) * 100) / 100) + ' MB';
 	                }else if((size / 1024) > 1){
 	                	new_size = (Math.round((size / 1024) * 100) / 100) + ' KB';
 	                }
+	                // document type (words, cells, etc)
 	                var docType = elem.docType;
+	                // document format
 	                var docFormat = (getDocumentFormat(name) == undefined)? '' : getDocumentFormat(name);
+	                // append document
 	                $('.qv-modal-table tbody').append(
 	                	'<tr>'+
 							'<td><i class="fa ' + getDocumentIcon(docType) + '"></i></td>'+
-							'<td>' + name + '</td>'+
+							'<td class="qv-filetree-name" data-guid="' + guid + '">' + name + '</td>'+
 							'<td>' + docFormat + '</td>'+
 							'<td>' + new_size + '</td>'+
 	                	'</tr>');
 	            });
+	        },
+	        error: function(xhr, status, error) {
+	          var err = eval("(" + xhr.responseText + ")");
+	          console.log(err.Message);
+	        }
+	    });
+	}
+
+	//////////////////////////////////////////////////
+	// Open document
+	//////////////////////////////////////////////////
+	function openDocument(documentGuid){
+		// get document description
+		var data = {guid: documentGuid};
+	    $.ajax({
+	        type: 'POST',
+	        url: getApplicationPath('loadDocumentDescription'),
+	        data: JSON.stringify(data),
+	        contentType: "application/json",
+	        success: function(returnedData) {
+	        	// get total page number
+	        	var totalPagaNumber = returnedData.length;
+	        	// clear previously opened document pages
+	        	$('#qv-panzoom').html('');
+	        	// set total page number on navigation panel
+	        	$('#qv-page-num').text('1/' + totalPagaNumber);
+	        	$.each(returnedData, function(index, elem){
+	        		var pageNumber = elem.number;
+	        		var pageWidth = elem.width;
+	        		var pageHeight = elem.height;
+	        		console.log('width: ' + pageWidth);
+	        		console.log('height' + pageHeight);
+	        		if(index == 0){
+		        		getPageHtmlContent(documentGuid, pageNumber, function(htmlData){
+		        			$('#qv-panzoom').append(
+		        			'<div id="qv-page' + pageNumber + '" class="qv-page">'+
+								'<div class="qv-wrapper">' + htmlData + '</div>'+
+							'</div>'
+							);
+		        		});
+	        		}else{
+	        			return null;
+	        		}
+	        	});
+	        },
+	        error: function(xhr, status, error) {
+	          var err = eval("(" + xhr.responseText + ")");
+	          console.log(err.Message);
+	        }
+	    });
+	}
+
+	function getPageHtmlContent(documentGuid, pageNumber, htmlData){
+		// get document description
+		var data = {guid: documentGuid, page: pageNumber};
+	    $.ajax({
+	        type: 'POST',
+	        url: getApplicationPath('loadDocumentPage'),
+	        data: JSON.stringify(data),
+	        contentType: "application/json",
+	        success: function(returnedData) {
+	        	htmlData(returnedData);
 	        },
 	        error: function(xhr, status, error) {
 	          var err = eval("(" + xhr.responseText + ")");
@@ -642,12 +741,6 @@ HTML MARKUP
 			                '</tr>'+
 			              '</thead>'+
 			              '<tbody>'+
-			                '<tr>'+
-			                  '<td class="text-center"><i class="fa fa-level-up"></i></td>'+
-			                  '<td>...</td>'+
-			                  '<td></td>'+
-			                  '<td></td>'+
-			                '</tr>'+
 			                // list of files
 			              '</tbody>'+
 			            '</table>'+

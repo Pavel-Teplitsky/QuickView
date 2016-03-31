@@ -180,7 +180,7 @@ PAGES
 */
 #qv-pages {
     position: fixed;
-    width: 100%;
+    /* width: 100%; */
     top: 50px;
     bottom: 0;
     overflow-x: hidden;
@@ -190,7 +190,7 @@ PAGES
     /* Hides the scrollbar */
     padding-right: 15px;
     left: 15px;
-
+    right: 15px;
     transition:all 0.4s;
     overflow: visible;
 }
@@ -200,17 +200,14 @@ PAGES
     transform-origin: 50% 50% 0px;
 }
 .qv-page {
-    width: 700px;
-    height: 990px;
     background-color: #ffffff;
     margin: 0 auto 20px auto;
-
     -webkit-box-shadow: 0px 4px 12px -4px rgba(0,0,0,0.38);
     -moz-box-shadow: 0px 4px 12px -4px rgba(0,0,0,0.38);
     box-shadow: 0px 4px 12px -4px rgba(0,0,0,0.38);
 }
 .qv-page .qv-wrapper {
-    padding: 80px 80px;
+    padding: 0;
 }
 /*
 ******************************************
