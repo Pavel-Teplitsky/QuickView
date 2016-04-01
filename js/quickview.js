@@ -6,7 +6,81 @@
  * @version 1.0.0
  */
 
+ /*
+******************************************************************
+******************************************************************
+GLOBAL VARIABLES
+******************************************************************
+******************************************************************
+*/
+var applicationPath;
+var preloadPageCount;
+
 $(document).ready(function(){
+	/*
+******************************************************************
+PRIVATE VARIABLES
+******************************************************************
+*/
+	var documentGuid;
+	var currentDirectory;
+
+	var map = {};
+	// add supported formats
+	map['pdf'] = 'Portable Document Format';
+	map['doc'] = 'Microsoft Word';
+	map['docx'] = 'Microsoft Word';
+	map['docm'] = 'Microsoft Word';
+	map['dot'] = 'Microsoft Word';
+	map['dotx'] = 'Microsoft Word';
+	map['dotm'] = 'Microsoft Word';
+	map['xls'] = 'Microsoft Excel';
+	map['xlsx'] = 'Microsoft Excel';
+	map['xlsm'] = 'Microsoft Excel';
+	map['xlsb'] = 'Microsoft Excel';
+	map['ppt'] = 'Microsoft PowerPoint';
+	map['pptx'] = 'Microsoft PowerPoint';
+	map['pps'] = 'Microsoft PowerPoint';
+	map['ppsx'] = 'Microsoft PowerPoint';
+	map['vsd'] = 'Microsoft Visio';
+	map['vdx'] = 'Microsoft Visio';
+	map['vss'] = 'Microsoft Visio';
+	map['vsx'] = 'Microsoft Visio';
+	map['vst'] = 'Microsoft Visio';
+	map['vtx'] = 'Microsoft Visio';
+	map['vsdx'] = 'Microsoft Visio';
+	map['vdw'] = 'Microsoft Visio';
+	map['mpp'] = 'Microsoft Project';
+	map['mpt'] = 'Microsoft Project';
+	map['msg'] = 'Microsoft Outlook';
+	map['eml'] = 'Microsoft Outlook';
+	map['emlx'] = 'Microsoft Outlook';
+	map['odt'] = 'Open Document Text';
+	map['ott'] = 'Open Document Text Template';
+	map['ods'] = 'Open Document Spreadsheet';
+	map['odp'] = 'Open Document Presentation';
+	map['rtf'] = 'Rich Text Format';
+	map['txt'] = 'Plain Text File';
+	map['csv'] = 'Comma-Separated Values';
+	map['html'] = 'HyperText Markup Language';
+	map['mht'] = 'HyperText Markup Language';
+	map['mhtml'] = 'HyperText Markup Language';
+	map['xml'] = 'Extensible Markup Language';
+	map['xps'] = 'XML Paper Specification';
+	map['dxf'] = 'AutoCAD Drawing File Format';
+	map['dwg'] = 'AutoCAD Drawing File Format';
+	map['bmp'] = 'Bitmap Picture';
+	map['gif'] = 'Graphics Interchange Format';
+	map['jpg'] = 'Joint Photographic Experts Group';
+	map['jpe'] = 'Joint Photographic Experts Group';
+	map['jpeg'] = 'Joint Photographic Experts Group';
+	map['jfif'] = 'Joint Photographic Experts Group';
+	map['png'] = 'Portable Network Graphics';
+	map['tiff'] = 'Tagged Image File Format';
+	map['tif'] = 'Tagged Image File Format';
+	map['epub'] = 'Electronic Publication';
+	map['ico'] = 'Windows Icon';
+
 /*
 ******************************************************************
 NAV BAR CONTROLS
@@ -60,10 +134,14 @@ NAV BAR CONTROLS
 		}else{
 			// if document -> open
 			toggleFileBrowser(false);
-			openDocument($(this).attr('data-guid'));
+			documentGuid = $(this).attr('data-guid');
+			openDocument();
 		}
 	});
 
+	//////////////////////////////////////////////////
+	// Go to parent directory event from file tree
+	//////////////////////////////////////////////////
 	$('.qv-modal-table').on('click', '.qv-filetree-up', function(e){
 		if(currentDirectory.length > 0 && currentDirectory.indexOf('/') == -1){
 			currentDirectory = '';
@@ -158,23 +236,43 @@ NAV BAR CONTROLS
 	});
 
 	//////////////////////////////////////////////////
-	// Set page number on page scrolling event
+	// Page scrolling event
 	//////////////////////////////////////////////////
 	$('#qv-pages').scroll(function() {
-		var page_array = $('#qv-page-num').text().split('/');
-		var current_page = parseInt(page_array[0]);
-		var last_page = parseInt(page_array[1]);
-		var zoom_val = $('#qv-panzoom').css('zoom');
-		if(zoom_val == 'undefined'){
-			zoom_val = 1;
+		var pagesAttr = $('#qv-page-num').text().split('/');
+		var currentPage = parseInt(pagesAttr[0]);
+		var lastPage = parseInt(pagesAttr[1]);
+		var zoomValue = $('#qv-panzoom').css('zoom');
+		if(zoomValue == 'undefined'){
+			zoomValue = 1;
 		}
 	    var scrollPosition = $(this).scrollTop();
-	    var page_height = $('.qv-page').height();
-	    var page_position = parseInt(Math.floor(scrollPosition / page_height / zoom_val)) + 1;
-	    if(current_page != page_position){
-	    	$('#qv-page-num').text(page_position + '/' + last_page);
+	    var pageHeight = $('#qv-page'+currentPage).height() + 20 /* plus margin */;
+	    var pagePosition = parseInt(Math.floor(scrollPosition / pageHeight / zoomValue)) + 1;
+	    if(pagePosition <= lastPage){
+		    // change current page value
+		    if(pagePosition != currentPage){
+		    	$('#qv-page-num').text(pagePosition + '/' + lastPage);
+		    	
+			}
+			// if((scrollPosition/currentPage - pageHeight < -100) && (scrollPosition/currentPage - pageHeight > -200)){
+			// 	console.log('ok');
+			// 	appendHtmlContent(currentPage + 1);
+			// }
+			// load next page
+			if((pagePosition == currentPage) && (pagePosition != lastPage)){
+				//if(!loading){
+					//loading = true;
+		  			appendHtmlContent(currentPage + 1);
+		  		//}
+			}
+			// console.log(scrollPosition + ' - ' + $('#qv-page' + currentPage).innerHeight() + ' - ' + $('#qv-page' + currentPage)[0].scrollHeight);
+			// if(scrollPosition + $(this).innerHeight() >= $('#qv-page' + currentPage)[0].scrollHeight){
+			// 	console.log('ok');
+			// }
 		}
 	});
+	var loading = false;
 
 	//////////////////////////////////////////////////
 	// Clear search input
@@ -254,63 +352,6 @@ FUNCTIONS
 	//////////////////////////////////////////////////
 	// Load file tree from server
 	//////////////////////////////////////////////////
-	var currentDirectory;
-	var map = {};
-	// add supported formats
-	map['pdf'] = 'Portable Document Format';
-	map['doc'] = 'Microsoft Word';
-	map['docx'] = 'Microsoft Word';
-	map['docm'] = 'Microsoft Word';
-	map['dot'] = 'Microsoft Word';
-	map['dotx'] = 'Microsoft Word';
-	map['dotm'] = 'Microsoft Word';
-	map['xls'] = 'Microsoft Excel';
-	map['xlsx'] = 'Microsoft Excel';
-	map['xlsm'] = 'Microsoft Excel';
-	map['xlsb'] = 'Microsoft Excel';
-	map['ppt'] = 'Microsoft PowerPoint';
-	map['pptx'] = 'Microsoft PowerPoint';
-	map['pps'] = 'Microsoft PowerPoint';
-	map['ppsx'] = 'Microsoft PowerPoint';
-	map['vsd'] = 'Microsoft Visio';
-	map['vdx'] = 'Microsoft Visio';
-	map['vss'] = 'Microsoft Visio';
-	map['vsx'] = 'Microsoft Visio';
-	map['vst'] = 'Microsoft Visio';
-	map['vtx'] = 'Microsoft Visio';
-	map['vsdx'] = 'Microsoft Visio';
-	map['vdw'] = 'Microsoft Visio';
-	map['mpp'] = 'Microsoft Project';
-	map['mpt'] = 'Microsoft Project';
-	map['msg'] = 'Microsoft Outlook';
-	map['eml'] = 'Microsoft Outlook';
-	map['emlx'] = 'Microsoft Outlook';
-	map['odt'] = 'Open Document Text';
-	map['ott'] = 'Open Document Text Template';
-	map['ods'] = 'Open Document Spreadsheet';
-	map['odp'] = 'Open Document Presentation';
-	map['rtf'] = 'Rich Text Format';
-	map['txt'] = 'Plain Text File';
-	map['csv'] = 'Comma-Separated Values';
-	map['html'] = 'HyperText Markup Language';
-	map['mht'] = 'HyperText Markup Language';
-	map['mhtml'] = 'HyperText Markup Language';
-	map['xml'] = 'Extensible Markup Language';
-	map['xps'] = 'XML Paper Specification';
-	map['dxf'] = 'AutoCAD Drawing File Format';
-	map['dwg'] = 'AutoCAD Drawing File Format';
-	map['bmp'] = 'Bitmap Picture';
-	map['gif'] = 'Graphics Interchange Format';
-	map['jpg'] = 'Joint Photographic Experts Group';
-	map['jpe'] = 'Joint Photographic Experts Group';
-	map['jpeg'] = 'Joint Photographic Experts Group';
-	map['jfif'] = 'Joint Photographic Experts Group';
-	map['png'] = 'Portable Network Graphics';
-	map['tiff'] = 'Tagged Image File Format';
-	map['tif'] = 'Tagged Image File Format';
-	map['epub'] = 'Electronic Publication';
-	map['ico'] = 'Windows Icon';
-
 	function loadFileTree(dir) {
 	    var data = {path: dir};
 	    currentDirectory = dir;
@@ -369,7 +410,7 @@ FUNCTIONS
 	//////////////////////////////////////////////////
 	// Open document
 	//////////////////////////////////////////////////
-	function openDocument(documentGuid){
+	function openDocument(){
 		// get document description
 		var data = {guid: documentGuid};
 	    $.ajax({
@@ -384,23 +425,22 @@ FUNCTIONS
 	        	$('#qv-panzoom').html('');
 	        	// set total page number on navigation panel
 	        	$('#qv-page-num').text('1/' + totalPagaNumber);
+	        	// loop though pages
 	        	$.each(returnedData, function(index, elem){
-	        		// break loop on after preloadPagesCount
-	        		if((preloadPageCount > 0) && (index > (preloadPageCount - 1))){
-	        			return false;
-	        		}
+	        		// add document description
 	        		var pageNumber = elem.number;
 	        		var pageWidth = elem.width;
 	        		var pageHeight = elem.height;
-	        		// apend empty page
-	        		$('#qv-panzoom').append('<div id="qv-page' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + '; min-height: ' + pageHeight + ';">'+
-	        			'<div class="qv-page-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
-	        			'</div>');
-	        		getPageHtmlContent(documentGuid, pageNumber, function(htmlData){
-	        			// apend page content
-	        			$('#qv-page' + pageNumber).append('<div class="qv-wrapper">' + htmlData + '</div>');
-	        			$('#qv-page' + pageNumber).find('.qv-page-spinner').hide();
-	        		});
+	        		// append empty page
+	        		$('#qv-panzoom').append(
+	        			'<div id="qv-page' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + '; min-height: ' + pageHeight + ';">'+
+						'<div class="qv-page-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
+						'</div>'
+						);
+	        		// check if preload page count is set
+	        		if((preloadPageCount == 0) || (index <= (preloadPageCount - 1))){
+	        			appendHtmlContent(pageNumber);
+	        		}
 	        	});
 	        },
 	        error: function(xhr, status, error) {
@@ -411,9 +451,31 @@ FUNCTIONS
 	}
 
 	//////////////////////////////////////////////////
+	// Append html content to an empty page
+	//////////////////////////////////////////////////
+	function appendHtmlContent(pageNumber){
+		if(!$('#qv-page' + pageNumber).hasClass('loaded')){
+			//console.log(pageNumber);
+			$('#qv-page' + pageNumber).addClass('loaded');
+			getPageHtmlContent(pageNumber, function(htmlData){
+				// apend page content
+				$('#qv-page' + pageNumber).append('<div class="qv-wrapper">' + htmlData + '</div>');
+				$('#qv-page' + pageNumber).find('.qv-page-spinner').hide();
+			});
+		}
+	}
+
+	// $(document).ajaxStop(function(){
+	// 	console.log('ok');
+	//     $('.qv-page').lazyload({ 
+	//         effect: "fadeIn" 
+	//     }).addClass("lazy");
+	// });
+
+	//////////////////////////////////////////////////
 	// Get page html content
 	//////////////////////////////////////////////////
-	function getPageHtmlContent(documentGuid, pageNumber, htmlData){
+	function getPageHtmlContent(pageNumber, htmlData){
 		// get document description
 		var data = {guid: documentGuid, page: pageNumber};
 	    $.ajax({
@@ -422,6 +484,7 @@ FUNCTIONS
 	        data: JSON.stringify(data),
 	        contentType: "application/json",
 	        success: function(returnedData) {
+	        	//loading = false;
 	        	htmlData(returnedData);
 	        	$('#qv-page' + pageNumber).attr('style', '');
 	        },
@@ -624,8 +687,6 @@ FUNCTIONS
 // END of document ready function
 });
 
-var applicationPath;
-var preloadPageCount;
 /*
 ******************************************************************
 ******************************************************************
