@@ -98,9 +98,15 @@ NAV BAR CONTROLS
 		}
 		var nav_drop = getElementByClass($(this), '.qv-nav-dropdown');
 		toggleNavDropdown(nav_drop);
-
 		//set focus to search input
 		$('#qv-search-input').focus();
+	});
+
+	//////////////////////////////////////////////////
+	// Prevent toggle events on search container click
+	//////////////////////////////////////////////////
+	$('#qv-nav-search-container').on('click', function(e){
+		e.stopPropagation();
 	});
 
 	//////////////////////////////////////////////////
@@ -464,7 +470,6 @@ FUNCTIONS
 	//////////////////////////////////////////////////
 	function appendHtmlContent(pageNumber){
 		if(!$('#qv-page' + pageNumber).hasClass('loaded')){
-			//console.log(pageNumber);
 			$('#qv-page' + pageNumber).addClass('loaded');
 			getPageHtmlContent(pageNumber, function(htmlData){
 				// apend page content
@@ -473,13 +478,6 @@ FUNCTIONS
 			});
 		}
 	}
-
-	// $(document).ajaxStop(function(){
-	// 	console.log('ok');
-	//     $('.qv-page').lazyload({ 
-	//         effect: "fadeIn" 
-	//     }).addClass("lazy");
-	// });
 
 	//////////////////////////////////////////////////
 	// Get page html content
@@ -594,11 +592,16 @@ FUNCTIONS
 	function highlightSearch(text) {
 		clearHighlightSearch();
 		if(text.length > 1){
-			var textNodes = $('#qv-pages').find('*').contents().filter(function() { 
-				return this.nodeType === 3 
+			// var styleParent = $('#qv-pages').find('style').parent();;
+			// var style = $('#qv-pages').find('style');
+			// style.remove();
+			// var textNodes = $('#qv-pages').find('*').contents().filter(function() { 
+			// 	return this.nodeType === 3;
+			// });
+			// styleParent.append(style);
+			var textNodes = $('.qv-wrapper div').find('*').contents().filter(function() { 
+				return this.nodeType === 3;
 			});
-			//console.log($('#qv-pages').find('*').html());
-			//console.log($('#qv-pages').find('*').html().replace('<style([\\s\\S]+?)</style>', ''));
 			textNodes.each(function() {
 				var $this = $(this);
 				var content = $this.text();
@@ -880,13 +883,13 @@ HTML MARKUP
 	}
 
 	function getHtmlNavSearchPanel(){
-		return '<li>'+
-					'<i class="fa fa-search qv-nav-toggle"></i>'+
+		return '<li class="qv-nav-toggle">'+
+					'<i class="fa fa-search"></i>'+
 					'<div id="qv-nav-search-container" class="qv-nav-dropdown">'+
 						'<input type="text" id="qv-search-input"/>'+
-						'<div id="qv-nav-search-cancel"><i class="fa fa-times"></i></div>'+
 						'<div class="qv-nav-search-btn" id="qv-nav-search-prev"><i class="fa fa-chevron-left"></i></div>'+
 						'<div class="qv-nav-search-btn" id="qv-nav-search-next"><i class="fa fa-chevron-right"></i></div>'+
+						'<div class="qv-nav-search-btn" id="qv-nav-search-cancel"><i class="fa fa-times"></i></div>'+
 					'</div>'+
 				'</li>';
 	}
