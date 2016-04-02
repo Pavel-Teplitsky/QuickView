@@ -493,7 +493,9 @@ FUNCTIONS
 	        success: function(returnedData) {
 	        	//loading = false;
 	        	htmlData(returnedData);
-	        	$('#qv-page' + pageNumber).attr('style', '');
+	        	// zoom in/out correct scaling
+	        	var qvpage = $('#qv-page' + pageNumber);
+	        	qvpage.attr('style', 'width:' + qvpage.innerWidth() + ';' + 'height:' + qvpage.innerHeight() + ';');
 	        },
 	        error: function(xhr, status, error) {
 	          var err = eval("(" + xhr.responseText + ")");
