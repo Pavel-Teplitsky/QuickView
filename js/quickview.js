@@ -201,7 +201,7 @@ NAV BAR CONTROLS
 	//////////////////////////////////////////////////
 	$('#qv-btn-zoom-out').on('click', function(e){
 		var zoom_val = parseInt($('#qv-zoom-value').text().slice(0, -1));
-		if(zoom_val > 20){
+		if(zoom_val > 30){
 			zoom_val = zoom_val - 10;
 		}
 		setZoomValue(zoom_val);
@@ -211,27 +211,37 @@ NAV BAR CONTROLS
 	// Page navigation event
 	//////////////////////////////////////////////////
 	$('.qv-nav-btn-pages').on('click', function(e){
-		var page_array = $('#qv-page-num').text().split('/');
-		var current_page = parseInt(page_array[0]);
-		var last_page = parseInt(page_array[1]);
+		var pagesAttr = $('#qv-page-num').text().split('/');
+		var currentPageNumber = parseInt(pagesAttr[0]);
+		var lastPageNumber = parseInt(pagesAttr[1]);
 		// get clicked id
 		switch($(this).attr('id')){
 			case 'qv-btn-page-first':
-				current_page = 1;
+				currentPageNumber = 1;
 			break;
 			case 'qv-btn-page-prev':
-				current_page = current_page - 1;
+				currentPageNumber = currentPageNumber - 1;
 			break;
 			case 'qv-btn-page-next':
-				current_page = current_page + 1;
+				currentPageNumber = currentPageNumber + 1;
 			break;
 			case 'qv-btn-page-last':
-				current_page = last_page;
+				currentPageNumber = lastPageNumber;
 			break;
 		}
 		// scroll to page
-		if(current_page > 0 && current_page <= last_page){
-			$('#qv-pages').scrollTo('#qv-page' + current_page);
+		if(currentPageNumber > 0 && currentPageNumber <= lastPageNumber){
+			// get zoom value
+			var zoomValue = $('#qv-panzoom').css('zoom');
+			if(zoomValue == 'undefined'){
+				zoomValue = 100;
+			}else{
+				zoomValue = zoomValue * 100;
+			}
+			// scroll
+			$('#qv-pages').scrollTo('#qv-page' + currentPageNumber, {
+				zoom: zoomValue
+			});
 		}
 	});
 
@@ -240,36 +250,35 @@ NAV BAR CONTROLS
 	//////////////////////////////////////////////////
 	$('#qv-pages').scroll(function() {
 		var pagesAttr = $('#qv-page-num').text().split('/');
-		var currentPage = parseInt(pagesAttr[0]);
-		var lastPage = parseInt(pagesAttr[1]);
+		// get current page number
+		var currentPageNumber = parseInt(pagesAttr[0]);
+		// get last page number
+    	var lastPageNumber = parseInt(pagesAttr[1]);
+    	// get zoom value
 		var zoomValue = $('#qv-panzoom').css('zoom');
 		if(zoomValue == 'undefined'){
 			zoomValue = 1;
 		}
+		// get scroll position
 	    var scrollPosition = $(this).scrollTop();
-	    var pageHeight = $('#qv-page'+currentPage).height() + 20 /* plus margin */;
+	    // get current page height
+	    var pageHeight = $('#qv-page' + currentPageNumber).height() + 20 /* plus margin */;
+	    // get scroll relative position to current page
 	    var pagePosition = parseInt(Math.floor(scrollPosition / pageHeight / zoomValue)) + 1;
-	    if(pagePosition <= lastPage){
+	    // update values and perform page lazy load
+	    if((pagePosition > 0) && (pagePosition <= lastPageNumber)){
 		    // change current page value
-		    if(pagePosition != currentPage){
-		    	$('#qv-page-num').text(pagePosition + '/' + lastPage);
-		    	
+		    if(pagePosition != currentPageNumber){
+				// set current page number
+		    	$('#qv-page-num').text(pagePosition + '/' + lastPageNumber);
 			}
-			// if((scrollPosition/currentPage - pageHeight < -100) && (scrollPosition/currentPage - pageHeight > -200)){
-			// 	console.log('ok');
-			// 	appendHtmlContent(currentPage + 1);
-			// }
 			// load next page
-			if((pagePosition == currentPage) && (pagePosition != lastPage)){
+			if((pagePosition == currentPageNumber) && (pagePosition != lastPageNumber)){
 				//if(!loading){
 					//loading = true;
-		  			appendHtmlContent(currentPage + 1);
+		  			appendHtmlContent(currentPageNumber + 1);
 		  		//}
 			}
-			// console.log(scrollPosition + ' - ' + $('#qv-page' + currentPage).innerHeight() + ' - ' + $('#qv-page' + currentPage)[0].scrollHeight);
-			// if(scrollPosition + $(this).innerHeight() >= $('#qv-page' + currentPage)[0].scrollHeight){
-			// 	console.log('ok');
-			// }
 		}
 	});
 	var loading = false;
@@ -588,6 +597,8 @@ FUNCTIONS
 			var textNodes = $('#qv-pages').find('*').contents().filter(function() { 
 				return this.nodeType === 3 
 			});
+			//console.log($('#qv-pages').find('*').html());
+			//console.log($('#qv-pages').find('*').html().replace('<style([\\s\\S]+?)</style>', ''));
 			textNodes.each(function() {
 				var $this = $(this);
 				var content = $this.text();
@@ -897,15 +908,17 @@ JQUERY SCROLL TO PLUGIN
 $.fn.scrollTo = function( target, options, callback ){
 	if(typeof options == 'function' && arguments.length == 2){ callback = options; options = target; }
 		var settings = $.extend({
-		scrollTarget  : target,
-		offsetTop     : 50,
-		duration      : 500,
-		easing        : 'swing'
+			scrollTarget : target,
+			offsetTop    : 50,
+			duration     : 500,
+			zoom         : 100,
+			easing       : 'swing'
 		}, options);
 		return this.each(function(){
 			var scrollPane = $(this);
 			var scrollTarget = (typeof settings.scrollTarget == "number") ? settings.scrollTarget : $(settings.scrollTarget);
-			var scrollY = (typeof scrollTarget == "number") ? scrollTarget : scrollTarget.offset().top + scrollPane.scrollTop() - parseInt(settings.offsetTop);
+			var scrollYTop = scrollTarget.offset().top * settings.zoom / 100;
+			var scrollY = (typeof scrollTarget == "number") ? scrollTarget : scrollYTop + scrollPane.scrollTop() - parseInt(settings.offsetTop);
 			scrollPane.animate({scrollTop : scrollY }, parseInt(settings.duration), settings.easing, function(){
 			  if (typeof callback == 'function') { callback.call(this); }
 		});
