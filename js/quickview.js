@@ -704,11 +704,12 @@ FUNCTIONS
 	// Clear previously highlighted search
 	//////////////////////////////////////////////////
 	function clearHighlightSearch(){
-		// get src html
-	    var srcHtml = $('#qv-pages').html();
-	    // clear highlights
-	    var newHtml = srcHtml.replace(/(<span class="qv-highlight">|<\/span>)/igm, '');
-	    $('#qv-pages').html(newHtml);
+	    //remove highlights
+	    $('#qv-pages .qv-highlight').contents().unwrap();
+	    // normalize text
+	    $('#qv-pages').each(function(index, element){
+	    	element.normalize();
+	    });
 	}
 
 	//////////////////////////////////////////////////
