@@ -139,6 +139,7 @@ NAV BAR CONTROLS
 			loadFileTree(currentDirectory);
 		}else{
 			// if document -> open
+			clearPageContents();
 			toggleFileBrowser(false);
 			documentGuid = $(this).attr('data-guid');
 			openDocument();
@@ -161,41 +162,41 @@ NAV BAR CONTROLS
 	// Zoom values event
 	//////////////////////////////////////////////////
 	$('#qv-btn-zoom-value > li').bind('click', function(e){
-		var zoom_val = $(this).text();
+		var zoomValue = $(this).text();
 
-		switch(zoom_val){
+		switch(zoomValue){
 			case 'Fit Width':
 				// get page width
-				var page_width = $('.qv-page').width();
+				var pageWidth = $('.qv-page').width();
 				// get screen width
-				var screen_width = $('#qv-pages').width();
+				var screenWidth = $('#qv-pages').width();
 				// get scale ratio
-				var scale = (page_width / screen_width) * 100;
+				var scale = (pageWidth / screenWidth) * 100;
 				// set values
-				zoom_val = 200 - scale;
+				zoomValue = 200 - scale;
 				break;
 			case 'Fit Height': 
 				// get page height
-				var page_height = $('.qv-page').height();
+				var pageHeight = $('.qv-page').height();
 				// get screen height
-				var screen_height = $('#qv-pages').height();
+				var screenHeight = $('#qv-pages').height();
 				// get scale ratio
-				var scale = (screen_height / page_height) * 100;
+				var scale = (screenHeight / pageHeight) * 100;
 				// set values
-				zoom_val = scale;
+				zoomValue = scale;
 				break;
 			default:
-				zoom_val = zoom_val.slice(0, -1);
+				zoomValue = zoomValue.slice(0, -1);
 				break;
 		}
-		setZoomValue(zoom_val);
+		setZoomValue(zoomValue);
 	});
 
 	//////////////////////////////////////////////////
 	// Zoom in event
 	//////////////////////////////////////////////////
 	$('#qv-btn-zoom-in').on('click', function(e){
-		var zoom_val = parseInt($('#qv-zoom-value').text().slice(0, -1));
+		var zoom_val = getZoomValue();
 		if(zoom_val < 490){
 			zoom_val = zoom_val + 10;
 		}
@@ -206,7 +207,7 @@ NAV BAR CONTROLS
 	// Zoom out event
 	//////////////////////////////////////////////////
 	$('#qv-btn-zoom-out').on('click', function(e){
-		var zoom_val = parseInt($('#qv-zoom-value').text().slice(0, -1));
+		var zoom_val = getZoomValue();
 		if(zoom_val > 30){
 			zoom_val = zoom_val - 10;
 		}
@@ -261,10 +262,7 @@ NAV BAR CONTROLS
 		// get last page number
     	var lastPageNumber = parseInt(pagesAttr[1]);
     	// get zoom value
-		var zoomValue = $('#qv-panzoom').css('zoom');
-		if(zoomValue == 'undefined'){
-			zoomValue = 1;
-		}
+		var zoomValue = getZoomValue()/100;
 		// get scroll position
 	    var scrollPosition = $(this).scrollTop();
 	    // get current page height
@@ -276,18 +274,14 @@ NAV BAR CONTROLS
 		    // change current page value
 		    if(pagePosition != currentPageNumber){
 				// set current page number
-		    	$('#qv-page-num').text(pagePosition + '/' + lastPageNumber);
+				setNavigationPageValues(pagePosition, lastPageNumber);
 			}
 			// load next page
 			if((pagePosition == currentPageNumber) && (pagePosition != lastPageNumber)){
-				//if(!loading){
-					//loading = true;
-		  			appendHtmlContent(currentPageNumber + 1);
-		  		//}
+		  		appendHtmlContent(currentPageNumber + 1);
 			}
 		}
 	});
-	var loading = false;
 
 	//////////////////////////////////////////////////
 	// Clear search input
@@ -394,7 +388,7 @@ FUNCTIONS
 	                var guid = elem.guid;
 	                // document size
 	                var size = elem.size;
-	                // document size in bytes, kb and mb
+	                // convert to proper size
 	                var new_size = size + ' Bytes';
 	                if((size / 1024 / 1024) > 1){
 	                	new_size = (Math.round((size / 1024 / 1024) * 100) / 100) + ' MB';
@@ -435,11 +429,9 @@ FUNCTIONS
 	        contentType: "application/json",
 	        success: function(returnedData) {
 	        	// get total page number
-	        	var totalPagaNumber = returnedData.length;
-	        	// clear previously opened document pages
-	        	$('#qv-panzoom').html('');
+	        	var totalPageNumber = returnedData.length;
 	        	// set total page number on navigation panel
-	        	$('#qv-page-num').text('1/' + totalPagaNumber);
+	        	setNavigationPageValues('1', totalPageNumber);
 	        	// loop though pages
 	        	$.each(returnedData, function(index, elem){
 	        		// add document description
@@ -491,7 +483,6 @@ FUNCTIONS
 	        data: JSON.stringify(data),
 	        contentType: "application/json",
 	        success: function(returnedData) {
-	        	//loading = false;
 	        	htmlData(returnedData);
 	        	// zoom in/out correct scaling
 	        	var qvpage = $('#qv-page' + pageNumber);
@@ -547,6 +538,33 @@ FUNCTIONS
 	}
 
 	//////////////////////////////////////////////////
+	// Get application path for GET/POST requests
+	//////////////////////////////////////////////////
+	function getApplicationPath(context){
+		if(applicationPath != null){
+			if(applicationPath.slice(-1) == '/'){
+				return applicationPath + context;
+			}else{
+				return applicationPath + "/" + context;
+			}
+		}else{
+			return context;
+		}
+	}
+
+	//////////////////////////////////////////////////
+	// Search for element by class (recursive)
+	//////////////////////////////////////////////////
+	function getElementByClass(target, class_id){
+		var elem = target.find(class_id);
+		if(!elem.hasClass(class_id.slice(1))){
+			return getElementByClass(target.parent(), class_id);
+		}else{
+			return elem;
+		}
+	}
+
+	//////////////////////////////////////////////////
 	// Toggle file browser modal
 	//////////////////////////////////////////////////
 	function toggleFileBrowser(open){
@@ -574,22 +592,33 @@ FUNCTIONS
 	}
 
 	//////////////////////////////////////////////////
-	// Get application path for GET/POST requests
+	// Toggle top navigation menus (zoom, search)
 	//////////////////////////////////////////////////
-	function getApplicationPath(context){
-		if(applicationPath != null){
-			if(applicationPath.slice(-1) == '/'){
-				return applicationPath + context;
-			}else{
-				return applicationPath + "/" + context;
-			}
+	function toggleNavDropdown(target){
+		var isOpened = target.hasClass('opened');
+		if(!isOpened){
+			$(target).addClass('opened');
+			$(target)
+				.css('opacity', 0)
+				.slideDown('fast')
+				.animate(
+					{ opacity: 1 },
+					{ queue: false, duration: 'fast' }
+				);
 		}else{
-			return context;
+			$(target).removeClass('opened');
+			$(target)
+				.css('opacity', 1)
+				.slideUp('fast')
+				.animate(
+					{ opacity: 0 },
+					{ queue: false, duration: 'fast' }
+				);
 		}
 	}
 
 	//////////////////////////////////////////////////
-	// Highlight search
+	// Highlight search results
 	//////////////////////////////////////////////////
 	function highlightSearch(text) {
 		clearHighlightSearch();
@@ -624,25 +653,14 @@ FUNCTIONS
 	}
 
 	//////////////////////////////////////////////////
-	// Clear previously highlighted search
-	//////////////////////////////////////////////////
-	function clearHighlightSearch(){
-		// get src html
-	    var srcHtml = $('#qv-pages').html();
-	    // clear highlights
-	    var newHtml = srcHtml.replace(/(<span class="qv-highlight">|<\/span>)/igm, '');
-	    $('#qv-pages').html(newHtml);
-	}
-
-	//////////////////////////////////////////////////
-	// Set zoom value and zoom document
+	// Zoom document
 	//////////////////////////////////////////////////
 	function setZoomValue(zoom_val){
 		// adapt value for css
 		var zoom_val_non_webkit = zoom_val / 100;
 		var zoom_val_webkit = Math.round(zoom_val) + '%';
 		// display zoom value
-		$('#qv-zoom-value').text(zoom_val_webkit);
+		setNavigationZoomValues(zoom_val_webkit);
 		// set css zoom values
 		var style = [
 			'zoom: ' + zoom_val_webkit,
@@ -654,41 +672,24 @@ FUNCTIONS
 	}
 
 	//////////////////////////////////////////////////
-	// Search for element by class (recursive)
+	// Get currently set zoom value
 	//////////////////////////////////////////////////
-	function getElementByClass(target, class_id){
-		var elem = target.find(class_id);
-		if(!elem.hasClass(class_id.slice(1))){
-			return getElementByClass(target.parent(), class_id);
-		}else{
-			return elem;
-		}
+	function getZoomValue(){
+		return parseInt($('#qv-zoom-value').text().slice(0, -1));
 	}
 
 	//////////////////////////////////////////////////
-	// Toggle top navigation menus (zoom values, search)
+	// Set zoom values on navigation panel
 	//////////////////////////////////////////////////
-	function toggleNavDropdown(target){
-		var isOpened = target.hasClass('opened');
-		if(!isOpened){
-			$(target).addClass('opened');
-			$(target)
-				.css('opacity', 0)
-				.slideDown('fast')
-				.animate(
-					{ opacity: 1 },
-					{ queue: false, duration: 'fast' }
-				);
-		}else{
-			$(target).removeClass('opened');
-			$(target)
-				.css('opacity', 1)
-				.slideUp('fast')
-				.animate(
-					{ opacity: 0 },
-					{ queue: false, duration: 'fast' }
-				);
-		}
+	function setNavigationZoomValues(value){
+		$('#qv-zoom-value').text(value);
+	}
+
+	//////////////////////////////////////////////////
+	// Set page values on navigation panel
+	//////////////////////////////////////////////////
+	function setNavigationPageValues(firstPageNumber, lastPageNumber){
+		$('#qv-page-num').text(firstPageNumber + '/' + lastPageNumber);
 	}
 
 	//////////////////////////////////////////////////
@@ -698,6 +699,34 @@ FUNCTIONS
 		$('#qv-nav-search-container :input').val('');
 		clearHighlightSearch();
 	}
+
+	//////////////////////////////////////////////////
+	// Clear previously highlighted search
+	//////////////////////////////////////////////////
+	function clearHighlightSearch(){
+		// get src html
+	    var srcHtml = $('#qv-pages').html();
+	    // clear highlights
+	    var newHtml = srcHtml.replace(/(<span class="qv-highlight">|<\/span>)/igm, '');
+	    $('#qv-pages').html(newHtml);
+	}
+
+	//////////////////////////////////////////////////
+	// Clear all data from peviously loaded document
+	//////////////////////////////////////////////////
+	function clearPageContents(){
+		// set zoom to default
+		setZoomValue(100);
+		// set page number and total pages to zero
+		setNavigationPageValues('0', '0');
+		// remove previously rendered document pages
+    	$('#qv-panzoom').html('');
+    	// go to top
+		$('#qv-pages').scrollTo(0, {
+			duration: 0
+		});
+	}
+
 
 //
 // END of document ready function
@@ -922,7 +951,9 @@ $.fn.scrollTo = function( target, options, callback ){
 		return this.each(function(){
 			var scrollPane = $(this);
 			var scrollTarget = (typeof settings.scrollTarget == "number") ? settings.scrollTarget : $(settings.scrollTarget);
-			var scrollYTop = scrollTarget.offset().top * settings.zoom / 100;
+			if(typeof settings.scrollTarget != "number"){
+				var scrollYTop = scrollTarget.offset().top * settings.zoom / 100;
+			}
 			var scrollY = (typeof scrollTarget == "number") ? scrollTarget : scrollYTop + scrollPane.scrollTop() - parseInt(settings.offsetTop);
 			scrollPane.animate({scrollTop : scrollY }, parseInt(settings.duration), settings.easing, function(){
 			  if (typeof callback == 'function') { callback.call(this); }
