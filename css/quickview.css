@@ -151,7 +151,7 @@ SEARCH
     border: 0;
     height: 20px;
     width: 215px;
-    padding: 5px 60px 5px 5px;
+    padding: 5px 65px 5px 5px;
 }
 #qv-nav-search-container input[type='text']:focus{
     outline: none;
@@ -167,7 +167,23 @@ SEARCH
     margin: 0px 10px;
     padding: 3px 5px;
 }
-
+#qv-search-count{
+    color: #959DA5;
+    font-size: 11px;
+    position: absolute;
+    left: 154px;
+    top: 13px;
+    text-align: right;
+    width: 62px;
+}
+/*
+******************************************
+Search highlight
+******************************************
+*/
+.qv-highlight{
+    background-color: yellow;
+}
 /*
 ******************************************
 PAGES
@@ -338,13 +354,4 @@ Fade annimation
     -ms-transform: translate(0, 0);
     -o-transform: translate(0, 0);
     transform: translate(0, 0);
-}
-
-/*
-******************************************
-Search highlight
-******************************************
-*/
-.qv-highlight{
-    background-color: yellow;
 }

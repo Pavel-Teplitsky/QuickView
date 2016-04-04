@@ -310,7 +310,7 @@ NAV BAR CONTROLS
 					offsetTop: 150
 				});
 				// check if this is last rearch result instance
-				if(search_position >= $('.qv-highlight').length){
+				if(search_position >= getTotalSearchMatches()){
 					// deactivate next button
 				}else{
 					// increment search position
@@ -321,6 +321,7 @@ NAV BAR CONTROLS
 			}
 			count++;
 		});
+		setSearchMatchCount(search_position, getTotalSearchMatches());
 	});
 
 	//////////////////////////////////////////////////
@@ -349,6 +350,7 @@ NAV BAR CONTROLS
 			// store last instance
 			prev = $(this);
 		});
+		setSearchMatchCount(search_position, getTotalSearchMatches());
 	});
 	
 
@@ -649,6 +651,11 @@ FUNCTIONS
 				// update to new content
 				$this.replaceWith(content);
 			});
+			var totalSearchMatches = getTotalSearchMatches();
+			setSearchMatchCount(0, totalSearchMatches);
+			if(totalSearchMatches > 0){
+				$('#qv-nav-search-next').click();
+			}
   		}
 	}
 
@@ -676,6 +683,20 @@ FUNCTIONS
 	//////////////////////////////////////////////////
 	function getZoomValue(){
 		return parseInt($('#qv-zoom-value').text().slice(0, -1));
+	}
+
+	//////////////////////////////////////////////////
+	// Get total matches count from search
+	//////////////////////////////////////////////////
+	function getTotalSearchMatches(){
+		return $('.qv-highlight').length;
+	}
+
+	//////////////////////////////////////////////////
+	// Set ny,ber of currently selected match
+	//////////////////////////////////////////////////
+	function setSearchMatchCount(index, totalCount){
+		$('#qv-search-count').text(index + " of " + totalCount);
 	}
 
 	//////////////////////////////////////////////////
@@ -710,6 +731,7 @@ FUNCTIONS
 	    $('#qv-pages').each(function(index, element){
 	    	element.normalize();
 	    });
+	    search_position = 0;
 	}
 
 	//////////////////////////////////////////////////
@@ -919,6 +941,7 @@ HTML MARKUP
 					'<i class="fa fa-search"></i>'+
 					'<div id="qv-nav-search-container" class="qv-nav-dropdown">'+
 						'<input type="text" id="qv-search-input"/>'+
+						'<div id="qv-search-count">0 of 0</div>'+
 						'<div class="qv-nav-search-btn" id="qv-nav-search-prev"><i class="fa fa-chevron-left"></i></div>'+
 						'<div class="qv-nav-search-btn" id="qv-nav-search-next"><i class="fa fa-chevron-right"></i></div>'+
 						'<div class="qv-nav-search-btn" id="qv-nav-search-cancel"><i class="fa fa-times"></i></div>'+
