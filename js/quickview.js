@@ -113,15 +113,15 @@ NAV BAR CONTROLS
 	// Open file browser event
 	//////////////////////////////////////////////////
 	$('#qv-header-logo').on('click', function(e){
-		toggleFileBrowser(true);
+		toggleModalDialog(true, 'Open Document');
 		loadFileTree('');
 	});
 
 	//////////////////////////////////////////////////
-	// Close file tree event
+	// Close modal dialog event
 	//////////////////////////////////////////////////
 	$('.qv-modal-close-action').on('click', function(e){
-		toggleFileBrowser(false);
+		toggleModalDialog(false, '');
 	});
 
 	//////////////////////////////////////////////////
@@ -140,7 +140,7 @@ NAV BAR CONTROLS
 		}else{
 			// if document -> open
 			clearPageContents();
-			toggleFileBrowser(false);
+			toggleModalDialog(false, '');
 			documentGuid = $(this).attr('data-guid');
 			openDocument();
 		}
@@ -366,22 +366,32 @@ FUNCTIONS
 	function loadFileTree(dir) {
 	    var data = {path: dir};
 	    currentDirectory = dir;
+	    // show loading spinner
+	    $('#qv-modal-spinner').show();
+	    // get data
 	    $.ajax({
 	        type: 'POST',
 	        url: getApplicationPath('loadFileTree'),
 	        data: JSON.stringify(data),
 	        contentType: "application/json",
 	        success: function(returnedData) {
-	        	// hide loading message
+	        	if(returnedData.error != undefined){
+	        		// open error popup
+	        		printMessage(returnedData.error);
+	        		return;
+	        	}
+	        	// hide loading spinner
 	        	$('#qv-modal-spinner').hide();
 	        	// clear tree list from previous data
-	        	$('.qv-modal-table tbody').html(
+	        	$('#qv-modal-filebroswer tbody').html(
         			'<tr>'+
 						'<td class="text-center"><i class="fa fa-level-up"></i></td>'+
 						'<td class="qv-filetree-up">...</td>'+
 						'<td></td>'+
 						'<td></td>'+
 	                '</tr>');
+	        	// show tree list wrapper
+	        	$('#qv-modal-filebroswer').show();
 	        	// append files to tree list
 	            $.each(returnedData, function(index, elem){
 	            	// document name
@@ -430,6 +440,11 @@ FUNCTIONS
 	        data: JSON.stringify(data),
 	        contentType: "application/json",
 	        success: function(returnedData) {
+	        	if(returnedData.error != undefined){
+	        		// open error popup
+	        		printMessage(returnedData.error);
+	        		return;
+	        	}
 	        	// get total page number
 	        	var totalPageNumber = returnedData.length;
 	        	// set total page number on navigation panel
@@ -485,6 +500,11 @@ FUNCTIONS
 	        data: JSON.stringify(data),
 	        contentType: "application/json",
 	        success: function(returnedData) {
+	        	if(returnedData.error != undefined){
+	        		// open error popup
+	        		printMessage(returnedData.error);
+	        		return;
+	        	}
 	        	htmlData(returnedData);
 	        	// zoom in/out correct scaling
 	        	var qvpage = $('#qv-page' + pageNumber);
@@ -567,22 +587,22 @@ FUNCTIONS
 	}
 
 	//////////////////////////////////////////////////
-	// Toggle file browser modal
+	// Toggle modal dialog
 	//////////////////////////////////////////////////
-	function toggleFileBrowser(open){
+	function toggleModalDialog(open, title){
 		if(open){
-			$('#fileBrowser')
+			$('#modalDialog .qv-modal-title').text(title);
+			$('#modalDialog')
 				.css('opacity', 0)
 				.fadeIn('fast')
 				.animate(
 					{ opacity: 1 },
 					{ queue: false, duration: 'fast' }
 				);
-			$('#fileBrowser').addClass('in');
-			$('#qv-modal-spinner').show();
+			$('#modalDialog').addClass('in');
 		}else{
-			$('#fileBrowser').removeClass('in');
-			$('#fileBrowser')
+			$('#modalDialog').removeClass('in');
+			$('#modalDialog')
 				.css('opacity', 1)
 				.fadeIn('fast')
 				.animate(
@@ -590,7 +610,11 @@ FUNCTIONS
 					{ queue: false, duration: 'fast' }
 				)
 				.css('display', 'none');
-			}
+			// hide all contents
+			$('#qv-modal-filebroswer').hide();
+			$('#qv-modal-spinner').hide();
+			$('#qv-modal-error').hide();
+		}
 	}
 
 	//////////////////////////////////////////////////
@@ -750,6 +774,14 @@ FUNCTIONS
 		});
 	}
 
+	//////////////////////////////////////////////////
+	// Clear all data from peviously loaded document
+	//////////////////////////////////////////////////
+	function printMessage(message){
+		$('#qv-modal-error').show();
+		$('#qv-modal-error').text(message);
+		toggleModalDialog(true, 'Error');
+	}
 
 //
 // END of document ready function
@@ -794,6 +826,7 @@ METHODS
 
 			// assembly html base
 			this.append(getHtmlBase);
+			this.append(getHtmlModalDialog);
 
 			// assembly nav bar
 			if(options.zoom){
@@ -857,18 +890,23 @@ HTML MARKUP
 			    	'</div>'+
 			    '</div>'+
 			    // pages END
+			'</div>';
+	}
 
-			    '<!-- modal dialog begin -->'+
-				'<div class="qv-modal fade" id="fileBrowser">'+
+	function getHtmlModalDialog(){
+		return 	'<div class="qv-modal fade" id="modalDialog">'+
 			      '<div class="qv-modal-dialog">'+
 			        '<div class="qv-modal-content">'+
+			        // header
 			          '<div class="qv-modal-header">'+
 			            '<div class="qv-modal-close qv-modal-close-action"><span>x</span></div>'+
 			            '<h4 class="qv-modal-title">Open Document</h4>'+
 			          '</div>'+
+			          // body
 			          '<div class="qv-modal-body">'+
 			          	'<div id="qv-modal-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
-			            '<table class="qv-modal-table">'+
+			          	'<div id="qv-modal-error">TEST</div>'+
+			            '<table id="qv-modal-filebroswer" class="qv-modal-table">'+
 			              '<thead>'+
 			                '<tr>'+
 			                  '<th class="col-md-1"> </th>'+
@@ -882,14 +920,13 @@ HTML MARKUP
 			              '</tbody>'+
 			            '</table>'+
 			          '</div>'+
+			          // footer
 			          '<div class="qv-modal-footer">'+
-			            
+			            // empty footer
 			          '</div>'+
 			        '</div><!-- /.modal-content -->'+
 			      '</div><!-- /.modal-dialog -->'+
-			    '</div>'+
-			    '<!-- modal dialog end -->'+
-			'</div>';
+			    '</div>';
 	}
 
 	function getHtmlNavSplitter(){
