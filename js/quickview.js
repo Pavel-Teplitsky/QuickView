@@ -303,8 +303,13 @@ NAV BAR CONTROLS
 	var search_position = 0;
 	$('#qv-nav-search-next').on('click', function(e){
 		var count = 0;
+		// remove/clear previously selected highlights
+		$('#qv-pages').find('.qv-highlight-select').removeClass('qv-highlight-select');
+		// search for matched elements
 		$('.qv-highlight').each(function(e){
 			if(count == search_position){
+				// add selected highlight
+				$(this).addClass('qv-highlight-select');
 				// scroll to next page
 				$('#qv-pages').scrollTo(this, {
 					offsetTop: 150
@@ -330,8 +335,13 @@ NAV BAR CONTROLS
 	$('#qv-nav-search-prev').on('click', function(e){
 		var count = 1;
 		var prev;
+		// remove/clear previously selected highlights
+		$('#qv-pages').find('.qv-highlight-select').removeClass('qv-highlight-select');
+		// search for matched elements
 		$('.qv-highlight').each(function(e){
 			if((count == (search_position)) && (prev != undefined)){
+				// add selected highlight
+				$(prev).addClass('qv-highlight-select');
 				// scroll to previous page
 				$('#qv-pages').scrollTo(prev, {
 					offsetTop: 150
@@ -742,6 +752,7 @@ FUNCTIONS
 	//////////////////////////////////////////////////
 	function clearSearch(){
 		$('#qv-nav-search-container :input').val('');
+		setSearchMatchCount(0, 0);
 		clearHighlightSearch();
 	}
 

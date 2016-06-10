@@ -184,6 +184,9 @@ Search highlight
 .qv-highlight{
     background-color: yellow;
 }
+.qv-highlight-select{
+    background-color: #ff9b00;
+}
 /*
 ******************************************
 PAGES
