@@ -22,7 +22,7 @@ CONTAINER
 */
 #qv-container{
     width: 100%;
-    height: 600px;
+    height: 100%;
     margin: auto;
 }
 
@@ -38,8 +38,10 @@ HEADER
 ******************************************
 */
 #qv-header{
+    position: fixed;
     width: 100%;
     height: 50px;
+    z-index: 999;
 }
 
 /*
@@ -200,11 +202,14 @@ PAGES
     height: 100%;
     overflow-x: hidden;
     overflow-y: scroll!important;
-    padding-top: 20px;
+    padding-top: 60px;
 
     /* Hides the scrollbar */
     transition:all 0.4s;
     overflow: visible;
+}
+#qv-pages img{
+    left: 0;
 }
 #qv-panzoom{
     transform: none;
