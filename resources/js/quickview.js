@@ -50,15 +50,20 @@ PRIVATE VARIABLES
 	map['vtx'] = 'Microsoft Visio';
 	map['vsdx'] = 'Microsoft Visio';
 	map['vdw'] = 'Microsoft Visio';
+	map['vstx'] = 'Microsoft Visio';
+	map['vssx'] = 'Microsoft Visio';
 	map['mpp'] = 'Microsoft Project';
 	map['mpt'] = 'Microsoft Project';
 	map['msg'] = 'Microsoft Outlook';
 	map['eml'] = 'Microsoft Outlook';
 	map['emlx'] = 'Microsoft Outlook';
+	map['one'] = 'Microsoft OneNote';
 	map['odt'] = 'Open Document Text';
 	map['ott'] = 'Open Document Text Template';
 	map['ods'] = 'Open Document Spreadsheet';
 	map['odp'] = 'Open Document Presentation';
+	map['otp'] = 'Open Document Presentation';
+	map['ots'] = 'Open Document Presentation';
 	map['rtf'] = 'Rich Text Format';
 	map['txt'] = 'Plain Text File';
 	map['csv'] = 'Comma-Separated Values';
@@ -80,6 +85,10 @@ PRIVATE VARIABLES
 	map['tif'] = 'Tagged Image File Format';
 	map['epub'] = 'Electronic Publication';
 	map['ico'] = 'Windows Icon';
+	map['webp'] = 'Compressed Image';
+	map['mobi'] = 'Mobipocket eBook';
+	map['tex'] = 'LaTeX Source Document';
+	map['djvu'] = 'Multi-Layer Raster Image';
 
 /*
 ******************************************************************
@@ -531,7 +540,7 @@ FUNCTIONS
 	// Get document format (type)
 	//////////////////////////////////////////////////
 	function getDocumentFormat(filename){
-		return map[filename.split('.').pop()];
+		return map[filename.split('.').pop().toLowerCase()];
 	}
 
 	//////////////////////////////////////////////////
@@ -563,11 +572,23 @@ FUNCTIONS
 			case 'Project':
 				return 'fa-file-text';
 			break;
+			case 'TaggedImage':
+				return 'fa-file-photo-o';
+			break;
+			case 'CAD':
+				return 'fa-file-image-o';
+			break;
+			case 'Note':
+				return 'fa-file-word-o';
+			break;
+			case 'Djvu':
+				return 'fa-file-text';
+			break;
 			default:
 				return 'fa-folder';
 			break;
 		}
-	}
+	}  
 
 	//////////////////////////////////////////////////
 	// Get application path for GET/POST requests
