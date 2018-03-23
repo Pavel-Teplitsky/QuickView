@@ -260,13 +260,14 @@ MODAL
 .qv-modal-close{
     position: absolute;
     right: 20px;
-    top: 16px;
+    top: 13px;
     font-size: 21px;
     cursor: pointer;
 }
 .qv-modal-title{
     font-size: 16px;
-    font-weight: 300;
+    font-weight: 400;
+    padding: 16px;
 }
 .qv-modal-body{
     background-color: #ffffff;
@@ -281,7 +282,7 @@ MODAL
 }
 .qv-modal-table > tbody > tr > td{
     font-size: 14px;
-    padding: 5px 0;
+    padding: 10px 0;
 }
 .qv-modal-table > tbody > tr > td:nth-child(2){
     cursor: pointer;
