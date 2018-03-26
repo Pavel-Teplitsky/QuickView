@@ -24,7 +24,8 @@ PRIVATE VARIABLES
 */
 	var documentGuid;
 	var currentDirectory;
-
+	var previousDocumentGuid;
+	
 	var map = {};
 	// add supported formats
 	map['pdf'] = 'Portable Document Format';
@@ -355,7 +356,7 @@ NAV BAR CONTROLS
 				$('#qv-pages').scrollTo(prev, {
 					offsetTop: 150
 				});
-				// check if this is first rearch result instance
+				// check if this is first search result instance
 				if(search_position <= 1){
 					// deactivate prev button
 				}else{
@@ -372,13 +373,47 @@ NAV BAR CONTROLS
 		setSearchMatchCount(search_position, getTotalSearchMatches());
 	});
 	
+	//////////////////////////////////////////////////
+	// Thumbnails button event
+	//////////////////////////////////////////////////
+	$('#qv-nav-right').on('click', function(){
+	    // open/close sidebar
+            $('#qv-sidebar').toggleClass('active');
+        });
+	
+	//////////////////////////////////////////////////
+	// Thumbnail click event
+	//////////////////////////////////////////////////
+	$('#qv-sidebar').on('click', function(event){
+	    // get thumbnail id under the mouse cursor
+	    var	thumbnail = document.elementFromPoint(event.pageX, event.pageY);
+	    // get current page number from the navigation panel
+  	    var pagesAttr = $('#qv-page-num').text().split('/');
+	    // get page number from the thumbnail id
+	    var currentPageNumber = thumbnail.id.match(/\d+/)[0];
+	    var lastPageNumber = parseInt(pagesAttr[1]);
+	    // scroll to page
+	    if(currentPageNumber > 0 && currentPageNumber <= lastPageNumber){
+	        // get zoom value
+	        var zoomValue = $('#qv-panzoom').css('zoom');
+	        if(zoomValue == 'undefined'){
+		    zoomValue = 100;
+	        }else{
+		    zoomValue = zoomValue * 100;
+	        }
+	        // scroll
+	        $('#qv-pages').scrollTo('#qv-page' + currentPageNumber, {
+		    zoom: zoomValue
+	        });
+	    }
+	});
 
 /*
 ******************************************************************
 FUNCTIONS
 ******************************************************************
 */
-
+	
 	//////////////////////////////////////////////////
 	// Load file tree from server
 	//////////////////////////////////////////////////
@@ -485,6 +520,8 @@ FUNCTIONS
 	        			appendHtmlContent(pageNumber);
 	        		}
 	        	});
+			// load document thumbnails images
+			loadThumbnails();
 	        },
 	        error: function(xhr, status, error) {
 	          var err = eval("(" + xhr.responseText + ")");
@@ -815,6 +852,44 @@ FUNCTIONS
 		toggleModalDialog(true, 'Error');
 	}
 
+	//////////////////////////////////////////////////
+	// Load document thumbnails
+	//////////////////////////////////////////////////
+	function loadThumbnails(){
+	    // check if other document is open
+	    if(previousDocumentGuid == "undefined" || previousDocumentGuid != documentGuid){
+	        // load document thumbnails images
+	        var data = {guid: documentGuid};
+	        $("#qv-thumbnails").empty();
+	        $.ajax({
+		    type: 'POST',
+		    url: getApplicationPath('loadThumbnails'),
+		    data: JSON.stringify(data),
+		    contentType: "application/json",
+		    success: function(returnedData) {
+			    if(returnedData.error != undefined){
+			        // open error popup
+			        printMessage(returnedData.error);
+			        return;
+			    }
+			    var pageNumber = 1;
+			    $.each(returnedData, function(index, elem){
+			        // append thumbnails images
+			        $('#qv-thumbnails').append(
+				    '<li><img id="qv-thumbnail' + pageNumber + '" src="data:image/png;base64,' + elem + '"/></li>'
+				);
+			        pageNumber++;
+			    });
+			    // set previous document guid to current document guid for further check when thumbnails sidebar will be open
+			    previousDocumentGuid = documentGuid;
+		    },
+		    error: function(xhr, status, error) {
+		      var err = eval("(" + xhr.responseText + ")");
+		      console.log(err.Message);
+		    }
+	        });
+	    }
+	}
 //
 // END of document ready function
 });
@@ -904,24 +979,35 @@ HTML MARKUP
 */
 	function getHtmlBase(){
 		return '<div id="qv-container">'+
-				// header BEGIN
-				'<div id="qv-header">'+
-					'<div id="qv-header-logo"></div>'+
-					// nav bar BEGIN
-					'<ul id="' + qv_navbar.slice(1) + '">'+
-						// nav bar content	
-					'</ul>'+
-					// nav bar END
-				'</div>'+
-				// header END
-
-				// pages BEGIN
-				'<div id="qv-pages">'+
-					'<div id="qv-panzoom">'+
-						// list of pages
-			    	'</div>'+
+			    '<div class="wrapper">'+
+			        // header BEGIN
+			        '<div id="qv-header">'+
+				    '<div id="qv-header-logo"></div>'+
+				    // nav bar BEGIN
+				    '<ul id="' + qv_navbar.slice(1) + '">'+
+					    // nav bar content	
+				    '</ul>'+
+				    // nav bar END
+			        '</div>'+
+			        // header END
+    
+			        // thumbnails sidebar BEGIN
+			        '<nav id="qv-sidebar">'+
+				    '<ul class="list-unstyled components" id="qv-thumbnails">'+
+				        // Thumbnails will be added here automatically on document open
+				    '</ul>'+
+			        '</nav>'+
+			        // thumbnails sidebar END
+			        
+			        // pages BEGIN
+			        '<div id="qv-pages">'+
+				    '<div id="qv-panzoom">'+
+					    // list of pages
+				    '</div>'+
+			        '</div>'+
+			        // pages END
+								        
 			    '</div>'+
-			    // pages END
 			'</div>';
 	}
 
