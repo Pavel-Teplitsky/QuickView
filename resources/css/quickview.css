@@ -19,6 +19,16 @@ body {
 }
 /*
 ******************************************
+Content wrapper
+******************************************
+*/
+.wrapper {
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+}
+/*
+******************************************
 CONTAINER
 ******************************************
 */
@@ -203,9 +213,11 @@ PAGES
     /* Hides the scrollbar */
     transition:all 0.4s;
     overflow: visible;
+    margin-left: 280px;
 }
 #qv-pages img{
     left: 0;
+    width: inherit;
 }
 #qv-panzoom{
     transform: none;
@@ -223,6 +235,8 @@ PAGES
 }
 .qv-page .qv-wrapper {
     padding: 0;
+    width: inherit;
+    height: inherit;
 }
 .qv-page-spinner{
     margin-top: 150px;
@@ -370,4 +384,55 @@ Fade annimation
     -ms-transform: translate(0, 0);
     -o-transform: translate(0, 0);
     transform: translate(0, 0);
+}
+/*
+******************************************
+Thumbnails sidebar
+******************************************
+*/
+#qv-sidebar.active{
+    width: 280px;
+    background: #f5f5f5;
+    color: #fff;
+    transition: all 0.3s;
+    overflow-y: auto;
+    display: block;
+}
+#qv-sidebar{
+    top: 0;
+    bottom: 0;
+    display: none;
+    position: fixed;
+    z-index: 9;
+    padding: 50px 0 20px 0;
+}
+#qv-sidebar.active div.qv-thumbnail{
+    display: table;
+    background-color: white;
+    zoom: 25%;
+    -moz-transform: (38%, 38%);
+    margin: auto;
+    padding-right: 66px;
+}
+#qv-sidebar ul.components {
+    padding: 20px 0;
+}
+#qv-sidebar ul li{
+    margin-bottom: 20px;
+}
+#qv-sidebar ul li div.qv-thumbnail {
+    padding: 10px;
+    display: none;
+}
+
+/*
+******************************************
+Make thumbnails sidebar scroll not visible
+******************************************
+*/
+
+#qv-sidebar::-webkit-scrollbar
+{
+    width: 0px;
+    background-color: #F5F5F5;
 }
