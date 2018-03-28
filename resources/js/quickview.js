@@ -379,7 +379,12 @@ NAV BAR CONTROLS
 	$('#qv-nav-right').on('click', function(){
 	    // open/close sidebar
             $('#qv-sidebar').toggleClass('active');
-        });
+	        if($("#qv-pages").css("margin-left") == "0px"){
+		        $("#qv-pages").css("margin-left", "280px");
+	        } else {
+		        $("#qv-pages").css("margin-left", "0px");
+	        }
+            });
 	
 	//////////////////////////////////////////////////
 	// Thumbnail click event
