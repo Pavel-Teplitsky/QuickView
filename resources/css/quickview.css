@@ -260,13 +260,15 @@ MODAL
     background-color: rgba(0,0,0,0.5);
 }
 .qv-modal-dialog{
-    position: relative;
+    position: absolute;
     width: 600px;
-    margin: 30px auto;
-    vertical-align: middle;
+    height: 400px;
+    top: calc(50% - 200px);
+    left: calc(50% - 300px);
 }
 .qv-modal-content{
     background-color: #ffffff;
+    height: 100%;
 }
 .qv-modal-header{
     padding: 1px 20px;
