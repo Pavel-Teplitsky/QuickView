@@ -24,7 +24,6 @@ PRIVATE VARIABLES
 */
 	var documentGuid;
 	var currentDirectory;
-	var previousDocumentGuid;
 	
 	var map = {};
 	// add supported formats
@@ -120,7 +119,7 @@ NAV BAR CONTROLS
 	});
 
 	//////////////////////////////////////////////////
-	// Open file browser event
+	// Open modal dialog (file browser) event
 	//////////////////////////////////////////////////
 	$('#qv-header-logo').on('click', function(e){
 		toggleModalDialog(true, 'Open Document');
@@ -152,7 +151,10 @@ NAV BAR CONTROLS
 			clearPageContents();
 			toggleModalDialog(false, '');
 			documentGuid = $(this).attr('data-guid');
-			openDocument();
+			loadDocument(function(data){
+				// Generate thumbnails
+				generatePagesTemplate(data, 'thumbnails-');
+			});
 		}
 	});
 
@@ -173,7 +175,6 @@ NAV BAR CONTROLS
 	//////////////////////////////////////////////////
 	$('#qv-btn-zoom-value > li').bind('click', function(e){
 		var zoomValue = $(this).text();
-
 		switch(zoomValue){
 			case 'Fit Width':
 				// get page width
@@ -248,17 +249,7 @@ NAV BAR CONTROLS
 		}
 		// scroll to page
 		if(currentPageNumber > 0 && currentPageNumber <= lastPageNumber){
-			// get zoom value
-			var zoomValue = $('#qv-panzoom').css('zoom');
-			if(zoomValue == 'undefined'){
-				zoomValue = 100;
-			}else{
-				zoomValue = zoomValue * 100;
-			}
-			// scroll
-			$('#qv-pages').scrollTo('#qv-page' + currentPageNumber, {
-				zoom: zoomValue
-			});
+			scrollToPage(currentPageNumber);
 		}
 	});
 
@@ -276,7 +267,7 @@ NAV BAR CONTROLS
 		// get scroll position
 	    var scrollPosition = $(this).scrollTop();
 	    // get current page height
-	    var pageHeight = $('#qv-page' + currentPageNumber).height() + 20 /* plus margin */;
+	    var pageHeight = $('#qv-page-' + currentPageNumber).height() + 20 /* plus margin */;
 	    // get scroll relative position to current page
 	    var pagePosition = parseInt(Math.floor(scrollPosition / pageHeight / zoomValue)) + 1;
 	    // update values and perform page lazy load
@@ -318,6 +309,7 @@ NAV BAR CONTROLS
 		// search for matched elements
 		$('.qv-highlight').each(function(e){
 			if(count == search_position){
+				console.log(this);
 				// add selected highlight
 				$(this).addClass('qv-highlight-select');
 				// scroll to next page
@@ -374,43 +366,25 @@ NAV BAR CONTROLS
 	});
 	
 	//////////////////////////////////////////////////
-	// Thumbnails button event
+	// Open/Close thumbnails event
 	//////////////////////////////////////////////////
 	$('#qv-nav-right').on('click', function(){
 	    // open/close sidebar
-            $('#qv-sidebar').toggleClass('active');
-	        if($("#qv-pages").css("margin-left") == "0px"){
-		        $("#qv-pages").css("margin-left", "280px");
-	        } else {
-		        $("#qv-pages").css("margin-left", "0px");
-	        }
-            });
+        $('#qv-thumbnails').toggleClass('active');
+        if($("#qv-pages").css("margin-left") == "0px"){
+	        $("#qv-pages").css("margin-left", "280px");
+        } else {
+	        $("#qv-pages").css("margin-left", "0px");
+        }
+    });
 	
 	//////////////////////////////////////////////////
 	// Thumbnail click event
 	//////////////////////////////////////////////////
-	$('#qv-sidebar').on('click', function(event){
-	    // get thumbnail id under the mouse cursor
-	    var	thumbnail = document.elementFromPoint(event.pageX, event.pageY);
-		// get current page number from the navigation panel
-  	    var pagesAttr = $('#qv-page-num').text().split('/');
-	    // get page number from the thumbnail id
-	    var currentPageNumber = thumbnail.closest('div.qv-thumbnail').id.match(/\d+/)[0];
-	    var lastPageNumber = parseInt(pagesAttr[1]);
-	    // scroll to page
-	    if(currentPageNumber > 0 && currentPageNumber <= lastPageNumber){
-	        // get zoom value
-	        var zoomValue = $('#qv-panzoom').css('zoom');
-	        if(zoomValue == 'undefined'){
-		    zoomValue = 100;
-	        }else{
-		    zoomValue = zoomValue * 100;
-	        }
-	        // scroll
-	        $('#qv-pages').scrollTo('#qv-page' + currentPageNumber, {
-		    zoom: zoomValue
-	        });
-	    }
+	$('#qv-thumbnails-panzoom').on('click', '.qv-page',function(){
+	    // get clicked thumbnail page number
+		var page = $(this).attr('id').split('-')[3];
+		scrollToPage(page);
 	});
 
 /*
@@ -488,9 +462,9 @@ FUNCTIONS
 	}
 
 	//////////////////////////////////////////////////
-	// Open document
+	// Open/Load document
 	//////////////////////////////////////////////////
-	function openDocument(){
+	function loadDocument(callback){
 		// get document description
 		var data = {guid: documentGuid};
 	    $.ajax({
@@ -508,43 +482,65 @@ FUNCTIONS
 	        	var totalPageNumber = returnedData.length;
 	        	// set total page number on navigation panel
 	        	setNavigationPageValues('1', totalPageNumber);
-	        	// loop though pages
-	        	$.each(returnedData, function(index, elem){
-	        		// add document description
-	        		var pageNumber = elem.number;
-	        		var pageWidth = elem.width;
-	        		var pageHeight = elem.height;
-	        		// append empty page
-	        		$('#qv-panzoom').append(
-	        			'<div id="qv-page' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + '; min-height: ' + pageHeight + ';">'+
-						'<div class="qv-page-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
-						'</div>'
-						);
-	        		// check if preload page count is set
-	        		if((preloadPageCount == 0) || (index <= (preloadPageCount - 1))){
-	        			appendHtmlContent(pageNumber, documentGuid);
-	        		}
-	        	});
-			// load document thumbnails images
-			loadThumbnails();
+	        	// render pages
+	        	generatePagesTemplate(returnedData);
 	        },
 	        error: function(xhr, status, error) {
 	          var err = eval("(" + xhr.responseText + ")");
 	          console.log(err.Message);
 	        }
+	    }).done(function(data){
+	    	// return POST data
+	    	callback(data);
 	    });
+	}
+
+	//////////////////////////////////////////////////
+	// Generate empty pages temples before the actual get pages request
+	//////////////////////////////////////////////////
+	function generatePagesTemplate(data, prefix){
+		// set empty for undefined of null
+		prefix = prefix || '';
+		// loop though pages
+		$.each(data, function(index, elem){
+    		// set document description
+    		var pageNumber = elem.number;
+    		var pageWidth = elem.width;
+    		var pageHeight = elem.height;
+    		// append empty page
+    		$('#qv-' + prefix + 'panzoom').append(
+    			'<div id="qv-' + prefix + 'page-' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + '; min-height: ' + pageHeight + ';">'+
+				'<div class="qv-page-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
+				'</div>'
+				);
+    		// check if preload page count is set
+    		if((preloadPageCount == 0) || (index <= (preloadPageCount - 1))){
+    			appendHtmlContent(pageNumber, documentGuid, prefix);
+    		}
+    	});
 	}
 
 	//////////////////////////////////////////////////
 	// Append html content to an empty page
 	//////////////////////////////////////////////////
-	function appendHtmlContent(pageNumber, documentName){
-		if(!$('#qv-page' + pageNumber).hasClass('loaded')){
-			$('#qv-page' + pageNumber).addClass('loaded');
+	function appendHtmlContent(pageNumber, documentName, prefix){
+		// set empty for undefined of null
+		prefix = prefix || '';
+		// initialize data
+		var qv_prefix_page = $('#qv-' + prefix + 'page-' + pageNumber);
+		if(!qv_prefix_page.hasClass('loaded')){
+			qv_prefix_page.addClass('loaded');
 			getPageHtmlContent(pageNumber, function(htmlData){
 				// apend page content
-				$('#qv-page' + pageNumber).append('<div class="qv-wrapper">' + htmlData + '</div>');
-				$('#qv-page' + pageNumber).find('.qv-page-spinner').hide();
+				qv_prefix_page.append('<div class="qv-wrapper">' + htmlData + '</div>');
+				qv_prefix_page.find('.qv-page-spinner').hide();
+				// fix zoom in/out scaling
+	        	var qv_page = $('#qv-page-' + pageNumber);
+	        	var zoomValue = 1;
+	        	if(qv_page.innerWidth() > qv_page.innerHeight()){
+	        		zoomValue = 0.79;
+	        	}
+	        	qv_prefix_page.attr('style', 'width:' + qv_page.innerWidth() + ';' + 'height:' + qv_page.innerHeight() + ';' + 'zoom:' + zoomValue + ';');
 				if(documentName.substr((documentName.lastIndexOf('.') +1)) == "one"){
 					$(".qv-wrapper").css("width", "initial");
 				}
@@ -555,7 +551,9 @@ FUNCTIONS
 	//////////////////////////////////////////////////
 	// Get page html content
 	//////////////////////////////////////////////////
-	function getPageHtmlContent(pageNumber, htmlData){
+	function getPageHtmlContent(pageNumber, htmlData, prefix){
+		// set empty for undefined of null
+		prefix = prefix || '';
 		// get document description
 		var data = {guid: documentGuid, page: pageNumber};
 	    $.ajax({
@@ -570,9 +568,6 @@ FUNCTIONS
 	        		return;
 	        	}
 	        	htmlData(returnedData);
-	        	// zoom in/out correct scaling
-	        	var qvpage = $('#qv-page' + pageNumber);
-	        	qvpage.attr('style', 'width:' + qvpage.innerWidth() + ';' + 'height:' + qvpage.innerHeight() + ';');
 	        },
 	        error: function(xhr, status, error) {
 	          var err = eval("(" + xhr.responseText + ")");
@@ -732,7 +727,7 @@ FUNCTIONS
 			// 	return this.nodeType === 3;
 			// });
 			// styleParent.append(style);
-			var textNodes = $('.qv-wrapper div').find('*').contents().filter(function() { 
+			var textNodes = $('#qv-pages .qv-wrapper div').find('*').contents().filter(function() { 
 				return this.nodeType === 3;
 			});
 			textNodes.each(function() {
@@ -845,6 +840,7 @@ FUNCTIONS
 		setNavigationPageValues('0', '0');
 		// remove previously rendered document pages
     	$('#qv-panzoom').html('');
+    	$('#qv-thumbnails-panzoom').html('');
     	// go to top
 		$('#qv-pages').scrollTo(0, {
 			duration: 0
@@ -861,98 +857,22 @@ FUNCTIONS
 	}
 
 	//////////////////////////////////////////////////
-	// Load document thumbnails
+	// Scroll to page
 	//////////////////////////////////////////////////
-	function loadThumbnails(){
-	    // check if other document is open
-	    if(previousDocumentGuid == "undefined" || previousDocumentGuid != documentGuid){
-	        // load document thumbnails images
-	        var data = {guid: documentGuid};
-	        $("#qv-thumbnails").empty();
-	        $.ajax({
-		    type: 'POST',
-		    url: getApplicationPath('loadThumbnails'),
-		    data: JSON.stringify(data),
-		    contentType: "application/json",
-		    success: function(returnedData) {
-			    if(returnedData.error != undefined){
-			        // open error popup
-			        printMessage(returnedData.error);
-			        return;
-			    }
-			    var pageNumber = 1;
-			    $.each(returnedData, function(index, elem){
-			        // append thumbnails images
-			        $('#qv-thumbnails').append(
-						'<li><div id="qv-thumbnail' + pageNumber + '" class="qv-thumbnail" >' + elem + '</div></li>'
-					);
-			        pageNumber++;
-			    });
-				if($("#qv-sidebar div.qv-thumbnail").children().length){
-									
-					if($("#qv-sidebar div.qv-thumbnail > table").length){
-						var tables = $($("#qv-sidebar div.qv-thumbnail > table"));
-						$.each(tables, function(index, table){
-							if($(table).width() > 392 && $(table).width() < 1000){
-								$(table).css("zoom", "95%");
-							} else if($(table).width() > 392 
-										&& $(table).width() > 1000 
-										&& $(table).width() < 1700){
-									$(table).css("zoom", "54%");
-							} else if($(table).width() > 392 
-										&& $(table).width() > 1000 
-										&& $(table).width() > 1700){
-									$(table).css("zoom", "32%");
-							}
-						});
-						var images = $($("#qv-sidebar div.qv-thumbnail > table")).find("img");
-						$.each(images, function(index, image){
-							if($(image).parent().css("position") == "absolute"){
-								$(image).parent().css("position", "static");
-							}
-						});
-					} else {
-						var thumbnails = $("#qv-sidebar div.qv-thumbnail > img");
-						if(thumbnails.length){
-							$.each(thumbnails, function(index, thumbnail){
-								if(thumbnail.width > 392 && thumbnail.width < 1000){
-									$(thumbnail).css("zoom", "73%");
-								} else if(thumbnail.width > 392 
-											&& thumbnail.width > 1000 
-											&& thumbnail.width < 1700){
-										$(thumbnail).css("zoom", "54%");
-								} else if(thumbnail.width > 392 
-											&& thumbnail.width > 1000 
-											&& thumbnail.width > 1700){
-										$(thumbnail).css("zoom", "32%");
-								}
-							});
-						} else {
-							thumbnails = $("#qv-sidebar div.qv-thumbnail > div");
-							$.each(thumbnails, function(index, thumbnail){
-								if($(thumbnail).width() > $(thumbnail).height()){
-									$(thumbnail).css("zoom", "85%");
-								} else {
-									$(thumbnail).css("height", "54em");
-									$(thumbnail).css("width", "40em");
-									$(thumbnail).css("zoom", "119%");
-								}
-								
-							});
-						}
-					}
-					
-				}
-			    // set previous document guid to current document guid for further check when thumbnails sidebar will be open
-			    previousDocumentGuid = documentGuid;
-		    },
-		    error: function(xhr, status, error) {
-		      var err = eval("(" + xhr.responseText + ")");
-		      console.log(err.Message);
-		    }
-	        });
-	    }
+	function scrollToPage(pageNumber){
+		// get zoom value
+		var zoomValue = $('#qv-panzoom').css('zoom');
+		if(zoomValue == 'undefined'){
+			zoomValue = 100;
+		}else{
+			zoomValue = zoomValue * 100;
+		}
+		// scroll
+		$('#qv-pages').scrollTo('#qv-page-' + pageNumber, {
+			zoom: zoomValue
+		});
 	}
+
 //
 // END of document ready function
 });
@@ -1055,11 +975,11 @@ HTML MARKUP
 			        // header END
     
 			        // thumbnails sidebar BEGIN
-			        '<nav id="qv-sidebar">'+
-						'<ul class="list-unstyled components" id="qv-thumbnails">'+
+			        '<div id="qv-thumbnails">'+
+						'<div id="qv-thumbnails-panzoom">'+
 							// Thumbnails will be added here automatically on document open
-						'</ul>'+
-			        '</nav>'+
+						'</div>'+
+			        '</div>'+
 			        // thumbnails sidebar END
 			        
 			        // pages BEGIN
