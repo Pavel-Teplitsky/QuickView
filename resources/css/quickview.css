@@ -231,6 +231,7 @@ PAGES
     -webkit-box-shadow: 0px 4px 12px -4px rgba(0,0,0,0.38);
     -moz-box-shadow: 0px 4px 12px -4px rgba(0,0,0,0.38);
     box-shadow: 0px 4px 12px -4px rgba(0,0,0,0.38);
+    transition: all 0.3s;
 }
 .qv-page .qv-wrapper {
     padding: 0;
