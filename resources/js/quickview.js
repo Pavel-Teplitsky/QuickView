@@ -387,6 +387,19 @@ NAV BAR CONTROLS
 		scrollToPage(page);
 	});
 
+	//////////////////////////////////////////////////
+	// Rotate counterclockwise event
+	//////////////////////////////////////////////////
+	$('#qv-btn-counterclockwise').on('click', function(e){
+		rotatePages("-90");
+	});
+	
+	//////////////////////////////////////////////////
+	// Rotate clockwise event
+	//////////////////////////////////////////////////
+	$('#qv-btn-clockwise').on('click', function(e){
+		rotatePages("90");
+	});
 /*
 ******************************************************************
 FUNCTIONS
@@ -839,9 +852,9 @@ FUNCTIONS
 		// set page number and total pages to zero
 		setNavigationPageValues('0', '0');
 		// remove previously rendered document pages
-    	$('#qv-panzoom').html('');
-    	$('#qv-thumbnails-panzoom').html('');
-    	// go to top
+		$('#qv-panzoom').html('');
+		$('#qv-thumbnails-panzoom').html('');
+		// go to top
 		$('#qv-pages').scrollTo(0, {
 			duration: 0
 		});
@@ -873,6 +886,40 @@ FUNCTIONS
 		});
 	}
 
+	//////////////////////////////////////////////////
+	// Rotate document pages
+	//////////////////////////////////////////////////
+	function rotatePages(angle){
+            // Get current page number
+	    var pagesAttr = $('#qv-page-num').text().split('/');
+	    var currentPageNumber = parseInt(pagesAttr[0]);
+            // Prepare pages numbers array
+	    var pages = [];
+	    pages[0] = currentPageNumber;
+	    // Prepare ajax data
+	    var data = {guid: documentGuid, angle: angle, pages: pages};
+	    $.ajax({
+	        type: 'POST',
+	        url: getApplicationPath('rotate'),
+	        data: JSON.stringify(data),
+	        contentType: "application/json",
+	        success: function(returnedData) {
+		    if(returnedData.error != undefined){
+			// open error popup
+			printMessage(returnedData.error);
+			return;
+		    }
+		    $.each(returnedData, function(index, elem){
+		        // Rotate the page
+		        $("#qv-page-" + index).css("transform", "rotate(" + elem + "deg)");
+		    });
+		},
+	        error: function(xhr, status, error) {
+	          var err = eval("(" + xhr.responseText + ")");
+	          console.log(err.Message);
+	        }
+	    });
+	}
 //
 // END of document ready function
 });
@@ -906,7 +953,8 @@ METHODS
 				zoom : true,
 				pageSelector: true,
 				search: true,
-				thumbnails: true
+				thumbnails: true,
+				rotate: true
 			};
 			options = $.extend(defaults, options);
 
@@ -925,6 +973,10 @@ METHODS
 			}
 			if(options.pageSelector){
 				$(qv_navbar).append(getHtmlNavPagesPanel);
+				$(qv_navbar).append(getHtmlNavSplitter);
+			}
+			if(options.rotate){
+				$(qv_navbar).append(getHtmlRotatePanel);
 				$(qv_navbar).append(getHtmlNavSplitter);
 			}
 			if(options.search){
@@ -1091,7 +1143,11 @@ HTML MARKUP
 		return '<li id="qv-nav-right"><i class="fa fa-th-large"></i></li>';
 	}
 
-
+	function getHtmlRotatePanel(){
+		return '<li id="qv-btn-counterclockwise"><i class="fa fa-rotate-left"></i></li>'+
+		       '<li id="qv-btn-clockwise"><i class="fa fa-rotate-right"></i></li>';
+	}
+	
 })(jQuery);
 
 /*
