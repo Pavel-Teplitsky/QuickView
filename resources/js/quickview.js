@@ -890,17 +890,17 @@ FUNCTIONS
 	// Rotate document pages
 	//////////////////////////////////////////////////
 	function rotatePages(angle){
-            // Get current page number
+        // Get current page number
 	    var pagesAttr = $('#qv-page-num').text().split('/');
 	    var currentPageNumber = parseInt(pagesAttr[0]);
-            // Prepare pages numbers array
+        // Prepare pages numbers array
 	    var pages = [];
 	    pages[0] = currentPageNumber;
 	    // Prepare ajax data
 	    var data = {guid: documentGuid, angle: angle, pages: pages};
 	    $.ajax({
 	        type: 'POST',
-	        url: getApplicationPath('rotate'),
+	        url: getApplicationPath('rotateDocumentPages'),
 	        data: JSON.stringify(data),
 	        contentType: "application/json",
 	        success: function(returnedData) {
@@ -911,7 +911,7 @@ FUNCTIONS
 		    }
 		    $.each(returnedData, function(index, elem){
 		        // Rotate the page
-		        $("#qv-page-" + index).css("transform", "rotate(" + elem + "deg)");
+		        $("#qv-page-" + elem.pageNumber).css("transform", "rotate(" + elem.angle + "deg)");
 		    });
 		},
 	        error: function(xhr, status, error) {
