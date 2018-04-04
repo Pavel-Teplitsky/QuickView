@@ -406,9 +406,10 @@ FUNCTIONS
 ******************************************************************
 */
 	
-	//////////////////////////////////////////////////
-	// Load file tree from server
-	//////////////////////////////////////////////////
+	/**
+	* Load file tree
+	* @param {string} dir - files location directory
+	*/
 	function loadFileTree(dir) {
 	    var data = {path: dir};
 	    currentDirectory = dir;
@@ -474,9 +475,10 @@ FUNCTIONS
 	    });
 	}
 
-	//////////////////////////////////////////////////
-	// Open/Load document
-	//////////////////////////////////////////////////
+	/**
+	* Open/Load document
+	* @param {object} callback - document pages array
+	*/
 	function loadDocument(callback){
 		// get document description
 		var data = {guid: documentGuid};
@@ -508,9 +510,11 @@ FUNCTIONS
 	    });
 	}
 
-	//////////////////////////////////////////////////
-	// Generate empty pages temples before the actual get pages request
-	//////////////////////////////////////////////////
+	/**
+	* Generate empty pages temples before the actual get pages request
+	* @param {object} data - document pages array
+	* @param {string} prefix - elements id prefix
+	*/
 	function generatePagesTemplate(data, prefix){
 		// set empty for undefined of null
 		prefix = prefix || '';
@@ -533,72 +537,70 @@ FUNCTIONS
     	});
 	}
 
-	//////////////////////////////////////////////////
-	// Append html content to an empty page
-	//////////////////////////////////////////////////
+	/**
+	* Append html content to an empty page
+	* @param {int} pageNumber - page number
+	* @param {string} documentName - document name/id
+	* @param {string} prefix - elements id prefix
+	*/
 	function appendHtmlContent(pageNumber, documentName, prefix){
 		// set empty for undefined of null
 		prefix = prefix || '';
 		// initialize data
 		var qv_prefix_page = $('#qv-' + prefix + 'page-' + pageNumber);
+		var qv_page = $('#qv-page-' + pageNumber);
+
 		if(!qv_prefix_page.hasClass('loaded')){
 			qv_prefix_page.addClass('loaded');
-			getPageHtmlContent(pageNumber, function(htmlData){
-				// apend page content
-				qv_prefix_page.append('<div class="qv-wrapper">' + htmlData + '</div>');
-				qv_prefix_page.find('.qv-page-spinner').hide();
-				// fix zoom in/out scaling
-	        	var qv_page = $('#qv-page-' + pageNumber);
-	        	var zoomValue = 1;
-	        	if(qv_page.innerWidth() > qv_page.innerHeight()){
-	        		zoomValue = 0.79;
-	        	}
-	        	qv_prefix_page.attr('style', 'width:' + qv_page.innerWidth() + ';' + 'height:' + qv_page.innerHeight() + ';' + 'zoom:' + zoomValue + ';');
-				if(documentName.substr((documentName.lastIndexOf('.') +1)) == "one"){
-					$(".qv-wrapper").css("width", "initial");
-				}
-			});
+			// get document description
+			var data = {guid: documentGuid, page: pageNumber};
+		    $.ajax({
+		        type: 'POST',
+		        url: getApplicationPath('loadDocumentPage'),
+		        data: JSON.stringify(data),
+		        contentType: "application/json",
+		        success: function(htmlData) {
+		        	if(htmlData.error != undefined){
+		        		// open error popup
+		        		printMessage(htmlData.error);
+		        		return;
+		        	}
+		        	// apend page content
+					qv_prefix_page.append('<div class="qv-wrapper">' + htmlData + '</div>');
+					qv_prefix_page.find('.qv-page-spinner').hide();
+					// fix zoom in/out scaling
+		        	var zoomValue = 1;
+		        	// check if page is horizontaly displayed
+		        	if(qv_page.innerWidth() > qv_page.innerHeight()){
+		        		zoomValue = 0.79;
+		        	}
+		        	qv_prefix_page.css('width', qv_page.innerWidth());
+		        	qv_prefix_page.css('height', qv_page.innerHeight());
+		        	qv_prefix_page.css('zoom', zoomValue);
+					if(documentName.substr((documentName.lastIndexOf('.') +1)) == "one"){
+						$(".qv-wrapper").css("width", "initial");
+					}
+		        },
+		        error: function(xhr, status, error) {
+		          var err = eval("(" + xhr.responseText + ")");
+		          console.log(err.Message);
+		        }
+		    });
 		}
 	}
 
-	//////////////////////////////////////////////////
-	// Get page html content
-	//////////////////////////////////////////////////
-	function getPageHtmlContent(pageNumber, htmlData, prefix){
-		// set empty for undefined of null
-		prefix = prefix || '';
-		// get document description
-		var data = {guid: documentGuid, page: pageNumber};
-	    $.ajax({
-	        type: 'POST',
-	        url: getApplicationPath('loadDocumentPage'),
-	        data: JSON.stringify(data),
-	        contentType: "application/json",
-	        success: function(returnedData) {
-	        	if(returnedData.error != undefined){
-	        		// open error popup
-	        		printMessage(returnedData.error);
-	        		return;
-	        	}
-	        	htmlData(returnedData);
-	        },
-	        error: function(xhr, status, error) {
-	          var err = eval("(" + xhr.responseText + ")");
-	          console.log(err.Message);
-	        }
-	    });
-	}
-
-	//////////////////////////////////////////////////
-	// Get document format (type)
-	//////////////////////////////////////////////////
+	/**
+	* Get document format (type)
+	* @param {string} filename - document name
+	*/
 	function getDocumentFormat(filename){
 		return map[filename.split('.').pop().toLowerCase()];
 	}
 
-	//////////////////////////////////////////////////
-	// Get css icon id for correspondent document type
-	//////////////////////////////////////////////////
+	/**
+	* Get css icon id for correspondent document type
+	* @param {value} - document type
+	*/
 	function getDocumentIcon(value){
 		switch(value){
 			case 'Cells':
@@ -643,9 +645,10 @@ FUNCTIONS
 		}
 	}  
 
-	//////////////////////////////////////////////////
-	// Get application path for GET/POST requests
-	//////////////////////////////////////////////////
+	/**
+	* Get application path for GET/POST requests
+	* @param {string} context - application context
+	*/
 	function getApplicationPath(context){
 		if(applicationPath != null){
 			if(applicationPath.slice(-1) == '/'){
@@ -658,9 +661,11 @@ FUNCTIONS
 		}
 	}
 
-	//////////////////////////////////////////////////
-	// Search for element by class (recursive)
-	//////////////////////////////////////////////////
+	/**
+	* Search for element by class (recursive)
+	* @param {object} target - object where to search for an id
+	* @param {string} class_id - class id
+	*/
 	function getElementByClass(target, class_id){
 		var elem = target.find(class_id);
 		if(!elem.hasClass(class_id.slice(1))){
@@ -670,9 +675,11 @@ FUNCTIONS
 		}
 	}
 
-	//////////////////////////////////////////////////
-	// Toggle modal dialog
-	//////////////////////////////////////////////////
+	/**
+	* Toggle modal dialog
+	* @param {boolean} open - open/close value
+	* @param {string} title - title to display in modual dialog (popup)
+	*/
 	function toggleModalDialog(open, title){
 		if(open){
 			$('#modalDialog .qv-modal-title').text(title);
@@ -701,9 +708,10 @@ FUNCTIONS
 		}
 	}
 
-	//////////////////////////////////////////////////
-	// Toggle top navigation menus (zoom, search)
-	//////////////////////////////////////////////////
+	/**
+	* Toggle top navigation menus (zoom, search)
+	* @param {object} target - dropdown target to be opened/closed
+	*/
 	function toggleNavDropdown(target){
 		var isOpened = target.hasClass('opened');
 		if(!isOpened){
@@ -727,19 +735,13 @@ FUNCTIONS
 		}
 	}
 
-	//////////////////////////////////////////////////
-	// Highlight search results
-	//////////////////////////////////////////////////
+	/**
+	* Highlight search results
+	* @param {string} text - text to search
+	*/
 	function highlightSearch(text) {
 		clearHighlightSearch();
 		if(text.length > 1){
-			// var styleParent = $('#qv-pages').find('style').parent();;
-			// var style = $('#qv-pages').find('style');
-			// style.remove();
-			// var textNodes = $('#qv-pages').find('*').contents().filter(function() { 
-			// 	return this.nodeType === 3;
-			// });
-			// styleParent.append(style);
 			var textNodes = $('#qv-pages .qv-wrapper div').find('*').contents().filter(function() { 
 				return this.nodeType === 3;
 			});
@@ -767,9 +769,10 @@ FUNCTIONS
   		}
 	}
 
-	//////////////////////////////////////////////////
-	// Zoom document
-	//////////////////////////////////////////////////
+	/**
+	* Zoom document
+	* @param {int} zoom_val - zoom value from 0 to 100
+	*/
 	function setZoomValue(zoom_val){
 		// adapt value for css
 		var zoom_val_non_webkit = zoom_val / 100;
@@ -786,53 +789,58 @@ FUNCTIONS
 		$('#qv-panzoom').attr('style', style);
 	}
 
-	//////////////////////////////////////////////////
-	// Get currently set zoom value
-	//////////////////////////////////////////////////
+	/**
+	* Get currently set zoom value
+	*/
 	function getZoomValue(){
 		return parseInt($('#qv-zoom-value').text().slice(0, -1));
 	}
 
-	//////////////////////////////////////////////////
-	// Get total matches count from search
-	//////////////////////////////////////////////////
+	/**
+	* Get total matches count from search
+	*/
 	function getTotalSearchMatches(){
 		return $('.qv-highlight').length;
 	}
 
-	//////////////////////////////////////////////////
-	// Set ny,ber of currently selected match
-	//////////////////////////////////////////////////
+	/**
+	* Set number of currently selected match
+	* @param {int} index - current searched result position
+	* @param {int} totalCound - total search matches
+	*/
 	function setSearchMatchCount(index, totalCount){
 		$('#qv-search-count').text(index + " of " + totalCount);
 	}
 
-	//////////////////////////////////////////////////
-	// Set zoom values on navigation panel
-	//////////////////////////////////////////////////
+	/**
+	* Set zoom values on navigation panel
+	* @param {int} value - zoom value from 0 to 100
+	*/
 	function setNavigationZoomValues(value){
 		$('#qv-zoom-value').text(value);
 	}
 
-	//////////////////////////////////////////////////
-	// Set page values on navigation panel
-	//////////////////////////////////////////////////
+	/**
+	* Set page values on navigation panel
+	* @param {int} firstPageNumber - first page number
+	* @param {int} lastPageNumber - last page number or total pages
+	*/
 	function setNavigationPageValues(firstPageNumber, lastPageNumber){
 		$('#qv-page-num').text(firstPageNumber + '/' + lastPageNumber);
 	}
 
-	//////////////////////////////////////////////////
-	// Clear search input
-	//////////////////////////////////////////////////
+	/**
+	* Clear search input
+	*/
 	function clearSearch(){
 		$('#qv-nav-search-container :input').val('');
 		setSearchMatchCount(0, 0);
 		clearHighlightSearch();
 	}
 
-	//////////////////////////////////////////////////
-	// Clear previously highlighted search
-	//////////////////////////////////////////////////
+	/**
+	* Clear previously highlighted search
+	*/
 	function clearHighlightSearch(){
 	    //remove highlights
 	    $('#qv-pages .qv-highlight').contents().unwrap();
@@ -843,9 +851,9 @@ FUNCTIONS
 	    search_position = 0;
 	}
 
-	//////////////////////////////////////////////////
-	// Clear all data from peviously loaded document
-	//////////////////////////////////////////////////
+	/**
+	* Clear all data from peviously loaded document
+	*/
 	function clearPageContents(){
 		// set zoom to default
 		setZoomValue(100);
@@ -860,18 +868,20 @@ FUNCTIONS
 		});
 	}
 
-	//////////////////////////////////////////////////
-	// Clear all data from peviously loaded document
-	//////////////////////////////////////////////////
+	/**
+	* Clear all data from peviously loaded document
+	* @param {string} message - message to diplay in popup
+	*/
 	function printMessage(message){
 		$('#qv-modal-error').show();
 		$('#qv-modal-error').text(message);
 		toggleModalDialog(true, 'Error');
 	}
 
-	//////////////////////////////////////////////////
-	// Scroll to page
-	//////////////////////////////////////////////////
+	/**
+	* Scroll to page
+	* @param {int} pageNumber - page number where to scroll
+	*/
 	function scrollToPage(pageNumber){
 		// get zoom value
 		var zoomValue = $('#qv-panzoom').css('zoom');
@@ -886,9 +896,10 @@ FUNCTIONS
 		});
 	}
 
-	//////////////////////////////////////////////////
-	// Rotate document pages
-	//////////////////////////////////////////////////
+	/**
+	* Rotate document pages
+	* @param {int} angle - document page rotation angle
+	*/
 	function rotatePages(angle){
         // Get current page number
 	    var pagesAttr = $('#qv-page-num').text().split('/');
@@ -904,16 +915,16 @@ FUNCTIONS
 	        data: JSON.stringify(data),
 	        contentType: "application/json",
 	        success: function(returnedData) {
-		    if(returnedData.error != undefined){
-			// open error popup
-			printMessage(returnedData.error);
-			return;
-		    }
-		    $.each(returnedData, function(index, elem){
-		        // Rotate the page
-		        $("#qv-page-" + elem.pageNumber).css("transform", "rotate(" + elem.angle + "deg)");
-		    });
-		},
+			    if(returnedData.error != undefined){
+					// open error popup
+					printMessage(returnedData.error);
+					return;
+		    	}
+			    $.each(returnedData, function(index, elem){
+			        // Rotate the page
+			        $('#qv-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');
+			    });
+			},
 	        error: function(xhr, status, error) {
 	          var err = eval("(" + xhr.responseText + ")");
 	          console.log(err.Message);
