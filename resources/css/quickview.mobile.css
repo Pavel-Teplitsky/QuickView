@@ -8,50 +8,47 @@
 		display: none;
 	}
 	#qv-header {
-        height: 78px;
-	}
+        height: 100px;
+ }
 	#qv-header-logo {
-		background-size: 100px 19px;
-		background-position: 15px 32px;
-		height: 78px;
-  	}
+		background-size: 180px 20px;
+		background-position: 15px 40px;
+		width: 210px;
+		height: 100%;
+		padding: 0;
+		margin: 0;
+	}
 	#qv-navbar > li {
 		font-size: 30px;
-		padding: 23px 15px 17px 15px;
+		padding: 32px 20px;
 	}
 	#qv-nav-search-container {
 		width: 100%;
-		height: 55px;
 		position: fixed;
-		top: 77px
-	}
-	#qv-nav-search-cancel, #qv-nav-search-next, #qv-nav-search-prev {
-		position: absolute;
+		padding: 8px;
+		top: 99px;
 	}
 	#qv-nav-search-container input[type='text']{
-	    font-size: inherit;
-		height: 36px !important;
-		width: 82%;   `    
+	    font-size: 22px;
+	    width: calc(100% - 250px);
+	    height: 42px;
+	       `
 	}
 	#qv-search-count {
-		float: right;
-		right: 206px;
+		right: 275px;
 		left: unset;
-		top: 14px;
+		top: 17px;
 		font-size: 21px;
-		width: 90px;
+		width: 100px;
 	}
-	#qv-nav-search-next {	
-		right: 59px;
-	}
-	#qv-nav-search-prev {	
-		right: 121px;
+	.qv-nav-search-btn{
+		margin: 3px 20px;
+		padding: 0 5px;
 	}	
 	#qv-nav-search-cancel {
-		right: 31px;
 		font-size: 36px;
-		margin-top: -3px;
-
+		float: right;
+		width: 25px;
 	}
 		
 	/*
@@ -60,48 +57,33 @@
 	******************************************
 	*/
 	.qv-modal-dialog{
-		height: 100%;
 		width: 100%;
-		top: unset;
-		left: unset;		
+		height: 100%;
+		top: 0;
+		left: 0;
 	}
 	.qv-modal-body {
-		max-height: 100vh;
+		max-height: calc(100% - 100px);
 	}	
 	.qv-modal-header{
-		height: 78px;
 	}
 	.qv-modal-title{
-	    font-size: 22px;
-        padding: 26px;
+	    font-size: 32px;
+	    padding: 28px;
 	}
 	.qv-modal-close {
-        font-size: 42px;
+        font-size: 50px;
 	}
-	.qv-modal-table{
-		font-size: 24px;
+	.qv-modal-table > tbody > tr > td{
+		font-size: 42px;
+		padding: 35px 0px;
+		min-width: 60px;
 	}
-	.qv-modal-table > thead > tr > th:nth-child(3) {
+	.qv-modal-table > tbody > tr > td:nth-child(2){
+    	max-width: 100vw;
+    }
+	.col-md-1, .col-md-3, .col-md-5, .qv-modal-table td:nth-child(3), .qv-modal-table td:last-child{
     	display: none;
-    }
-	.qv-modal-table > thead > tr > th:nth-child(4) {
-    	display: none;
-    }
-	.qv-modal-table > tbody > tr > td {
-		font-size: 46px;
-		padding: 17px 0px;
-   }
-   .qv-modal-table > thead > tr > th:nth-child(2) {
-    	display: none;
-    }
-	.qv-modal-table > thead > tr > th:nth-child(3) {
-    	display: none;
-    }
-   .qv-modal-table > tbody > tr > td:nth-child(2) {
-    	max-width: 330px;
-    }
-	.qv-modal-table td:nth-child(3), .qv-modal-table td:last-child {
-		display: none;
     }
 	
 	/*

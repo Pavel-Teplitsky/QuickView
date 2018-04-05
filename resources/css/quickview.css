@@ -74,6 +74,7 @@ NAV BUTTONS
 */
 #qv-navbar{
     margin-left: 10px;
+    height: 100%;
 }
 #qv-navbar > li{
     font-size: 14px;
