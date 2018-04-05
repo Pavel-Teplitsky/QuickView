@@ -1,4 +1,4 @@
-![Alt text](https://raw.githubusercontent.com/LilAlex/QuickView/master/resources/images/banner.png "QuickView")
+![Alt text](https://raw.githubusercontent.com/bobkovalex/QuickView/master/resources/images/banner.png "QuickView")
 # QuickView
 ###### version 1.0.0
 
