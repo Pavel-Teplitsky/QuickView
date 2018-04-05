@@ -1,7 +1,7 @@
 /**
  * QuickView Plugin
  * Copyright (c) 2016 Alexandr Bobkov <lilalex85@gmail.com>
- * Dual licensed under MIT and GPL.
+ * Licensed under MIT.
  * @author Alexandr Bobkov
  * @version 1.0.0
  */
