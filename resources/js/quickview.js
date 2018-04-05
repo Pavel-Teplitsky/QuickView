@@ -400,6 +400,13 @@ NAV BAR CONTROLS
 	$('#qv-btn-clockwise').on('click', function(e){
 		rotatePages("90");
 	});
+	
+	//////////////////////////////////////////////////
+	// Download event
+	//////////////////////////////////////////////////
+	$('#qv-btn-download').on('click', function(e){
+		downloadDocument();
+	});
 /*
 ******************************************************************
 FUNCTIONS
@@ -931,6 +938,19 @@ FUNCTIONS
 	        }
 	    });
 	}
+	
+	/**
+	* Download current document
+	*/
+	function downloadDocument(){
+		if(documentGuid != "" && typeof documentGuid != "undefined"){
+		    // Open download dialog
+		    window.location.assign(getApplicationPath('downloadDocument/?path=') + documentGuid);
+		} else {
+		    // open error popup
+		    printMessage("Please open document first");
+	    }
+	}
 //
 // END of document ready function
 });
@@ -965,7 +985,8 @@ METHODS
 				pageSelector: true,
 				search: true,
 				thumbnails: true,
-				rotate: true
+				rotate: true,
+				download: true
 			};
 			options = $.extend(defaults, options);
 
@@ -992,6 +1013,10 @@ METHODS
 			}
 			if(options.search){
 				$(qv_navbar).append(getHtmlNavSearchPanel);
+				$(qv_navbar).append(getHtmlNavSplitter);
+			}
+			if(options.download){
+				$(qv_navbar).append(getHtmlNavDownloadPanel);
 				$(qv_navbar).append(getHtmlNavSplitter);
 			}
 			if(options.thumbnails){
@@ -1158,6 +1183,10 @@ HTML MARKUP
 		return '<li id="qv-btn-counterclockwise"><i class="fa fa-rotate-left"></i></li>'+
 		       '<li id="qv-btn-clockwise"><i class="fa fa-rotate-right"></i></li>';
 	}
+	
+	function getHtmlNavDownloadPanel(){
+		return '<li id="qv-btn-download"><i class="fa fa-cloud-download"></i></li>';
+	}	
 	
 })(jQuery);
 
