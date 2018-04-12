@@ -786,6 +786,7 @@ FUNCTIONS
 			$('#qv-modal-filebroswer').hide();
 			$('#qv-modal-spinner').hide();
 			$('#qv-modal-error').hide();
+			$('.tabs').show();
 		}
 	}
 
@@ -954,9 +955,10 @@ FUNCTIONS
 	* @param {string} message - message to diplay in popup
 	*/
 	function printMessage(message){
+		$(".tabs").hide();
 		$('#qv-modal-error').show();
 		$('#qv-modal-error').text(message);
-		toggleModalDialog(true, 'Error');
+		toggleModalDialog(true, 'Error');		
 	}
 
 	/**
@@ -1213,6 +1215,13 @@ METHODS
 			if(options.thumbnails){
 				$(qv_navbar).append(getHtmlNavThumbTogglePanel);
 			}
+			if(!options.upload){
+			    $("#qv-upload-tab").css("display", "none");
+			    var innerElements = $(".tabs").children();
+			    for (var i = 0; i < 4; i++){
+				    $(innerElements[i]).css("display", "none");
+			    }
+			}
 		}
 
 	};
@@ -1284,14 +1293,14 @@ HTML MARKUP
 			            '</div>'+
 			            // body
 			            '<div class="qv-modal-body">'+
+					'<div id="qv-modal-error">TEST</div>'+
 				        '<div class="tabs">'+
 					    '<input id="qv-tab1" type="radio" name="tabs" checked>'+
 					    '<label for="qv-tab1"><i class="fa fa-list-alt"></i>Select</label>'+
 					    '<input id="qv-tab2" type="radio" name="tabs">'+
 					    '<label for="qv-tab2"><i class="fa fa-cloud-upload"></i>Upload</label>'+
 					    '<section id="qv-select-tab" class="tab-slider-body">'+
-					        '<div id="qv-modal-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
-					        '<div id="qv-modal-error">TEST</div>'+
+					        '<div id="qv-modal-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+					      
 					        '<table id="qv-modal-filebroswer" class="qv-modal-table">'+
 					        '<thead>'+
 						    '<tr>'+
