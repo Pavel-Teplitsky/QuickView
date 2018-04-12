@@ -1294,13 +1294,13 @@ HTML MARKUP
 			            // body
 			            '<div class="qv-modal-body">'+
 					'<div id="qv-modal-error">TEST</div>'+
-				        '<div class="tabs">'+
+				         '<div class="tabs">'+
 					    '<input id="qv-tab1" type="radio" name="tabs" checked>'+
-					    '<label for="qv-tab1"><i class="fa fa-list-alt"></i>Select</label>'+
+					    '<label for="qv-tab1"><i class="fa fa-list"></i>Browse</label>'+
 					    '<input id="qv-tab2" type="radio" name="tabs">'+
-					    '<label for="qv-tab2"><i class="fa fa-cloud-upload"></i>Upload</label>'+
+					    '<label for="qv-tab2"><i class="fa fa-upload"></i>Upload</label>'+
 					    '<section id="qv-select-tab" class="tab-slider-body">'+
-					        '<div id="qv-modal-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+					      
+					        '<div id="qv-modal-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+					        
 					        '<table id="qv-modal-filebroswer" class="qv-modal-table">'+
 					        '<thead>'+
 						    '<tr>'+
@@ -1418,7 +1418,7 @@ HTML MARKUP
 	}
 	
 	function getHtmlNavDownloadPanel(){
-		return '<li id="qv-btn-download"><i class="fa fa-cloud-download"></i></li>';
+		return '<li id="qv-btn-download"><i class="fa fa-download"></i></li>';
 	}	
 	
 })(jQuery);
