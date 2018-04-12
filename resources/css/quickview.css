@@ -431,7 +431,7 @@ MODAL
     width: 550px;
 }
 #qv-upload-tab label{
-    background-color: #29b5ca;
+    background-color: #25c2d4;
     border-radius: 0px;
     color: #ffffff;
     padding-top: 8px;
@@ -448,32 +448,36 @@ MODAL
     color: #ffffff;
 }  
 #qv-upload-button:disabled{
-    background-color: #9ca2a7;
+    background-color: #cacaca;
     cursor: not-allowed;
 }
 #qv-upload-files-table{
     width: 100%;
     max-width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
+    border-spacing: 0;
 }
 #qv-upload-files-table>tbody>tr:nth-of-type(odd) {
     background-color: #f9f9f9;
 }
 #qv-upload-files-table tbody tr td > i {
-    font-size: 24px;
+    font-size: 21px;
 }
 #qv-upload-files-table tbody tr td {
     height: 70px;
-	padding-left: 14px;
+    padding-left: 14px;
 }
 #qv-upload-files-table .qv-filetree-name{
     padding-top: 0px;
 }
+#qv-upload-files-table .qv-filetree-name > span{
+    font-size: 12px;
+    font-weight: 300;
+    color: #cacaca;
+}
 .qv-progress{
-    margin-top: 27px;
     width: 200px;
-    height: 20px;
-    margin-bottom: 20px;
+    height: 10px;
     overflow: hidden;
     background-color: #f5f5f5;
     border-radius: 0px;
@@ -495,20 +499,14 @@ MODAL
     -o-transition: width .6s ease;
     transition: width .6s ease;
 }
-.qv-cancel-button{
-    border-radius: 0px !important;
-    height: 43px;
-    width: 44px;
-}
+.qv-cancel-button{padding: 5px;background: none;}
 .qv-cancel-button i{
-    width: 46px;
-    height: 21px;
-    font-size: 31px;
-    padding-bottom: 30px;
-    padding-right: 4px;
+    font-size: 21px;
 }
 #qv-url-button{
+    background-color: #25c2d4;
     border-radius: 0px;
+    border: 0;
 }
 .qv-file-name{
     white-space: nowrap;
@@ -567,12 +565,12 @@ section {
     vertical-align: middle;
     -ms-touch-action: manipulation;
     touch-action: manipulation;
-    cursor: pointer;  
+    cursor: pointer;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
     background-image: none;
-    border: 1px solid transparent;   
+    border: 1px solid transparent;
 }
 .btn-warning {
     color: #fff;
@@ -641,13 +639,15 @@ Drag n Drop
     padding-bottom: 7px;
 }
 .qv-drag-n-drop-wrap h2 {
-    color: #797979;
+    color: #cacaca;
     margin: 5px 0;
+    font-size: 18px;
+    font-weight: 300;
 }
 .qv-drag-n-drop-wrap h4 {
-    color: #afafaf;
-    font-weight: 200;
-    font-size: 16px;
+    color: #cacaca;
+    font-weight: 300;
+    font-size: 14px;
     margin: 10px 0;
 }
 .qv-drag-n-drop-wrap h5 {
@@ -660,8 +660,8 @@ Drag n Drop
     margin: 12px auto;
 }
 .qv-drag-n-drop-icon .fa-cloud-download {
-    color: #afafaf;
-    font-size: 76px;
+    color: #efefef;
+    font-size: 80px;
 }
 .qv-drag-n-drop-buttons {
     position: relative;
@@ -676,6 +676,8 @@ Drag n Drop
     width: 134px;
     height: 35px;
     margin: 0 10px;
+    font-size: 12px;
+    font-weight: 400;
 }
 #qv-file{
     display: none;
