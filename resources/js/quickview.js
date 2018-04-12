@@ -455,24 +455,24 @@ NAV BAR CONTROLS
 	// Cancel file upload event
 	//////////////////////////////////////////////////
 	 $('#qv-upload-files-table').on('click', ".qv-cancel-button", function(e){
-		// get selected files
-		var button = $(this);
-		// get file name which will be deleted
-		var fileName = button.closest("tr").find("div")[0].innerHTML;
-		// find its index in the array
-		for(var i = 0; i < uploadFilesList.length; i++){
-		  if(uploadFilesList[i].name == fileName){
-			  // remove file from the files array
-			  uploadFilesList.splice(i, 1);
-		  }
-		}
-		// remove table row
-		button.closest("tr").remove();
+      // get selected files
+      var button = $(this);
+      // get file name which will be deleted
+      var fileName = button.closest("tr").find("div")[0].innerHTML;
+      // find its index in the array
+      for(var i = 0; i < uploadFilesList.length; i++){
+          if(uploadFilesList[i].name == fileName){
+              // remove file from the files array
+              uploadFilesList.splice(i, 1);
+          }
+      }
+      // remove table row
+      button.closest("tr").remove();
 	    $('#qv-upload-input').val('');
 	    // recalculate indexes in the files table
 	    var tableRows = $('#qv-upload-files-table > tbody > tr');
 	    for(var n = 0; n < tableRows.length; n++){
-		$(tableRows[n]).find("div.progress-bar").attr("id", "qv-pregress-bar-" + n);
+		      $(tableRows[n]).find("div.progress-bar").attr("id", "qv-pregress-bar-" + n);
 	    }
 	    // if table is empty disable upload button
 	    if(tableRows.length == 0){
@@ -484,54 +484,58 @@ NAV BAR CONTROLS
 	// Upload event
 	//////////////////////////////////////////////////
 	$("#qv-upload-button").on('click', function(e){
-		// get current number of table rows
-		var tableRows = $('#qv-upload-files-table > tbody > tr');
-		// initiate URL counter required for proper calculating of the uploaded files in case local files uploaded with URLs
-		var urlCounter = 0;
-		// upload file one by one
-		for (var i = 0; i < tableRows.length; i++) {
-			// check if current table row contains URL instead of file
-			if($(tableRows[i]).find("td[data-value]").length > 0) {
-			// upload URL
-			uploadDocument(null, i, $(tableRows[i]).find("td.qv-filetree-name").data().value);
-			// increase URL counter
-			urlCounter++;
-			} else {
-			// upload local file
-			uploadDocument(uploadFilesList[i - urlCounter], i);
-			}
-		}
+      // get current number of table rows
+      var tableRows = $('#qv-upload-files-table > tbody > tr');
+      // initiate URL counter required for proper calculating of the uploaded files in case local files uploaded with URLs
+      var urlCounter = 0;
+      // upload file one by one
+      for (var i = 0; i < tableRows.length; i++) {
+          // check if current table row contains URL instead of file
+          if($(tableRows[i]).find("td[data-value]").length > 0) {
+              // upload URL
+              uploadDocument(null, i, $(tableRows[i]).find("td.qv-filetree-name").data().value);
+              // increase URL counter
+              urlCounter++;
+          } else {
+              // upload local file
+              uploadDocument(uploadFilesList[i - urlCounter], i);
+              // remove file from the files array
+              uploadFilesList.splice(i - urlCounter, 1);
+          }
+      }
 	});
 	
 	//////////////////////////////////////////////////
 	// Open URL input event
 	//////////////////////////////////////////////////
 	$('#qv-url-button').on('click', function () {
-		$('#qv-url-wrap').slideDown('fast');
-	});
+      $('#qv-url-wrap').slideDown('fast');
+  });
+
 	
 	//////////////////////////////////////////////////
 	// Close URL input event
 	//////////////////////////////////////////////////
 	$('#qv-url-cancel').on('click', function () {
-		$('#qv-url-wrap').slideUp('fast');
-		$('#qv-url').val('');
-	});
+      $('#qv-url-wrap').slideUp('fast');
+      $('#qv-url').val('');
+  });
 	
 	//////////////////////////////////////////////////
 	// Add file via URL event
 	//////////////////////////////////////////////////
 	$('#qv-add-url').on('click', function () {
-		addFileForUpload(null, $("#qv-url").val());
+		  addFileForUpload(null, $("#qv-url").val());
 	});
 	
 	//////////////////////////////////////////////////
 	// Print event
 	//////////////////////////////////////////////////
 	$('#qv-btn-print').on('click', function(e){
-		printDocument();
+		  printDocument();
 	});
-/*
+
+  /*
 ******************************************************************
 FUNCTIONS
 ******************************************************************
@@ -790,6 +794,7 @@ FUNCTIONS
 			$('#qv-modal-filebroswer').hide();
 			$('#qv-modal-spinner').hide();
 			$('#qv-modal-error').hide();
+			$('.tabs').show();
 		}
 	}
 
@@ -958,9 +963,10 @@ FUNCTIONS
 	* @param {string} message - message to diplay in popup
 	*/
 	function printMessage(message){
+		$(".tabs").hide();
 		$('#qv-modal-error').show();
 		$('#qv-modal-error').text(message);
-		toggleModalDialog(true, 'Error');
+		toggleModalDialog(true, 'Error');		
 	}
 
 	/**
@@ -1162,7 +1168,7 @@ FUNCTIONS
 	    windowObject.print();
 	    windowObject.close();
 	}
-	
+
 //
 // END of document ready function
 });
@@ -1232,12 +1238,19 @@ METHODS
 				$(qv_navbar).append(getHtmlNavDownloadPanel);
 				$(qv_navbar).append(getHtmlNavSplitter);
 			}
-			if(options.download){
+			if(options.print){
 			    $(qv_navbar).append(getHtmlNavPrintPanel);
 			    $(qv_navbar).append(getHtmlNavSplitter);
 			}
 			if(options.thumbnails){
 				$(qv_navbar).append(getHtmlNavThumbTogglePanel);
+			}
+			if(!options.upload){
+			    $("#qv-upload-tab").css("display", "none");
+			    var innerElements = $(".tabs").children();
+			    for (var i = 0; i < 4; i++){
+				    $(innerElements[i]).css("display", "none");
+			    }
 			}
 		}
 
@@ -1305,19 +1318,19 @@ HTML MARKUP
 			        '<div class="qv-modal-content">'+
 			            // header
 			            '<div class="qv-modal-header">'+
-							'<div class="qv-modal-close qv-modal-close-action"><span>x</span></div>'+
-							'<h4 class="qv-modal-title">Open Document</h4>'+						
-			            '</div>'+
-			            // body
-			            '<div class="qv-modal-body">'+
-				        '<div class="tabs">'+
+                  '<div class="qv-modal-close qv-modal-close-action"><span>x</span></div>'+
+                  '<h4 class="qv-modal-title">Open Document</h4>'+						
+                '</div>'+
+                // body
+                '<div class="qv-modal-body">'+
+                '<div id="qv-modal-error">TEST</div>'+
+               '<div class="tabs">'+
 					    '<input id="qv-tab1" type="radio" name="tabs" checked>'+
-					    '<label for="qv-tab1"><i class="fa fa-list-alt"></i>Select</label>'+
+					    '<label for="qv-tab1"><i class="fa fa-list"></i>Browse</label>'+
 					    '<input id="qv-tab2" type="radio" name="tabs">'+
-					    '<label for="qv-tab2"><i class="fa fa-cloud-upload"></i>Upload</label>'+
+					    '<label for="qv-tab2"><i class="fa fa-upload"></i>Upload</label>'+
 					    '<section id="qv-select-tab" class="tab-slider-body">'+
-					        '<div id="qv-modal-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
-					        '<div id="qv-modal-error">TEST</div>'+
+					        '<div id="qv-modal-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+					        
 					        '<table id="qv-modal-filebroswer" class="qv-modal-table">'+
 					        '<thead>'+
 						    '<tr>'+
@@ -1390,25 +1403,31 @@ HTML MARKUP
 				'</li>'+
 				'<li id="qv-btn-zoom-in">'+
 					'<i class="fa fa-search-plus"></i>'+
+					'<span class="qv-tooltip">Zoom In</span>'+
 				'</li>'+
 				'<li id="qv-btn-zoom-out">'+
 					'<i class="fa fa-search-minus"></i>'+
+					'<span class="qv-tooltip">Zoom Out</span>'+
 				'</li>';
 	}
 
 	function getHtmlNavPagesPanel(){
 		return '<li id="qv-btn-page-first" class="qv-nav-btn-pages">'+
 					'<i class="fa fa-angle-double-left"></i>'+
+					'<span class="qv-tooltip">First Page</span>'+
 				'</li>'+
 				'<li id="qv-btn-page-prev" class="qv-nav-btn-pages">'+
 					'<i class="fa fa-angle-left"></i>'+
+					'<span class="qv-tooltip">Previous Page</span>'+
 				'</li>'+
 				'<li id="qv-page-num">0/0</li>'+
 				'<li id="qv-btn-page-next" class="qv-nav-btn-pages">'+
 					'<i class="fa fa-angle-right"></i>'+
+					'<span class="qv-tooltip">Next Page</span>'+
 				'</li>'+
 				'<li id="qv-btn-page-last" class="qv-nav-btn-pages">'+
 					'<i class="fa fa-angle-double-right"></i>'+
+					'<span class="qv-tooltip">Last Page</span>'+
 				'</li>';
 	}
 
@@ -1422,20 +1441,21 @@ HTML MARKUP
 						'<div class="qv-nav-search-btn" id="qv-nav-search-next"><i class="fa fa-chevron-right"></i></div>'+
 						'<div class="qv-nav-search-btn" id="qv-nav-search-cancel"><i class="fa fa-times"></i></div>'+
 					'</div>'+
+					'<span class="qv-tooltip">Search</span>'+
 				'</li>';
 	}
 
 	function getHtmlNavThumbTogglePanel(){
-		return '<li id="qv-nav-right"><i class="fa fa-th-large"></i></li>';
+		return '<li id="qv-nav-right"><i class="fa fa-th-large"></i><span class="qv-tooltip">Thumbnails</span></li>';
 	}
 
 	function getHtmlRotatePanel(){
-		return '<li id="qv-btn-counterclockwise"><i class="fa fa-rotate-left"></i></li>'+
-		       '<li id="qv-btn-clockwise"><i class="fa fa-rotate-right"></i></li>';
+		return '<li id="qv-btn-counterclockwise"><i class="fa fa-rotate-left"></i><span class="qv-tooltip">Rotate Counterclockwise</span></li>'+
+		       '<li id="qv-btn-clockwise"><i class="fa fa-rotate-right"></i><span class="qv-tooltip">Rotate Clockwise</span></li>';
 	}
 	
 	function getHtmlNavDownloadPanel(){
-		return '<li id="qv-btn-download"><i class="fa fa-cloud-download"></i></li>';
+		return '<li id="qv-btn-download"><i class="fa fa-download"></i><span class="qv-tooltip">Download</span></li>';
 	}	
 	
 	function getHtmlNavPrintPanel(){
