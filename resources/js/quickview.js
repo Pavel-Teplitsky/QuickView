@@ -1373,25 +1373,31 @@ HTML MARKUP
 				'</li>'+
 				'<li id="qv-btn-zoom-in">'+
 					'<i class="fa fa-search-plus"></i>'+
+					'<span class="qv-tooltip">Zoom In</span>'+
 				'</li>'+
 				'<li id="qv-btn-zoom-out">'+
 					'<i class="fa fa-search-minus"></i>'+
+					'<span class="qv-tooltip">Zoom Out</span>'+
 				'</li>';
 	}
 
 	function getHtmlNavPagesPanel(){
 		return '<li id="qv-btn-page-first" class="qv-nav-btn-pages">'+
 					'<i class="fa fa-angle-double-left"></i>'+
+					'<span class="qv-tooltip">First Page</span>'+
 				'</li>'+
 				'<li id="qv-btn-page-prev" class="qv-nav-btn-pages">'+
 					'<i class="fa fa-angle-left"></i>'+
+					'<span class="qv-tooltip">Previous Page</span>'+
 				'</li>'+
 				'<li id="qv-page-num">0/0</li>'+
 				'<li id="qv-btn-page-next" class="qv-nav-btn-pages">'+
 					'<i class="fa fa-angle-right"></i>'+
+					'<span class="qv-tooltip">Next Page</span>'+
 				'</li>'+
 				'<li id="qv-btn-page-last" class="qv-nav-btn-pages">'+
 					'<i class="fa fa-angle-double-right"></i>'+
+					'<span class="qv-tooltip">Last Page</span>'+
 				'</li>';
 	}
 
@@ -1405,20 +1411,21 @@ HTML MARKUP
 						'<div class="qv-nav-search-btn" id="qv-nav-search-next"><i class="fa fa-chevron-right"></i></div>'+
 						'<div class="qv-nav-search-btn" id="qv-nav-search-cancel"><i class="fa fa-times"></i></div>'+
 					'</div>'+
+					'<span class="qv-tooltip">Search</span>'+
 				'</li>';
 	}
 
 	function getHtmlNavThumbTogglePanel(){
-		return '<li id="qv-nav-right"><i class="fa fa-th-large"></i></li>';
+		return '<li id="qv-nav-right"><i class="fa fa-th-large"></i><span class="qv-tooltip">Thumbnails</span></li>';
 	}
 
 	function getHtmlRotatePanel(){
-		return '<li id="qv-btn-counterclockwise"><i class="fa fa-rotate-left"></i></li>'+
-		       '<li id="qv-btn-clockwise"><i class="fa fa-rotate-right"></i></li>';
+		return '<li id="qv-btn-counterclockwise"><i class="fa fa-rotate-left"></i><span class="qv-tooltip">Rotate Counterclockwise</span></li>'+
+		       '<li id="qv-btn-clockwise"><i class="fa fa-rotate-right"></i><span class="qv-tooltip">Rotate Clockwise</span></li>';
 	}
 	
 	function getHtmlNavDownloadPanel(){
-		return '<li id="qv-btn-download"><i class="fa fa-download"></i></li>';
+		return '<li id="qv-btn-download"><i class="fa fa-download"></i><span class="qv-tooltip">Download</span></li>';
 	}	
 	
 })(jQuery);

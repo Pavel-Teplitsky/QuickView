@@ -140,6 +140,33 @@ NAV BUTTONS
 #qv-zoom-val-container{
     min-width: 50px;
 }
+.qv-tooltip {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 0px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    margin-top: 31px;
+    margin-left: -66px;
+    font-size: 10px;
+}
+.qv-tooltip::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent black transparent;
+}
+#qv-navbar li:hover .qv-tooltip {
+    visibility: visible;
+}
 
 /*
 ******************************************
