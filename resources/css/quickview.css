@@ -337,17 +337,25 @@ MODAL
 .qv-modal-body{
     background-color: #ffffff;
     padding: 20px;
-    overflow-y: scroll;
-    max-height: 300px;
+    max-height: 500px;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    margin-right: 14px;
+    padding-right: 28px;
 }
-
 .qv-modal-table{
     width: 100%;
     text-align: left;
 }
+.qv-modal-table th:nth-child(3), .qv-modal-table th:last-child{
+    width: 31%;
+    padding-left: 52px;
+}   
 .qv-modal-table > tbody > tr > td{
     font-size: 14px;
-    padding: 10px 0;
+    padding: 10px 6px;
 }
 .qv-modal-table > tbody > tr > td:nth-child(2){
     cursor: pointer;
@@ -357,7 +365,9 @@ MODAL
 .qv-modal-table td:nth-child(3), .qv-modal-table td:last-child{
     font-size: 12px;
 }
-
+.qv-modal-table td:last-child{
+    padding-left: 45px
+}
 .qv-modal-footer{
     height: 25px;
 }
@@ -389,6 +399,265 @@ MODAL
     margin: -20px;
     padding: 20px;
 }
+#qv-upload-tab{
+    margin-top: 75px;
+    width: 550px;
+}
+#qv-upload-tab label{
+    background-color: #29b5ca;
+    border-radius: 0px;
+    color: #ffffff;
+    padding-top: 8px;
+    padding-left: 21px;
+}
+#qv-upload-button{
+    position: relative;
+    right: 0px;
+    bottom: 20px;
+    width: 550px;
+    background-color: #3e4e5a;
+    border: none;
+    height: 33px;
+    color: #ffffff;
+}  
+#qv-upload-button:disabled{
+    background-color: #9ca2a7;
+    cursor: not-allowed;
+}
+#qv-upload-files-table{
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+#qv-upload-files-table>tbody>tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+#qv-upload-files-table tbody tr td > i {
+    font-size: 24px;
+}
+#qv-upload-files-table tbody tr td {
+    height: 70px;
+	padding-left: 14px;
+}
+#qv-upload-files-table .qv-filetree-name{
+    padding-top: 0px;
+}
+.qv-progress{
+    margin-top: 27px;
+    width: 200px;
+    height: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    border-radius: 0px;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+}
+.progress-bar{
+    float: left;
+    width: 0;
+    height: 100%;
+    font-size: 12px;
+    line-height: 20px;
+    color: #fff;
+    text-align: center;
+    background-color: #337ab7;
+    -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+    -webkit-transition: width .6s ease;
+    -o-transition: width .6s ease;
+    transition: width .6s ease;
+}
+.qv-cancel-button{
+    border-radius: 0px !important;
+    height: 43px;
+    width: 44px;
+}
+.qv-cancel-button i{
+    width: 46px;
+    height: 21px;
+    font-size: 31px;
+    padding-bottom: 30px;
+    padding-right: 4px;
+}
+#qv-url-button{
+    border-radius: 0px;
+}
+.qv-file-name{
+    white-space: nowrap;
+    overflow: hidden;
+    width: 200px;
+    text-overflow: ellipsis;
+}
+#qv-upload-files-table.qv-file-name{
+    font-weight: bold;
+}
+section {
+    display: none;
+    padding: 20px 0 0;
+}
+#qv-tab1, #qv-tab2 {
+    display: none;
+}
+.tabs label {
+    display: inline-block;
+    margin: 0 0 -1px;
+    padding: 15px 25px;
+    font-weight: 600;
+    text-align: center;
+    color: #bbb;
+    background-color: #f0f8ff;
+    width: 260px;
+}
+.tabs label i{
+    margin-right: 10px;
+    margin-left: -10px;
+}
+.tabs label:before {
+    font-family: fontawesome;
+    font-weight: normal;
+    margin-right: 10px;
+}
+
+.tabs label:hover {
+    color: #888;
+    cursor: pointer;
+}
+
+.tabs input:checked + label {
+    color: #555;
+    background-color: #ffffff; 
+}
+
+#qv-tab1:checked ~ #qv-select-tab,
+#qv-tab2:checked ~ #qv-upload-tab{
+    display: block;
+}
+.btn {
+    font-size: 14px;
+    line-height: 1.42857143;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;  
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;   
+}
+.btn-warning {
+    color: #fff;
+    background-color: #f0ad4e;
+    border-color: #eea236;
+}
+
+/*
+******************************************
+URL field
+******************************************
+*/
+.qv-url-wrap {
+    position: relative;
+    padding: 0;
+    padding-left: inherit;
+    width: 100%;
+    margin: -50px 0px 52px;
+}
+.qv-url-wrap > input {
+    padding-left: 12px;
+    margin-left: 45px;
+    width: 81%;
+    height: 34px;
+}
+#qv-url-cancel {
+    padding-bottom: 12px;
+    border-radius: 0px;
+    position: absolute;
+    left: -3px;
+    top: 0px;
+}
+#qv-url-cancel i{
+    width: 46px;
+    height: 21px;
+    font-size: 31px;
+    padding-top: 3px;
+}
+#qv-add-url{
+    position: absolute;
+    top: 0px;
+    width: 59px;
+    height: 34px;
+    right: 0px;
+    border-radius: 0px;
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4;
+}
+
+/*
+******************************************
+Drag n Drop
+******************************************
+*/
+.qv-drag-n-drop-wrap {
+    border: 2px dashed #ccc;
+    background-color: #f8f8f8;
+    text-align: center;
+    cursor: default;
+    margin-bottom: 20px;
+    margin-top: -81px;
+    position: inherit;
+    width: 550px;
+    height: 228px;
+    padding-bottom: 7px;
+}
+.qv-drag-n-drop-wrap h2 {
+    color: #797979;
+    margin: 5px 0;
+}
+.qv-drag-n-drop-wrap h4 {
+    color: #afafaf;
+    font-weight: 200;
+    font-size: 16px;
+    margin: 10px 0;
+}
+.qv-drag-n-drop-wrap h5 {
+    color: #afafaf;
+    font-weight: 200;
+    font-size: 12px;
+    margin: 20px 0 0 0;
+}
+.qv-drag-n-drop-icon {
+    margin: 12px auto;
+}
+.qv-drag-n-drop-icon .fa-cloud-download {
+    color: #afafaf;
+    font-size: 76px;
+}
+.qv-drag-n-drop-buttons {
+    position: relative;
+    top: -77px;
+    left: 117px;
+    width: 62%;
+}
+.qv-drag-n-drop-buttons i {
+    margin-right: 5px;
+}
+.qv-drag-n-drop-buttons .btn {
+    width: 134px;
+    height: 35px;
+    margin: 0 10px;
+}
+#qv-file{
+    display: none;
+}
+#qv-dropZone.hover {
+    background: #ddd;
+    border-color: #aaa;
+}
+
 /*
 ******************************************
 Document types
