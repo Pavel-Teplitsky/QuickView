@@ -497,10 +497,16 @@ NAV BAR CONTROLS
 		        // increase URL counter
 		        urlCounter++;
 	        } else {
-		        // upload local file
-		        uploadDocument(uploadFilesList[i - urlCounter], i);
-		        // remove file from the files array
-		        uploadFilesList.splice(i - urlCounter, 1);
+                    // check if the current file already uploaded
+		    var isUploaded = $(tableRows[i]).find("td.qv-filetree-name").data().uploaded;
+		    if(!isUploaded){
+                        // upload local file
+			uploadDocument(uploadFilesList[i - urlCounter], i);
+                        // mark file as uploaded		
+			$(tableRows[i]).find("td.qv-filetree-name").data().uploaded = true;
+		    } else {	
+			continue;
+		    }				
 	        }
             }
 	});
@@ -1043,7 +1049,7 @@ FUNCTIONS
 	        table.append(
 		    '<tr>'+
 			'<td><i class="fa ' + getDocumentFormat(url.split('/').pop()).icon + '"></i></td>'+
-			'<td class="qv-filetree-name" data-value="' + url + '"><div class="qv-file-name">' + url.split('/').pop() + '</div>'+ 
+			'<td class="qv-filetree-name" data-value="' + url + '" data-uploaded="false"><div class="qv-file-name">' + url.split('/').pop() + '</div>'+ 
 			    '<span id="qv-upload-size"> type: ' + url.split('/').pop().split('.').pop() +'</span>'+
 			'</td>'+
 			'<td>'+
@@ -1075,7 +1081,7 @@ FUNCTIONS
 		    table.append(
 			'<tr>'+
 			    '<td><i class="fa ' + docFormat.icon + '"></i></td>'+
-			    '<td class="qv-filetree-name"><div class="qv-file-name">' + file.name + '</div>'+ 
+			    '<td class="qv-filetree-name" data-uploaded="false"><div class="qv-file-name">' + file.name + '</div>'+ 
 				'<span id="qv-upload-size">size: ' + new_size +'</span>'+
 				'<span id="qv-upload-size"> type: ' + file.name.split('.').pop() +'</span>'+
 			    '</td>'+
