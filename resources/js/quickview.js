@@ -455,19 +455,19 @@ NAV BAR CONTROLS
 	// Cancel file upload event
 	//////////////////////////////////////////////////
 	 $('#qv-upload-files-table').on('click', ".qv-cancel-button", function(e){
-            // get selected files
-            var button = $(this);
-            // get file name which will be deleted
-            var fileName = button.closest("tr").find("div")[0].innerHTML;
-            // find its index in the array
-            for(var i = 0; i < uploadFilesList.length; i++){
-              if(uploadFilesList[i].name == fileName){
-                  // remove file from the files array
-                  uploadFilesList.splice(i, 1);
-              }
-            }
-            // remove table row
-       	    button.closest("tr").remove();
+		// get selected files
+		var button = $(this);
+		// get file name which will be deleted
+		var fileName = button.closest("tr").find("div")[0].innerHTML;
+		// find its index in the array
+		for(var i = 0; i < uploadFilesList.length; i++){
+		  if(uploadFilesList[i].name == fileName){
+			  // remove file from the files array
+			  uploadFilesList.splice(i, 1);
+		  }
+		}
+		// remove table row
+		button.closest("tr").remove();
 	    $('#qv-upload-input').val('');
 	    // recalculate indexes in the files table
 	    var tableRows = $('#qv-upload-files-table > tbody > tr');
@@ -484,47 +484,53 @@ NAV BAR CONTROLS
 	// Upload event
 	//////////////////////////////////////////////////
 	$("#qv-upload-button").on('click', function(e){
-            // get current number of table rows
-            var tableRows = $('#qv-upload-files-table > tbody > tr');
-            // initiate URL counter required for proper calculating of the uploaded files in case local files uploaded with URLs
-            var urlCounter = 0;
-            // upload file one by one
-            for (var i = 0; i < tableRows.length; i++) {
-	        // check if current table row contains URL instead of file
-	        if($(tableRows[i]).find("td[data-value]").length > 0) {
-		    // upload URL
-		    uploadDocument(null, i, $(tableRows[i]).find("td.qv-filetree-name").data().value);
-		    // increase URL counter
-		    urlCounter++;
-	        } else {
-		    // upload local file
-		    uploadDocument(uploadFilesList[i - urlCounter], i);
-	        }
-            }
+		// get current number of table rows
+		var tableRows = $('#qv-upload-files-table > tbody > tr');
+		// initiate URL counter required for proper calculating of the uploaded files in case local files uploaded with URLs
+		var urlCounter = 0;
+		// upload file one by one
+		for (var i = 0; i < tableRows.length; i++) {
+			// check if current table row contains URL instead of file
+			if($(tableRows[i]).find("td[data-value]").length > 0) {
+			// upload URL
+			uploadDocument(null, i, $(tableRows[i]).find("td.qv-filetree-name").data().value);
+			// increase URL counter
+			urlCounter++;
+			} else {
+			// upload local file
+			uploadDocument(uploadFilesList[i - urlCounter], i);
+			}
+		}
 	});
 	
 	//////////////////////////////////////////////////
 	// Open URL input event
 	//////////////////////////////////////////////////
 	$('#qv-url-button').on('click', function () {
-            $('#qv-url-wrap').slideDown('fast');
-        });
+		$('#qv-url-wrap').slideDown('fast');
+	});
 	
 	//////////////////////////////////////////////////
 	// Close URL input event
 	//////////////////////////////////////////////////
 	$('#qv-url-cancel').on('click', function () {
-            $('#qv-url-wrap').slideUp('fast');
-            $('#qv-url').val('');
-        });
+		$('#qv-url-wrap').slideUp('fast');
+		$('#qv-url').val('');
+	});
 	
 	//////////////////////////////////////////////////
 	// Add file via URL event
 	//////////////////////////////////////////////////
 	$('#qv-add-url').on('click', function () {
-            addFileForUpload(null, $("#qv-url").val());
-        });
-
+		addFileForUpload(null, $("#qv-url").val());
+	});
+	
+	//////////////////////////////////////////////////
+	// Print event
+	//////////////////////////////////////////////////
+	$('#qv-btn-print').on('click', function(e){
+		printDocument();
+	});
 /*
 ******************************************************************
 FUNCTIONS
@@ -1140,6 +1146,23 @@ FUNCTIONS
 	        }
 	    });		
 	}
+	
+	/**
+	* Print current document
+	*/
+	function printDocument(){
+	    // get current document content
+	    var documentContainer = $("#qv-panzoom");
+	    // open print dialog 
+	    var windowObject = window.open('', "PrintWindow", "width=750,height=650,top=50,left=50,toolbars=no,scrollbars=yes,status=no,resizable=yes");
+	    // add current document into the print window
+	    windowObject.document.writeln(documentContainer[0].innerHTML);
+	    windowObject.document.close();
+	    windowObject.focus();
+	    windowObject.print();
+	    windowObject.close();
+	}
+	
 //
 // END of document ready function
 });
@@ -1175,7 +1198,8 @@ METHODS
 				search: true,
 				thumbnails: true,
 				rotate: true,
-				download: true
+				download: true,
+				print: true
 			};
 			options = $.extend(defaults, options);
 
@@ -1207,6 +1231,10 @@ METHODS
 			if(options.download){
 				$(qv_navbar).append(getHtmlNavDownloadPanel);
 				$(qv_navbar).append(getHtmlNavSplitter);
+			}
+			if(options.download){
+			    $(qv_navbar).append(getHtmlNavPrintPanel);
+			    $(qv_navbar).append(getHtmlNavSplitter);
 			}
 			if(options.thumbnails){
 				$(qv_navbar).append(getHtmlNavThumbTogglePanel);
@@ -1409,6 +1437,10 @@ HTML MARKUP
 	function getHtmlNavDownloadPanel(){
 		return '<li id="qv-btn-download"><i class="fa fa-cloud-download"></i></li>';
 	}	
+	
+	function getHtmlNavPrintPanel(){
+	    return '<li id="qv-btn-print"><i class="fa fa-print"></i></li>';
+	}
 	
 })(jQuery);
 
