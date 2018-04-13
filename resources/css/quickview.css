@@ -368,7 +368,7 @@ MODAL
     overflow: hidden;
     width: 100%;
     height: 100%;
-    overflow: auto;
+    overflow-y: auto;
     margin-right: 14px;
     padding-right: 28px;
 }
@@ -426,29 +426,33 @@ MODAL
     margin: -20px;
     padding: 20px;
 }
-#qv-upload-tab{
+#qv-upload-section{
     margin-top: 75px;
     width: 550px;
 }
-#qv-upload-tab label{
-    background-color: #25c2d4;
+#qv-upload-section label{
+    background-color: #3e4e5a;
     border-radius: 0px;
     color: #ffffff;
     padding-top: 8px;
-    padding-left: 21px;
+    padding-left: 7px;
+    display: inline-block;  
+    text-align: center;
 }
-#qv-upload-button{
+#qv-upload-button, #qv-open-document{
     position: relative;
     right: 0px;
     bottom: 20px;
-    width: 550px;
+    width: 265px;
     background-color: #3e4e5a;
     border: none;
     height: 33px;
     color: #ffffff;
 }  
+#qv-open-document{
+    right: -15px;
+}
 #qv-upload-button:disabled{
-    background-color: #cacaca;
     cursor: not-allowed;
 }
 #qv-upload-files-table{
@@ -499,14 +503,18 @@ MODAL
     -o-transition: width .6s ease;
     transition: width .6s ease;
 }
-.qv-cancel-button{padding: 5px;background: none;}
+.qv-cancel-button{
+    padding: 5px;
+    background: none;
+}
 .qv-cancel-button i{
     font-size: 21px;
 }
 #qv-url-button{
-    background-color: #25c2d4;
+    background-color: #3e4e5a;
     border-radius: 0px;
     border: 0;
+    color: #ffffff;
 }
 .qv-file-name{
     white-space: nowrap;
@@ -518,45 +526,12 @@ MODAL
     font-weight: bold;
 }
 section {
-    display: none;
+    display: block;
     padding: 20px 0 0;
 }
-#qv-tab1, #qv-tab2 {
-    display: none;
-}
-.tabs label {
-    display: inline-block;
-    margin: 0 0 -1px;
-    padding: 15px 25px;
-    font-weight: 600;
-    text-align: center;
-    color: #bbb;
-    background-color: #f0f8ff;
-    width: 260px;
-}
-.tabs label i{
+#qv-upload-section label i{
     margin-right: 10px;
     margin-left: -10px;
-}
-.tabs label:before {
-    font-family: fontawesome;
-    font-weight: normal;
-    margin-right: 10px;
-}
-
-.tabs label:hover {
-    color: #888;
-    cursor: pointer;
-}
-
-.tabs input:checked + label {
-    color: #555;
-    background-color: #ffffff; 
-}
-
-#qv-tab1:checked ~ #qv-select-tab,
-#qv-tab2:checked ~ #qv-upload-tab{
-    display: block;
 }
 .btn {
     font-size: 14px;
@@ -571,11 +546,6 @@ section {
     user-select: none;
     background-image: none;
     border: 1px solid transparent;
-}
-.btn-warning {
-    color: #fff;
-    background-color: #f0ad4e;
-    border-color: #eea236;
 }
 
 /*
