@@ -124,6 +124,8 @@ NAV BAR CONTROLS
 	// Open modal dialog (file browser) event
 	//////////////////////////////////////////////////
 	$('#qv-header-logo').on('click', function(e){
+		$("#qv-browse-section").show();
+		$("#qv-upload-section").hide();
 		toggleModalDialog(true, 'Open Document');
 		loadFileTree('');
 	});
@@ -131,9 +133,7 @@ NAV BAR CONTROLS
 	//////////////////////////////////////////////////
 	// Close modal dialog event
 	//////////////////////////////////////////////////
-	$('.qv-modal-close-action').on('click', function(e){
-		toggleModalDialog(false, '');
-	});
+	$('.qv-modal-close-action').on('click', closeModal);
 
 	//////////////////////////////////////////////////
 	// File or directory click event from file tree
@@ -531,6 +531,7 @@ NAV BAR CONTROLS
 	//////////////////////////////////////////////////
 	$('#qv-add-url').on('click', function () {
             addFileForUpload(null, $("#qv-url").val());
+	    $('#qv-url').val('');
         });
 
 	//////////////////////////////////////////////////
@@ -539,7 +540,25 @@ NAV BAR CONTROLS
 	$('#qv-btn-print').on('click', function(e){
             printDocument();
 	});
-
+	
+	//////////////////////////////////////////////////
+	// Open modal dialog (file upload) event
+	//////////////////////////////////////////////////
+	$('#qv-btn-upload').on('click', function(e){
+	    $("#qv-upload-section").show();
+	    $("#qv-browse-section").hide();
+	    toggleModalDialog(true, 'Upload Document');		
+	});
+	
+	//////////////////////////////////////////////////
+	// Open document button (upload dialog) click
+	//////////////////////////////////////////////////
+	$('#qv-open-document').on('click', function(e){
+	    $("#qv-browse-section").show();
+	    $("#qv-upload-section").hide();
+	    toggleModalDialog(true, 'Open Document');
+	    loadFileTree('');	
+	});
 /*
 ******************************************************************
 FUNCTIONS
@@ -798,8 +817,7 @@ FUNCTIONS
 			// hide all contents
 			$('#qv-modal-filebroswer').hide();
 			$('#qv-modal-spinner').hide();
-			$('#qv-modal-error').hide();
-			$('.tabs').show();
+			$('#qv-modal-error').hide();			
 		}
 	}
 
@@ -968,7 +986,6 @@ FUNCTIONS
 	* @param {string} message - message to diplay in popup
 	*/
 	function printMessage(message){
-		$(".tabs").hide();
 		$('#qv-modal-error').show();
 		$('#qv-modal-error').text(message);
 		toggleModalDialog(true, 'Error');		
@@ -1130,8 +1147,16 @@ FUNCTIONS
 	            // upload progress
 	            xhr.upload.addEventListener("progress", function(event){
 		        if (event.lengthComputable) {
+			    $(".qv-modal-close-action").off('click');
+			    $("#qv-open-document").prop("disabled", true);
 		            // increase progress
 		            $("#qv-pregress-bar-" + index).css("width",  event.loaded / event.total * 100+"%");
+			    if(event.loaded == event.total){
+			        $('<div style="color: green; text-align: center;">Upload complete</div>').insertBefore($("#qv-pregress-bar-" + index).parent());
+			        $("#qv-pregress-bar-" + index).parent().remove();
+			        $('.qv-modal-close-action').on('click', closeModal);
+			        $("#qv-open-document").prop("disabled", false);
+			    }
 		        }
 	            }, false);
 	            return xhr;
@@ -1173,7 +1198,20 @@ FUNCTIONS
 	    windowObject.print();
 	    windowObject.close();
 	}
-
+		
+	/**
+	* Close modal
+	*/
+	function closeModal(){
+	    // remove all files from the upload list
+	    uploadFilesList = [];
+	    var tableRows = $('#qv-upload-files-table > tbody > tr');
+	    for(var n = 0; n < tableRows.length; n++){
+	        $(tableRows[n]).remove();
+	    }
+	    $("#qv-upload-input").val('');
+	    toggleModalDialog(false, '');
+	}
 //
 // END of document ready function
 });
@@ -1222,6 +1260,9 @@ METHODS
 			// assembly html base
 			this.append(getHtmlBase);
 			this.append(getHtmlModalDialog);
+			
+			// assembly modal html
+			$(".qv-modal-body").append(getHtmlFileBrowser);
 
 			// assembly nav bar
 			if(options.zoom){
@@ -1243,23 +1284,20 @@ METHODS
 			if(options.download){
 				$(qv_navbar).append(getHtmlNavDownloadPanel);
 				$(qv_navbar).append(getHtmlNavSplitter);
-			}
+			}			
+			if(options.upload){
+				$(qv_navbar).append(getHtmlNavUploadPanel);
+				$(qv_navbar).append(getHtmlNavSplitter);	
+				getHtmlUpload();
+			} 			
 			if(options.print){
 			        $(qv_navbar).append(getHtmlNavPrintPanel);
 			        $(qv_navbar).append(getHtmlNavSplitter);
 			}
 			if(options.thumbnails){
 				$(qv_navbar).append(getHtmlNavThumbTogglePanel);
-			}
-			if(!options.upload){
-			    $("#qv-upload-tab").css("display", "none");
-			    var innerElements = $(".tabs").children();
-			    for (var i = 0; i < 4; i++){
-				    $(innerElements[i]).css("display", "none");
-			    }
-			}
+			}					
 		}
-
 	};
 	
 
@@ -1329,55 +1367,9 @@ HTML MARKUP
 			            '</div>'+
 			            // body
 			            '<div class="qv-modal-body">'+
-					'<div id="qv-modal-error">TEST</div>'+
-				         '<div class="tabs">'+
-					    '<input id="qv-tab1" type="radio" name="tabs" checked>'+
-					    '<label for="qv-tab1"><i class="fa fa-list"></i>Browse</label>'+
-					    '<input id="qv-tab2" type="radio" name="tabs">'+
-					    '<label for="qv-tab2"><i class="fa fa-upload"></i>Upload</label>'+
-					    '<section id="qv-select-tab" class="tab-slider-body">'+
-					        '<div id="qv-modal-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+					        
-					        '<table id="qv-modal-filebroswer" class="qv-modal-table">'+
-					        '<thead>'+
-						    '<tr>'+
-							'<th class="col-md-1"> </th>'+
-							'<th class="col-md-5">Document</th>'+
-							'<th class="col-md-3">Format</th>'+
-							'<th class="col-md-3">Size</th>'+
-						    '</tr>'+
-					        '</thead>'+
-					        '<tbody>'+
-					        // list of files
-					        '</tbody>'+
-					        '</table>'+
-					    '</section>'+				    
-					    '<section id="qv-upload-tab" class="tab-slider-body">'+
-					       '<div class="qv-drag-n-drop-wrap" id="qv-dropZone">'+
-						    '<div class="qv-drag-n-drop-icon"><i class="fa fa-cloud-download fa-5x" aria-hidden="true"></i></div>'+
-						    '<h2>Drag &amp; Drop your files here</h2>'+
-						    '<h4>OR</h4>'+
-					        '</div>'+
-						'<div class="qv-drag-n-drop-buttons">'+
-						    '<label class="btn btn-primary">'+
-							'<i class="fa fa-file"></i>'+
-							'SELECT FILE <input id="qv-upload-input" type="file" multiple style="display: none;">'+
-						    '</label>'+
-						    '<button class="btn btn-warning" id="qv-url-button"><i class="fa fa-link"></i>URL</button>'+
-						'</div>'+
-						'<div class="inner-addon left-addon btn qv-url-wrap" id="qv-url-wrap" style="display: none;">'+
-						    '<input type="url" class="form-control" id="qv-url" placeholder="Enter your file URL">'+
-						    '<button class="btn" id="qv-url-cancel"><i class="fa fa-trash-o"></i></button>'+
-						    '<button class="btn btn-primary" id="qv-add-url">Add</button>'+
-						'</div>'+
-						'<table id="qv-upload-files-table" class="table table-striped">'+
-						    '<tbody>'+
-						    // list of files
-						    '</tbody>'+
-						'</table>'+
-						'<button id="qv-upload-button" type="button" class="btn btn-success" disabled>Upload</button>'+
-					    '</section>'+
-				        '</div>'+
-			            '</div>'+						
+							'<div id="qv-modal-error">TEST</div>'+
+							// modal content will be here							
+						'</div>'+						
 			            // footer
 			            '<div class="qv-modal-footer">'+
 			            // empty footer
@@ -1466,6 +1458,62 @@ HTML MARKUP
 	
 	function getHtmlNavPrintPanel(){
 	        return '<li id="qv-btn-print"><i class="fa fa-print"></i><span class="qv-tooltip">Print</span></li>';
+	}
+	
+	function getHtmlFileBrowser(){
+	    return '<section id="qv-browse-section" class="tab-slider-body">'+
+		        '<div id="qv-modal-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+					        
+		        '<table id="qv-modal-filebroswer" class="qv-modal-table">'+
+			    '<thead>'+
+			        '<tr>'+
+				    '<th class="col-md-1"> </th>'+
+				    '<th class="col-md-5">Document</th>'+
+				    '<th class="col-md-3">Format</th>'+
+				    '<th class="col-md-3">Size</th>'+
+			        '</tr>'+
+			    '</thead>'+
+			    '<tbody>'+
+			    // list of files
+			    '</tbody>'+
+		        '</table>'+
+		    '</section>';		
+	}
+	
+	function getHtmlNavUploadPanel(){
+	    return '<li id="qv-btn-upload"><i class="fa fa-upload"></i><span class="qv-tooltip">Upload</span></li>';
+	}	
+	
+	function getHtmlUpload(){
+	    // upload section
+	    var uploadSection = '<section id="qv-upload-section" class="tab-slider-body">'+
+				'<div class="qv-drag-n-drop-wrap" id="qv-dropZone">'+
+				    '<div class="qv-drag-n-drop-icon"><i class="fa fa-cloud-download fa-5x" aria-hidden="true"></i></div>'+
+					'<h2>Drag &amp; Drop your files here</h2>'+
+					'<h4>OR</h4>'+
+				    '</div>'+
+				    '<div class="qv-drag-n-drop-buttons">'+
+					'<label class="btn btn-primary">'+
+					    '<i class="fa fa-file"></i>'+
+					    'SELECT FILE <input id="qv-upload-input" type="file" multiple style="display: none;">'+
+					'</label>'+
+					'<button class="btn" id="qv-url-button"><i class="fa fa-link"></i>URL</button>'+
+				    '</div>'+
+				    '<div class="inner-addon left-addon btn qv-url-wrap" id="qv-url-wrap" style="display: none;">'+
+					'<input type="url" class="form-control" id="qv-url" placeholder="Enter your file URL">'+
+					'<button class="btn" id="qv-url-cancel"><i class="fa fa-trash-o"></i></button>'+
+					'<button class="btn btn-primary" id="qv-add-url">Add</button>'+
+				    '</div>'+
+				    '<table id="qv-upload-files-table" class="table table-striped">'+
+					'<tbody>'+
+					// list of files
+					'</tbody>'+
+				    '</table>'+
+			    '<button id="qv-upload-button" type="button" class="btn btn-success" disabled>Upload</button>'+
+			    '<button id="qv-open-document" type="button" class="btn">Browse files</button>'+
+			    '</section>';
+	    // add upload section
+	    $(uploadSection).insertAfter($("#qv-browse-section"));
+	    $("#qv-upload-section").hide();
 	}
 	
 })(jQuery);
