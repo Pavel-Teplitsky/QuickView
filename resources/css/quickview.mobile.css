@@ -1,10 +1,10 @@
-@media (max-width: 1000px){
+@media (max-width: 1024px){
 	/*
 	******************************************
 	Dashboard
 	******************************************
 	*/
-	#qv-zoom-val-container, #qv-btn-zoom-in, #qv-btn-zoom-out, #qv-nav-right {
+	#qv-zoom-val-container, #qv-btn-zoom-in, #qv-btn-zoom-out, #qv-nav-right , #qv-btn-print{
 		display: none;
 	}
 	#qv-header {
@@ -20,7 +20,7 @@
 	}
 	#qv-navbar > li {
 		font-size: 30px;
-		padding: 32px 20px;
+		padding: 32px 17px;
 	}
 	#qv-nav-search-container {
 		width: 100%;
@@ -102,13 +102,13 @@
 	    height: 108px;
 	    font-size: 50px;
 	}
-	#qv-upload-tab {
+	#qv-upload-section {
 	    position: inherit;
 	    top: calc(100% - 50%);
 	    width: 89%;
 	    left: 61px;
 	}
-	#qv-upload-tab span{
+	#qv-upload-section span{
 	    height: 113px;
 	    font-size: 42px;
 	    padding: 20px;
@@ -120,12 +120,15 @@
 	    font-size: -webkit-xxx-large;
 	    height: 63px;
 	}
-	#qv-upload-button {
+	#qv-upload-button, #qv-open-document  {
 	    height: 97px;
 	    font-size: 55px;
 	    position: inherit;
-	    width: 100%;
-	    margin: 10px 48px 10px;
+	    width: 51%;
+	    margin: 10px 34px 9px;
+	}
+	#qv-open-document  {
+	    margin: -106px 500px 9px;
 	}
 	.nav-item a {
 	    font-size: 53px;
@@ -144,16 +147,16 @@
 	#qv-upload-files-table {
     	    width: 926px;
 	}
-	#qv-upload-tab label{
+	#qv-upload-section label{
 	    width: 46%;
 	    height: 77px;
 	    font-size: 44px;
 	}
-	#qv-upload-tab i{
+	#qv-upload-section i{
 	    font-size: 53px;
 	    padding-bottom: 45px;
 	}
-	#qv-upload-tab tr{
+	#qv-upload-section tr{
 	    font-size: 38px;
 	}
 	#qv-upload-files-table tbody tr td {
@@ -210,7 +213,7 @@
 	.qv-file-name {
 	    width: 530px;
 	}
-
+	
 	/*
 	******************************************
 	PAGES
