@@ -32,7 +32,7 @@ Content wrapper
 CONTAINER
 ******************************************
 */
-#qv-container{
+#qv-container {
     position: fixed;
     top: 0;
     bottom: 0;
@@ -45,7 +45,7 @@ CONTAINER
 HEADER
 ******************************************
 */
-#qv-header{
+#qv-header {
     position: fixed;
     width: 100%;
     height: 50px;
@@ -56,7 +56,7 @@ HEADER
 LOGO
 ******************************************
 */
-#qv-header-logo{
+#qv-header-logo {
     width: 134px;
     height: 12px;
     background-repeat: no-repeat;
@@ -72,27 +72,27 @@ LOGO
 NAV BUTTONS
 ******************************************
 */
-#qv-navbar{
+#qv-navbar {
     margin-left: 10px;
     height: 100%;
 }
-#qv-navbar > li{
+#qv-navbar > li {
     font-size: 14px;
     float: left;
     position: relative;
     cursor: pointer;
     padding: 19px 15px 17px 15px;
 }
-.qv-nav-separator{
+.qv-nav-separator {
     width: 20px;
     height: 100%;
     margin: 0 !important;
     cursor: default !important;
 }
-#qv-nav-right{
+#qv-nav-right {
     float: right !important;
 }
-.qv-nav-caret{
+.qv-nav-caret {
     display: inline-block;
     width: 0;
     height: 0;
@@ -103,7 +103,7 @@ NAV BUTTONS
     border-right: 4px solid transparent;
     border-left: 4px solid transparent;
 }
-.qv-nav-dropdown-menu{
+.qv-nav-dropdown-menu {
     position: absolute;
     top: 49px;
     left: 0;
@@ -122,7 +122,7 @@ NAV BUTTONS
     background-clip: padding-box;
     display: none;
 }
-.qv-nav-dropdown-menu li{
+.qv-nav-dropdown-menu li {
     display: block;
     padding: 3px 20px;
     clear: both;
@@ -130,27 +130,27 @@ NAV BUTTONS
     line-height: 1.42857143;
     white-space: nowrap;
 }
-.qv-nav-dropdown-menu-separator{
+.qv-nav-dropdown-menu-separator {
     height: 1px;
     margin: 8px 0;
     overflow: hidden;
     background-color: #e5e5e5;
     padding: 0 !important;
 }
-#qv-zoom-val-container{
+#qv-zoom-val-container {
     min-width: 50px;
 }
 .qv-tooltip {
     visibility: hidden;
     width: 120px;
-    background-color: black;
+    background-color: #000000;
     color: #fff;
     text-align: center;
     border-radius: 0px;
     padding: 5px 0;
     position: absolute;
     z-index: 1;
-    margin-top: 31px;
+    margin-top: 37px;
     margin-left: -66px;
     font-size: 10px;
 }
@@ -167,13 +167,24 @@ NAV BUTTONS
 #qv-navbar li:hover .qv-tooltip {
     visibility: visible;
 }
+#qv-header-logo:hover .qv-tooltip {
+    visibility: visible;
+    margin-left: 10px;
+    margin-top: 31px;
+}
+#qv-nav-right:hover .qv-tooltip {
+    margin-left: -108px;
+}
+#qv-nav-right .qv-tooltip::after {
+    left: 85%;
+}
 
 /*
 ******************************************
 SEARCH
 ******************************************
 */
-#qv-nav-search-container{
+#qv-nav-search-container {
     min-width: 330px;
     padding: 8px 0px 7px 7px;
     position: absolute;
@@ -183,28 +194,28 @@ SEARCH
     top: 49px;
     z-index: 1;
 }
-#qv-nav-search-container input[type='text']{
+#qv-nav-search-container input[type='text'] {
     float: left;
     border: 0;
     height: 20px;
     width: 215px;
     padding: 5px 65px 5px 5px;
 }
-#qv-nav-search-container input[type='text']:focus{
+#qv-nav-search-container input[type='text']:focus {
     outline: none;
 }
-#qv-nav-search-cancel{
+#qv-nav-search-cancel {
     font-size: 15px;
     width: 10px;
     margin-left: 1px;
     margin-top: -2px;
 }
-.qv-nav-search-btn{
+.qv-nav-search-btn {
     float: left;
     margin: 0px 10px;
     padding: 3px 5px;
 }
-#qv-search-count{
+#qv-search-count {
     color: #959DA5;
     font-size: 11px;
     position: absolute;
@@ -218,10 +229,10 @@ SEARCH
 Search highlight
 ******************************************
 */
-.qv-highlight{
+.qv-highlight {
     background-color: yellow;
 }
-.qv-highlight-select{
+.qv-highlight-select {
     background-color: #ff9b00;
 }
 /*
@@ -242,11 +253,11 @@ PAGES
     transition:all 0.4s;
     overflow: visible;
 }
-#qv-pages img{
+#qv-pages img {
     left: 0;
     width: inherit;
 }
-#qv-panzoom{
+#qv-panzoom {
     transform: none;
     backface-visibility: hidden;
     transform-origin: 50% 50% 0px;
@@ -266,12 +277,12 @@ PAGES
     width: inherit;
     height: inherit;
 }
-.qv-page-spinner{
+.qv-page-spinner {
     margin-top: 150px;
 }
 
 /* Fix for image files */
-#qv-pages .qv-wrapper > img{
+#qv-pages .qv-wrapper > img {
     max-width: 100vw !important;
     display: -webkit-box;
 }
@@ -280,7 +291,7 @@ PAGES
 Thumbnails sidebar
 ******************************************
 */
-#qv-thumbnails{
+#qv-thumbnails {
     top: 0;
     bottom: 0;
     display: none;
@@ -296,22 +307,22 @@ Thumbnails sidebar
     overflow-y: auto;
     display: block;
 }
-#qv-thumbnails-panzoom{
+#qv-thumbnails-panzoom {
     zoom: 0.25;
     zoom: 25%;
 }
-#qv-thumbnails-panzoom > .qv-page{
+#qv-thumbnails-panzoom > .qv-page {
     margin-bottom: 100px;
 }
-#qv-thumbnails-panzoom .qv-wrapper > div > div > img{
+#qv-thumbnails-panzoom .qv-wrapper > div > div > img {
     width: inherit;
 }
 /* Make thumbnails sidebar scroll not visible */
-#qv-thumbnails::-webkit-scrollbar{
+#qv-thumbnails::-webkit-scrollbar {
     width: 0px;
     background-color: #F5F5F5;
 }
-#qv-thumbnails .qv-wrapper > img{
+#qv-thumbnails .qv-wrapper > img {
     position: absolute;
     width: -webkit-fill-available !important;
     margin: 0 20px;
@@ -322,7 +333,7 @@ Thumbnails sidebar
 MODAL
 ******************************************
 */
-.qv-modal{
+.qv-modal {
     display: none;
     overflow: hidden;
     position: fixed;
@@ -335,33 +346,33 @@ MODAL
     outline: 0;
     background-color: rgba(0,0,0,0.5);
 }
-.qv-modal-dialog{
+.qv-modal-dialog {
     position: absolute;
     width: 600px;
     height: 400px;
     top: calc(50% - 200px);
     left: calc(50% - 300px);
 }
-.qv-modal-content{
+.qv-modal-content {
     background-color: #ffffff;
     height: 100%;
 }
-.qv-modal-header{
+.qv-modal-header {
     padding: 1px 20px;
 }
-.qv-modal-close{
+.qv-modal-close {
     position: absolute;
     right: 20px;
     top: 13px;
     font-size: 21px;
     cursor: pointer;
 }
-.qv-modal-title{
+.qv-modal-title {
     font-size: 16px;
     font-weight: 400;
     padding: 16px;
 }
-.qv-modal-body{
+.qv-modal-body {
     background-color: #ffffff;
     padding: 20px;
     max-height: 500px;
@@ -372,43 +383,43 @@ MODAL
     margin-right: 14px;
     padding-right: 28px;
 }
-.qv-modal-table{
+.qv-modal-table {
     width: 100%;
     text-align: left;
 }
-.qv-modal-table th:nth-child(3), .qv-modal-table th:last-child{
+.qv-modal-table th:nth-child(3), .qv-modal-table th:last-child {
     width: 31%;
     padding-left: 52px;
 }   
-.qv-modal-table > tbody > tr > td{
+.qv-modal-table > tbody > tr > td {
     font-size: 14px;
     padding: 10px 6px;
 }
-.qv-modal-table > tbody > tr > td:nth-child(2){
+.qv-modal-table > tbody > tr > td:nth-child(2) {
     cursor: pointer;
     max-width: 200px;
     overflow: hidden;
 }
-.qv-modal-table td:nth-child(3), .qv-modal-table td:last-child{
+.qv-modal-table td:nth-child(3), .qv-modal-table td:last-child {
     font-size: 12px;
 }
-.qv-modal-table td:last-child{
+.qv-modal-table td:last-child {
     padding-left: 45px
 }
-.qv-modal-footer{
+.qv-modal-footer {
     height: 25px;
 }
-.qv-modal-footer > .btn{
+.qv-modal-footer > .btn {
     float: right;
     margin: 20px 15px;
     padding: 10px 20px;
     cursor: pointer;
     font-size: 12px;
 }
-#qv-modal-filebroswer{
+#qv-modal-filebroswer {
     display: none;
 }
-#qv-modal-spinner{
+#qv-modal-spinner {
     position: absolute;
     background-color: #ffffff;
     width: 560px;
@@ -417,7 +428,7 @@ MODAL
     font-size: 16px;
     display: none;
 }
-#qv-modal-error{
+#qv-modal-error {
     position: absolute;
     background-color: #ffffff;
     width: 100%;
@@ -426,20 +437,21 @@ MODAL
     margin: -20px;
     padding: 20px;
 }
-#qv-upload-section{
+#qv-upload-section {
     margin-top: 75px;
     width: 550px;
 }
-#qv-upload-section label{
+#qv-upload-section label {
     background-color: #3e4e5a;
     border-radius: 0px;
     color: #ffffff;
-    padding-top: 8px;
+    padding-top: 9px;
     padding-left: 7px;
-    display: inline-block;  
+    display: inline-block;
     text-align: center;
+    font-size: 11px;
 }
-#qv-upload-button, #qv-open-document{
+#qv-upload-button, #qv-open-document {
     position: relative;
     right: 0px;
     bottom: 20px;
@@ -449,13 +461,14 @@ MODAL
     height: 33px;
     color: #ffffff;
 }  
-#qv-open-document{
+#qv-open-document {
     right: -15px;
+    background-color: #25c2d4;
 }
-#qv-upload-button:disabled{
+#qv-upload-button:disabled {
     cursor: not-allowed;
 }
-#qv-upload-files-table{
+#qv-upload-files-table {
     width: 100%;
     max-width: 100%;
     margin-bottom: 40px;
@@ -471,15 +484,15 @@ MODAL
     height: 70px;
     padding-left: 14px;
 }
-#qv-upload-files-table .qv-filetree-name{
+#qv-upload-files-table .qv-filetree-name {
     padding-top: 0px;
 }
-#qv-upload-files-table .qv-filetree-name > span{
+#qv-upload-files-table .qv-filetree-name > span {
     font-size: 12px;
     font-weight: 300;
-    color: #cacaca;
+    color: #9a9a9a;
 }
-.qv-progress{
+.qv-progress {
     width: 200px;
     height: 10px;
     overflow: hidden;
@@ -488,7 +501,7 @@ MODAL
     -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
     box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
 }
-.progress-bar{
+.progress-bar {
     float: left;
     width: 0;
     height: 100%;
@@ -503,33 +516,31 @@ MODAL
     -o-transition: width .6s ease;
     transition: width .6s ease;
 }
-.qv-cancel-button{
+.qv-upload-complete {
+    text-align: center;
+    color: #8c8c8c;
+}
+.qv-cancel-button {
     padding: 5px;
     background: none;
 }
-.qv-cancel-button i{
+.qv-cancel-button i {
     font-size: 21px;
 }
-#qv-url-button{
-    background-color: #3e4e5a;
-    border-radius: 0px;
-    border: 0;
-    color: #ffffff;
-}
-.qv-file-name{
+.qv-file-name {
     white-space: nowrap;
     overflow: hidden;
     width: 200px;
     text-overflow: ellipsis;
 }
-#qv-upload-files-table.qv-file-name{
+#qv-upload-files-table.qv-file-name {
     font-weight: bold;
 }
 section {
     display: block;
     padding: 20px 0 0;
 }
-#qv-upload-section label i{
+#qv-upload-section label i {
     margin-right: 10px;
     margin-left: -10px;
 }
@@ -562,33 +573,28 @@ URL field
 }
 .qv-url-wrap > input {
     padding-left: 12px;
-    margin-left: 45px;
-    width: 81%;
+    margin-left: 35px;
+    width: 454px;
     height: 34px;
+    color: #585858;
 }
 #qv-url-cancel {
-    padding-bottom: 12px;
-    border-radius: 0px;
     position: absolute;
-    left: -3px;
-    top: 0px;
+    left: 0;
+    top: 0;
 }
-#qv-url-cancel i{
-    width: 46px;
-    height: 21px;
-    font-size: 31px;
-    padding-top: 3px;
+#qv-url-cancel i {
+    font-size: 21px;
+    margin-top: 5px;
+    margin-left: 6px;
 }
-#qv-add-url{
+#qv-add-url {
     position: absolute;
-    top: 0px;
-    width: 59px;
-    height: 34px;
-    right: 0px;
-    border-radius: 0px;
+    top: 1px;
     color: #fff;
-    background-color: #337ab7;
-    border-color: #2e6da4;
+    background-color: #3e4d59;
+    padding: 7px 16px 6px;
+    font-size: 12px;
 }
 
 /*
@@ -649,7 +655,7 @@ Drag n Drop
     font-size: 12px;
     font-weight: 400;
 }
-#qv-file{
+#qv-file {
     display: none;
 }
 #qv-dropZone.hover {
@@ -674,13 +680,13 @@ Document types
 .fa-file-excel-o {
     color: #207245;
 }
-.fa-file-image-o{
+.fa-file-image-o {
     color: #25c2d4;
 }
-.fa-file-text-o{
+.fa-file-text-o {
     color: #D89E13;
 }
-.fa-file-code-o{
+.fa-file-code-o {
     color: #636363;
 }
 /*

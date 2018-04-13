@@ -1152,7 +1152,7 @@ FUNCTIONS
 		            // increase progress
 		            $("#qv-pregress-bar-" + index).css("width",  event.loaded / event.total * 100+"%");
 			    if(event.loaded == event.total){
-			        $('<div style="color: green; text-align: center;">Upload complete</div>').insertBefore($("#qv-pregress-bar-" + index).parent());
+			        $('<div class="qv-upload-complete">Upload Complete</div>').insertBefore($("#qv-pregress-bar-" + index).parent());
 			        $("#qv-pregress-bar-" + index).parent().remove();
 			        $('.qv-modal-close-action').on('click', closeModal);
 			        $("#qv-open-document").prop("disabled", false);
@@ -1327,7 +1327,10 @@ HTML MARKUP
 			    '<div class="wrapper">'+
 			        // header BEGIN
 			        '<div id="qv-header">'+
-						'<div id="qv-header-logo"></div>'+
+						'<div id="qv-header-logo">'+
+							'<span class="qv-tooltip">Browse Files</span>'+
+						'</div>'+
+						
 						// nav bar BEGIN
 						'<ul id="' + qv_navbar.slice(1) + '">'+
 							// nav bar content	
@@ -1448,8 +1451,8 @@ HTML MARKUP
 	}
 
 	function getHtmlRotatePanel(){
-		return '<li id="qv-btn-counterclockwise"><i class="fa fa-rotate-left"></i><span class="qv-tooltip">Rotate Counterclockwise</span></li>'+
-		       '<li id="qv-btn-clockwise"><i class="fa fa-rotate-right"></i><span class="qv-tooltip">Rotate Clockwise</span></li>';
+		return '<li id="qv-btn-counterclockwise"><i class="fa fa-rotate-left"></i><span class="qv-tooltip">Rotate CCW</span></li>'+
+		       '<li id="qv-btn-clockwise"><i class="fa fa-rotate-right"></i><span class="qv-tooltip">Rotate CW</span></li>';
 	}
 	
 	function getHtmlNavDownloadPanel(){
@@ -1490,14 +1493,18 @@ HTML MARKUP
 				    '<div class="qv-drag-n-drop-icon"><i class="fa fa-cloud-download fa-5x" aria-hidden="true"></i></div>'+
 					'<h2>Drag &amp; Drop your files here</h2>'+
 					'<h4>OR</h4>'+
-				    '</div>'+
-				    '<div class="qv-drag-n-drop-buttons">'+
+			    '</div>'+
+			    '<div class="qv-drag-n-drop-buttons">'+
 					'<label class="btn btn-primary">'+
 					    '<i class="fa fa-file"></i>'+
-					    'SELECT FILE <input id="qv-upload-input" type="file" multiple style="display: none;">'+
+					    'SELECT FILE'+
+					    '<input id="qv-upload-input" type="file" multiple style="display: none;">'+
 					'</label>'+
-					'<button class="btn" id="qv-url-button"><i class="fa fa-link"></i>URL</button>'+
-				    '</div>'+
+					'<label class="btn" id="qv-url-button">'+
+						'<i class="fa fa-link"></i>'+
+						'URL'+
+					'</label>'+
+			    '</div>'+
 				    '<div class="inner-addon left-addon btn qv-url-wrap" id="qv-url-wrap" style="display: none;">'+
 					'<input type="url" class="form-control" id="qv-url" placeholder="Enter your file URL">'+
 					'<button class="btn" id="qv-url-cancel"><i class="fa fa-trash-o"></i></button>'+

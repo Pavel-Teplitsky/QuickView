@@ -4,12 +4,12 @@
 	Dashboard
 	******************************************
 	*/
-	#qv-zoom-val-container, #qv-btn-zoom-in, #qv-btn-zoom-out, #qv-nav-right , #qv-btn-print{
+	#qv-zoom-val-container, #qv-btn-zoom-in, #qv-btn-zoom-out, #qv-nav-right , #qv-btn-print {
 		display: none;
 	}
 	#qv-header {
         height: 100px;
- }
+ 	}
 	#qv-header-logo {
 		background-size: 180px 20px;
 		background-position: 15px 40px;
@@ -22,6 +22,9 @@
 		font-size: 30px;
 		padding: 32px 17px;
 	}
+	#qv-navbar li:hover .qv-tooltip, #qv-header-logo:hover .qv-tooltip{
+		visibility: hidden;
+	}
 	#qv-nav-search-container {
 		width: 100%;
 		position: fixed;
@@ -32,7 +35,6 @@
 	    font-size: 22px;
 	    width: calc(100% - 250px);
 	    height: 42px;
-	       `
 	}
 	#qv-search-count {
 		right: 275px;
@@ -65,8 +67,6 @@
 	.qv-modal-body {
 		max-height: calc(100% - 100px);
 	}	
-	.qv-modal-header{
-	}
 	.qv-modal-title{
 	    font-size: 32px;
 	    padding: 28px;
@@ -80,17 +80,17 @@
 		min-width: 60px;
 	}
 	.qv-modal-table > tbody > tr > td:nth-child(2){
-            max-width: 100vw;
-        }
+        max-width: 100vw;
+    }
 	.col-md-1, .col-md-3, .col-md-5, .qv-modal-table td:nth-child(3), .qv-modal-table td:last-child{
-            display: none !important;
-        }
+        display: none !important;
+    }
 	.nav-link {
 	    height: 62px;
 	    padding-top: 17px;
 	    font-size: 23px;
 	}
-        .tabs label {
+    .tabs label {
 	    display: inline-block;
 	    margin: 0 0 -1px;
 	    padding: 15px 25px;
@@ -104,9 +104,7 @@
 	}
 	#qv-upload-section {
 	    position: inherit;
-	    top: calc(100% - 50%);
-	    width: 89%;
-	    left: 61px;
+	    width: 100%;
 	}
 	#qv-upload-section span{
 	    height: 113px;
@@ -121,14 +119,11 @@
 	    height: 63px;
 	}
 	#qv-upload-button, #qv-open-document  {
+	    width: calc(50% - 20px);
 	    height: 97px;
-	    font-size: 55px;
+	    font-size: 38px;
 	    position: inherit;
-	    width: 51%;
-	    margin: 10px 34px 9px;
-	}
-	#qv-open-document  {
-	    margin: -106px 500px 9px;
+	    margin: 0 10px;
 	}
 	.nav-item a {
 	    font-size: 53px;
@@ -142,15 +137,21 @@
 	    position: inherit;
 	    margin-bottom: 25px;
 	    width: 100%;
-	    margin-left: 69px;
+	    top: 0;
+	    left: 0;
 	}
 	#qv-upload-files-table {
-    	    width: 926px;
+	    width: calc(100% - 20px);
+	    margin: 20px 10px;
 	}
 	#qv-upload-section label{
-	    width: 46%;
+	    width: calc(50% - 20px);
 	    height: 77px;
-	    font-size: 44px;
+	    font-size: 26px;
+	    padding-top: 18px;
+	}
+	#qv-upload-section label > i {
+		font-size: 26px;
 	}
 	#qv-upload-section i{
 	    font-size: 53px;
@@ -163,7 +164,7 @@
 	    height: 185px;
 	}
 	#qv-upload-files-table tbody tr td > i {
-            font-size: 44px;
+        font-size: 44px;
 	    margin-top: 57px;
 	}
 	.qv-progress {
@@ -223,4 +224,3 @@
 		padding-top: 94px;
 	}
 }
-
