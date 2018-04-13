@@ -533,6 +533,13 @@ NAV BAR CONTROLS
             addFileForUpload(null, $("#qv-url").val());
         });
 
+	//////////////////////////////////////////////////
+	// Print event
+	//////////////////////////////////////////////////
+	$('#qv-btn-print').on('click', function(e){
+            printDocument();
+	});
+
 /*
 ******************************************************************
 FUNCTIONS
@@ -1150,6 +1157,23 @@ FUNCTIONS
 	        }
 	    });		
 	}
+	
+	/**
+	* Print current document
+	*/
+	function printDocument(){
+	    // get current document content
+	    var documentContainer = $("#qv-panzoom");
+	    // open print dialog 
+	    var windowObject = window.open('', "PrintWindow", "width=750,height=650,top=50,left=50,toolbars=no,scrollbars=yes,status=no,resizable=yes");
+	    // add current document into the print window
+	    windowObject.document.writeln(documentContainer[0].innerHTML);
+	    windowObject.document.close();
+	    windowObject.focus();
+	    windowObject.print();
+	    windowObject.close();
+	}
+
 //
 // END of document ready function
 });
@@ -1185,7 +1209,9 @@ METHODS
 				search: true,
 				thumbnails: true,
 				rotate: true,
-				download: true
+				download: true,
+                               upload: true,
+				print: true
 			};
 			options = $.extend(defaults, options);
 
@@ -1217,6 +1243,10 @@ METHODS
 			if(options.download){
 				$(qv_navbar).append(getHtmlNavDownloadPanel);
 				$(qv_navbar).append(getHtmlNavSplitter);
+			}
+			if(options.print){
+			        $(qv_navbar).append(getHtmlNavPrintPanel);
+			        $(qv_navbar).append(getHtmlNavSplitter);
 			}
 			if(options.thumbnails){
 				$(qv_navbar).append(getHtmlNavThumbTogglePanel);
@@ -1433,6 +1463,10 @@ HTML MARKUP
 	function getHtmlNavDownloadPanel(){
 		return '<li id="qv-btn-download"><i class="fa fa-download"></i><span class="qv-tooltip">Download</span></li>';
 	}	
+	
+	function getHtmlNavPrintPanel(){
+	        return '<li id="qv-btn-print"><i class="fa fa-print"></i><span class="qv-tooltip">Print</span></li>';
+	}
 	
 })(jQuery);
 
