@@ -470,8 +470,7 @@ MODAL
 }
 #qv-upload-files-table {
     width: 100%;
-    max-width: 100%;
-    margin-bottom: 40px;
+    margin: 40px 0;
     border-spacing: 0;
 }
 #qv-upload-files-table>tbody>tr:nth-of-type(odd) {
@@ -566,10 +565,6 @@ URL field
 */
 .qv-url-wrap {
     position: relative;
-    padding: 0;
-    padding-left: inherit;
-    width: 100%;
-    margin: -50px 0px 52px;
 }
 .qv-url-wrap > input {
     padding-left: 12px;
@@ -638,12 +633,6 @@ Drag n Drop
 .qv-drag-n-drop-icon .fa-cloud-download {
     color: #efefef;
     font-size: 80px;
-}
-.qv-drag-n-drop-buttons {
-    position: relative;
-    top: -77px;
-    left: 117px;
-    width: 62%;
 }
 .qv-drag-n-drop-buttons i {
     margin-right: 5px;

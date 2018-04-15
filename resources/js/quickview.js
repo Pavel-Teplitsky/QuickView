@@ -1489,35 +1489,35 @@ HTML MARKUP
 	function getHtmlUpload(){
 	    // upload section
 	    var uploadSection = '<section id="qv-upload-section" class="tab-slider-body">'+
-				'<div class="qv-drag-n-drop-wrap" id="qv-dropZone">'+
-				    '<div class="qv-drag-n-drop-icon"><i class="fa fa-cloud-download fa-5x" aria-hidden="true"></i></div>'+
-					'<h2>Drag &amp; Drop your files here</h2>'+
-					'<h4>OR</h4>'+
-			    '</div>'+
-			    '<div class="qv-drag-n-drop-buttons">'+
-					'<label class="btn btn-primary">'+
-					    '<i class="fa fa-file"></i>'+
-					    'SELECT FILE'+
-					    '<input id="qv-upload-input" type="file" multiple style="display: none;">'+
-					'</label>'+
-					'<label class="btn" id="qv-url-button">'+
-						'<i class="fa fa-link"></i>'+
-						'URL'+
-					'</label>'+
-			    '</div>'+
-				    '<div class="inner-addon left-addon btn qv-url-wrap" id="qv-url-wrap" style="display: none;">'+
-					'<input type="url" class="form-control" id="qv-url" placeholder="Enter your file URL">'+
-					'<button class="btn" id="qv-url-cancel"><i class="fa fa-trash-o"></i></button>'+
-					'<button class="btn btn-primary" id="qv-add-url">Add</button>'+
-				    '</div>'+
-				    '<table id="qv-upload-files-table" class="table table-striped">'+
-					'<tbody>'+
-					// list of files
-					'</tbody>'+
-				    '</table>'+
-			    '<button id="qv-upload-button" type="button" class="btn btn-success" disabled>Upload</button>'+
-			    '<button id="qv-open-document" type="button" class="btn">Browse files</button>'+
-			    '</section>';
+								'<div class="qv-drag-n-drop-wrap" id="qv-dropZone">'+
+								    '<div class="qv-drag-n-drop-icon"><i class="fa fa-cloud-download fa-5x" aria-hidden="true"></i></div>'+
+									'<h2>Drag &amp; Drop your files here</h2>'+
+									'<h4>OR</h4>'+
+									'<div class="qv-drag-n-drop-buttons">'+
+										'<label class="btn btn-primary">'+
+										    '<i class="fa fa-file"></i>'+
+										    'SELECT FILE'+
+										    '<input id="qv-upload-input" type="file" multiple style="display: none;">'+
+										'</label>'+
+										'<label class="btn" id="qv-url-button">'+
+											'<i class="fa fa-link"></i>'+
+											'URL'+
+										'</label>'+
+								    '</div>'+
+							    '</div>'+
+							    '<div class="inner-addon left-addon btn qv-url-wrap" id="qv-url-wrap" style="display: none;">'+
+									'<input type="url" class="form-control" id="qv-url" placeholder="Enter your file URL">'+
+									'<button class="btn" id="qv-url-cancel"><i class="fa fa-trash-o"></i></button>'+
+									'<button class="btn btn-primary" id="qv-add-url">Add</button>'+
+							    '</div>'+
+							    '<table id="qv-upload-files-table" class="table table-striped">'+
+									'<tbody>'+
+									// list of files
+									'</tbody>'+
+							    '</table>'+
+							    '<button id="qv-upload-button" type="button" class="btn btn-success" disabled>Upload</button>'+
+							    '<button id="qv-open-document" type="button" class="btn">Browse files</button>'+
+						    '</section>';
 	    // add upload section
 	    $(uploadSection).insertAfter($("#qv-browse-section"));
 	    $("#qv-upload-section").hide();
