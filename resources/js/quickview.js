@@ -1189,8 +1189,21 @@ FUNCTIONS
 	function printDocument(){
 	    // get current document content
 	    var documentContainer = $("#qv-panzoom");
+	    // force each document page to be printed as a new page
+	    var cssPrint = '<style>'+
+			    '@media print'+
+			    '{.qv-wrapper {page-break-after:always;}';
+	    // set correct page orientation if page were rotated						
+	    documentContainer.find(".qv-page").each(function(index, page){
+		if($(page).css("transform") != "none"){
+		    cssPrint = cssPrint + "#" + $(page).attr("id") + "{transform: rotate(0deg) !important;}";
+		}
+	    });
+	    cssPrint = cssPrint + '}</style>';	
 	    // open print dialog 
-	    var windowObject = window.open('', "PrintWindow", "width=750,height=650,top=50,left=50,toolbars=no,scrollbars=yes,status=no,resizable=yes");
+	    var windowObject = window.open('', "PrintWindow", "width=750,height=650,top=50,left=50,toolbars=yes,scrollbars=yes,status=yes,resizable=yes");
+	    // add current document into the print window
+	    windowObject.document.writeln(cssPrint);
 	    // add current document into the print window
 	    windowObject.document.writeln(documentContainer[0].innerHTML);
 	    windowObject.document.close();
