@@ -15,83 +15,77 @@ GLOBAL VARIABLES
 */
 var applicationPath;
 var preloadPageCount;
+var currentDirectory;
+var uploadFilesList = [];
+var documentGuid;
+var map = {};
+// add supported formats
+map['folder'] = { 'format': '', 'icon': 'fa-folder' };
+map['pdf'] = { 'format': 'Portable Document Format', 'icon': 'fa-file-pdf-o' };
+map['doc'] = { 'format': 'Microsoft Word', 'icon': 'fa-file-word-o' };
+map['docx'] = { 'format': 'Microsoft Word', 'icon': 'fa-file-word-o' };
+map['docm'] = { 'format': 'Microsoft Word', 'icon': 'fa-file-word-o' };
+map['dot'] = { 'format': 'Microsoft Word', 'icon': 'fa-file-word-o' };
+map['dotx'] = { 'format': 'Microsoft Word', 'icon': 'fa-file-word-o' };
+map['dotm'] = { 'format': 'Microsoft Word', 'icon': 'fa-file-word-o' };
+map['xls'] = { 'format': 'Microsoft Excel', 'icon': 'fa-file-excel-o' };
+map['xlsx'] = { 'format': 'Microsoft Excel', 'icon': 'fa-file-excel-o' };
+map['xlsm'] = { 'format': 'Microsoft Excel', 'icon': 'fa-file-excel-o' };
+map['xlsb'] = { 'format': 'Microsoft Excel', 'icon': 'fa-file-excel-o' };
+map['ppt'] = { 'format': 'Microsoft PowerPoint', 'icon': 'fa-file-powerpoint-o' };
+map['pptx'] = { 'format': 'Microsoft PowerPoint', 'icon': 'fa-file-powerpoint-o' };
+map['pps'] = { 'format': 'Microsoft PowerPoint', 'icon': 'fa-file-powerpoint-o' };
+map['ppsx'] = { 'format': 'Microsoft PowerPoint', 'icon': 'fa-file-powerpoint-o' };
+map['vsd'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
+map['vdx'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
+map['vss'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
+map['vsx'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
+map['vst'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
+map['vtx'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
+map['vsdx'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
+map['vdw'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
+map['vstx'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
+map['vssx'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
+map['mpp'] = { 'format': 'Microsoft Project', 'icon': 'fa-file-text' };
+map['mpt'] = { 'format': 'Microsoft Project', 'icon': 'fa-file-text' };
+map['msg'] = { 'format': 'Microsoft Outlook', 'icon': 'fa-file-text-o' };
+map['eml'] = { 'format': 'Microsoft Outlook', 'icon': 'fa-file-text-o' };
+map['emlx'] = { 'format': 'Microsoft Outlook', 'icon': 'fa-file-text-o' };
+map['one'] = { 'format': 'Microsoft OneNote', 'icon': 'fa-file-word-o' };
+map['odt'] = { 'format': 'Open Document Text', 'icon': 'fa-file-word-o' };
+map['ott'] = { 'format': 'Open Document Text Template', 'icon': 'fa-file-word-o' };
+map['ods'] = { 'format': 'Open Document Spreadsheet', 'icon': 'fa-file-excel-o' };
+map['odp'] = { 'format': 'Open Document Presentation', 'icon': 'fa-file-powerpoint-o' };
+map['otp'] = { 'format': 'Open Document Presentation', 'icon': 'fa-file-powerpoint-o' };
+map['ots'] = { 'format': 'Open Document Presentation', 'icon': 'fa-file-powerpoint-o' };
+map['rtf'] = { 'format': 'Rich Text Format', 'icon': 'fa-file-text-o' };
+map['txt'] = { 'format': 'Plain Text File', 'icon': 'fa-file-text-o' };
+map['csv'] = { 'format': 'Comma-Separated Values', 'icon': 'fa-file-excel-o' };
+map['html'] = { 'format': 'HyperText Markup Language', 'icon': 'fa-file-word-o' };
+map['mht'] = { 'format': 'HyperText Markup Language', 'icon': 'fa-file-word-o' };
+map['mhtml'] = { 'format': 'HyperText Markup Language', 'icon': 'fa-file-word-o' };
+map['xml'] = { 'format': 'Extensible Markup Language', 'icon': 'fa-file-word-o' };
+map['xps'] = { 'format': 'XML Paper Specification', 'icon': 'fa-file-word-o' };
+map['dxf'] = { 'format': 'AutoCAD Drawing File Format', 'icon': 'fa-file-image-o' };
+map['dwg'] = { 'format': 'AutoCAD Drawing File Format', 'icon': 'fa-file-image-o' };
+map['bmp'] = { 'format': 'Bitmap Picture', 'icon': 'fa-file-image-o' };
+map['gif'] = { 'format': 'Graphics Interchange Format', 'icon': 'fa-file-image-o' };
+map['jpg'] = { 'format': 'Joint Photographic Experts Group', 'icon': 'fa-file-image-o' };
+map['jpe'] = { 'format': 'Joint Photographic Experts Group', 'icon': 'fa-file-image-o' };
+map['jpeg'] = { 'format': 'Joint Photographic Experts Group', 'icon': 'fa-file-image-o' };
+map['jfif'] = { 'format': 'Joint Photographic Experts Group', 'icon': 'fa-file-image-o' };
+map['png'] = { 'format': 'Portable Network Graphics', 'icon': 'fa-file-image-o' };
+map['tiff'] = { 'format': 'Tagged Image File Format', 'icon': 'fa-file-photo-o' };
+map['tif'] = { 'format': 'Tagged Image File Format', 'icon': 'fa-file-photo-o' };
+map['epub'] = { 'format': 'Electronic Publication', 'icon': 'fa-file-pdf-o' };
+map['ico'] = { 'format': 'Windows Icon', 'icon': 'fa-file-image-o' };
+map['webp'] = { 'format': 'Compressed Image', 'icon': 'fa-file-image-o' };
+map['mobi'] = { 'format': 'Mobipocket eBook', 'icon': 'fa-file-pdf-o' };
+map['tex'] = { 'format': 'LaTeX Source Document', 'icon': 'fa-file-pdf-o' };
+map['djvu'] = { 'format': 'Multi-Layer Raster Image', 'icon': 'fa-file-text' };
 
 $(document).ready(function(){
-	/*
-******************************************************************
-PRIVATE VARIABLES
-******************************************************************
-*/
-	var documentGuid;
-	var currentDirectory;
-	var uploadFilesList = [];
-	
-	var map = {};
-	// add supported formats
-	map['folder'] = { 'format': '', 'icon': 'fa-folder' };
-	map['pdf'] = { 'format': 'Portable Document Format', 'icon': 'fa-file-pdf-o' };
-	map['doc'] = { 'format': 'Microsoft Word', 'icon': 'fa-file-word-o' };
-	map['docx'] = { 'format': 'Microsoft Word', 'icon': 'fa-file-word-o' };
-	map['docm'] = { 'format': 'Microsoft Word', 'icon': 'fa-file-word-o' };
-	map['dot'] = { 'format': 'Microsoft Word', 'icon': 'fa-file-word-o' };
-	map['dotx'] = { 'format': 'Microsoft Word', 'icon': 'fa-file-word-o' };
-	map['dotm'] = { 'format': 'Microsoft Word', 'icon': 'fa-file-word-o' };
-	map['xls'] = { 'format': 'Microsoft Excel', 'icon': 'fa-file-excel-o' };
-	map['xlsx'] = { 'format': 'Microsoft Excel', 'icon': 'fa-file-excel-o' };
-	map['xlsm'] = { 'format': 'Microsoft Excel', 'icon': 'fa-file-excel-o' };
-	map['xlsb'] = { 'format': 'Microsoft Excel', 'icon': 'fa-file-excel-o' };
-	map['ppt'] = { 'format': 'Microsoft PowerPoint', 'icon': 'fa-file-powerpoint-o' };
-	map['pptx'] = { 'format': 'Microsoft PowerPoint', 'icon': 'fa-file-powerpoint-o' };
-	map['pps'] = { 'format': 'Microsoft PowerPoint', 'icon': 'fa-file-powerpoint-o' };
-	map['ppsx'] = { 'format': 'Microsoft PowerPoint', 'icon': 'fa-file-powerpoint-o' };
-	map['vsd'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
-	map['vdx'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
-	map['vss'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
-	map['vsx'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
-	map['vst'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
-	map['vtx'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
-	map['vsdx'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
-	map['vdw'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
-	map['vstx'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
-	map['vssx'] = { 'format': 'Microsoft Visio', 'icon': 'fa-file-code-o' };
-	map['mpp'] = { 'format': 'Microsoft Project', 'icon': 'fa-file-text' };
-	map['mpt'] = { 'format': 'Microsoft Project', 'icon': 'fa-file-text' };
-	map['msg'] = { 'format': 'Microsoft Outlook', 'icon': 'fa-file-text-o' };
-	map['eml'] = { 'format': 'Microsoft Outlook', 'icon': 'fa-file-text-o' };
-	map['emlx'] = { 'format': 'Microsoft Outlook', 'icon': 'fa-file-text-o' };
-	map['one'] = { 'format': 'Microsoft OneNote', 'icon': 'fa-file-word-o' };
-	map['odt'] = { 'format': 'Open Document Text', 'icon': 'fa-file-word-o' };
-	map['ott'] = { 'format': 'Open Document Text Template', 'icon': 'fa-file-word-o' };
-	map['ods'] = { 'format': 'Open Document Spreadsheet', 'icon': 'fa-file-excel-o' };
-	map['odp'] = { 'format': 'Open Document Presentation', 'icon': 'fa-file-powerpoint-o' };
-	map['otp'] = { 'format': 'Open Document Presentation', 'icon': 'fa-file-powerpoint-o' };
-	map['ots'] = { 'format': 'Open Document Presentation', 'icon': 'fa-file-powerpoint-o' };
-	map['rtf'] = { 'format': 'Rich Text Format', 'icon': 'fa-file-text-o' };
-	map['txt'] = { 'format': 'Plain Text File', 'icon': 'fa-file-text-o' };
-	map['csv'] = { 'format': 'Comma-Separated Values', 'icon': 'fa-file-excel-o' };
-	map['html'] = { 'format': 'HyperText Markup Language', 'icon': 'fa-file-word-o' };
-	map['mht'] = { 'format': 'HyperText Markup Language', 'icon': 'fa-file-word-o' };
-	map['mhtml'] = { 'format': 'HyperText Markup Language', 'icon': 'fa-file-word-o' };
-	map['xml'] = { 'format': 'Extensible Markup Language', 'icon': 'fa-file-word-o' };
-	map['xps'] = { 'format': 'XML Paper Specification', 'icon': 'fa-file-word-o' };
-	map['dxf'] = { 'format': 'AutoCAD Drawing File Format', 'icon': 'fa-file-image-o' };
-	map['dwg'] = { 'format': 'AutoCAD Drawing File Format', 'icon': 'fa-file-image-o' };
-	map['bmp'] = { 'format': 'Bitmap Picture', 'icon': 'fa-file-image-o' };
-	map['gif'] = { 'format': 'Graphics Interchange Format', 'icon': 'fa-file-image-o' };
-	map['jpg'] = { 'format': 'Joint Photographic Experts Group', 'icon': 'fa-file-image-o' };
-	map['jpe'] = { 'format': 'Joint Photographic Experts Group', 'icon': 'fa-file-image-o' };
-	map['jpeg'] = { 'format': 'Joint Photographic Experts Group', 'icon': 'fa-file-image-o' };
-	map['jfif'] = { 'format': 'Joint Photographic Experts Group', 'icon': 'fa-file-image-o' };
-	map['png'] = { 'format': 'Portable Network Graphics', 'icon': 'fa-file-image-o' };
-	map['tiff'] = { 'format': 'Tagged Image File Format', 'icon': 'fa-file-photo-o' };
-	map['tif'] = { 'format': 'Tagged Image File Format', 'icon': 'fa-file-photo-o' };
-	map['epub'] = { 'format': 'Electronic Publication', 'icon': 'fa-file-pdf-o' };
-	map['ico'] = { 'format': 'Windows Icon', 'icon': 'fa-file-image-o' };
-	map['webp'] = { 'format': 'Compressed Image', 'icon': 'fa-file-image-o' };
-	map['mobi'] = { 'format': 'Mobipocket eBook', 'icon': 'fa-file-pdf-o' };
-	map['tex'] = { 'format': 'LaTeX Source Document', 'icon': 'fa-file-pdf-o' };
-	map['djvu'] = { 'format': 'Multi-Layer Raster Image', 'icon': 'fa-file-text' };
-
+		
 /*
 ******************************************************************
 NAV BAR CONTROLS
@@ -559,687 +553,689 @@ NAV BAR CONTROLS
 	    toggleModalDialog(true, 'Open Document');
 	    loadFileTree('');	
 	});
+	
+	//
+// END of document ready function
+});
+
 /*
 ******************************************************************
 FUNCTIONS
 ******************************************************************
 */
 	
-	/**
-	* Load file tree
-	* @param {string} dir - files location directory
-	*/
-	function loadFileTree(dir) {
-	    var data = {path: dir};
-	    currentDirectory = dir;
-	    // show loading spinner
-	    $('#qv-modal-spinner').show();
-	    // get data
-	    $.ajax({
-	        type: 'POST',
-	        url: getApplicationPath('loadFileTree'),
-	        data: JSON.stringify(data),
-	        contentType: "application/json",
-	        success: function(returnedData) {
-	        	if(returnedData.error != undefined){
-	        		// open error popup
-	        		printMessage(returnedData.error);
-	        		return;
-	        	}
-	        	// hide loading spinner
-	        	$('#qv-modal-spinner').hide();
-	        	// clear tree list from previous data
-	        	$('#qv-modal-filebroswer tbody').html(
-        			'<tr>'+
-						'<td class="text-center"><i class="fa fa-level-up"></i></td>'+
-						'<td class="qv-filetree-up">...</td>'+
-						'<td></td>'+
-						'<td></td>'+
-	                '</tr>');
-	        	// show tree list wrapper
-	        	$('#qv-modal-filebroswer').show();
-	        	// append files to tree list
-	            $.each(returnedData, function(index, elem){
-	            	// document name
-	                var name = elem.name;
-	                // document guid
-	                var guid = elem.guid;
-	                // document size
-	                var size = elem.size;
-	                // convert to proper size
-	                var new_size = size + ' Bytes';
-	                if((size / 1024 / 1024) > 1){
-	                	new_size = (Math.round((size / 1024 / 1024) * 100) / 100) + ' MB';
-	                }else if((size / 1024) > 1){
-	                	new_size = (Math.round((size / 1024) * 100) / 100) + ' KB';
-	                }
-	                // document format
-	                var docFormat = (getDocumentFormat(name) == undefined)? 'fa-folder' : getDocumentFormat(name);
-	                // append document
-	                $('.qv-modal-table tbody').append(
-	                    '<tr>'+
-			        '<td><i class="fa ' + docFormat.icon + '"></i></td>'+
-			        '<td class="qv-filetree-name" data-guid="' + guid + '"><div class="qv-file-name">' + name + '</div></td>'+
-			        '<td>' + docFormat.format + '</td>'+
-			        '<td>' + new_size + '</td>'+
-	                    '</tr>');
-	            });
-	        },
-	        error: function(xhr, status, error) {
-	          var err = eval("(" + xhr.responseText + ")");
-	          console.log(err.Message);
-	        }
-	    });
-	}
-
-	/**
-	* Open/Load document
-	* @param {object} callback - document pages array
-	*/
-	function loadDocument(callback){
-		// get document description
-		var data = {guid: documentGuid};
-	    $.ajax({
-	        type: 'POST',
-	        url: getApplicationPath('loadDocumentDescription'),
-	        data: JSON.stringify(data),
-	        contentType: "application/json",
-	        success: function(returnedData) {
-	        	if(returnedData.error != undefined){
-	        		// open error popup
-	        		printMessage(returnedData.error);
-	        		return;
-	        	}
-	        	// get total page number
-	        	var totalPageNumber = returnedData.length;
-	        	// set total page number on navigation panel
-	        	setNavigationPageValues('1', totalPageNumber);
-	        	// render pages
-	        	generatePagesTemplate(returnedData);
-	        },
-	        error: function(xhr, status, error) {
-	          var err = eval("(" + xhr.responseText + ")");
-	          console.log(err.Message);
-	        }
-	    }).done(function(data){
-	    	// return POST data
-	    	callback(data);
-	    });
-	}
-
-	/**
-	* Generate empty pages temples before the actual get pages request
-	* @param {object} data - document pages array
-	* @param {string} prefix - elements id prefix
-	*/
-	function generatePagesTemplate(data, prefix){
-		// set empty for undefined of null
-		prefix = prefix || '';
-		// loop though pages
-		$.each(data, function(index, elem){
-    		// set document description
-    		var pageNumber = elem.number;
-    		var pageWidth = elem.width;
-    		var pageHeight = elem.height;
-    		// append empty page
-    		$('#qv-' + prefix + 'panzoom').append(
-    			'<div id="qv-' + prefix + 'page-' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + '; min-height: ' + pageHeight + ';">'+
-				'<div class="qv-page-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
-				'</div>'
-				);
-    		// check if preload page count is set
-    		if((preloadPageCount == 0) || (index <= (preloadPageCount - 1))){
-    			appendHtmlContent(pageNumber, documentGuid, prefix);
-    		}
-    	});
-	}
-
-	/**
-	* Append html content to an empty page
-	* @param {int} pageNumber - page number
-	* @param {string} documentName - document name/id
-	* @param {string} prefix - elements id prefix
-	*/
-	function appendHtmlContent(pageNumber, documentName, prefix){
-		// set empty for undefined of null
-		prefix = prefix || '';
-		// initialize data
-		var qv_prefix_page = $('#qv-' + prefix + 'page-' + pageNumber);
-		var qv_page = $('#qv-page-' + pageNumber);
-
-		if(!qv_prefix_page.hasClass('loaded')){
-			qv_prefix_page.addClass('loaded');
-			// get document description
-			var data = {guid: documentGuid, page: pageNumber};
-		    $.ajax({
-		        type: 'POST',
-		        url: getApplicationPath('loadDocumentPage'),
-		        data: JSON.stringify(data),
-		        contentType: "application/json",
-		        success: function(htmlData) {
-		        	if(htmlData.error != undefined){
-		        		// open error popup
-		        		printMessage(htmlData.error);
-		        		return;
-		        	}
-		        	// apend page content
-					qv_prefix_page.append('<div class="qv-wrapper">' + htmlData.pageHtml + '</div>');
-					qv_prefix_page.find('.qv-page-spinner').hide();
-					// fix zoom in/out scaling
-		        	var zoomValue = 1;
-		        	// check if page is horizontaly displayed
-		        	if(qv_page.innerWidth() > qv_page.innerHeight()){
-		        		zoomValue = 0.79;
-		        	}
-		        	qv_prefix_page.css('width', qv_page.innerWidth());
-		        	qv_prefix_page.css('height', qv_page.innerHeight());
-		        	qv_prefix_page.css('zoom', zoomValue);
-					if(documentName.substr((documentName.lastIndexOf('.') +1)) == "one"){
-						$(".qv-wrapper").css("width", "initial");
-					}
-                                        // rotate page if it were rotated earlier
-					if(htmlData.angle != 0){
-					     $('#qv-page-' + pageNumber).css('transform', 'rotate(' + htmlData.angle + 'deg)');
-					     $("#qv-panzoom").css("zoom", "1.3");
-					     $('#qv-thumbnails-page-' + pageNumber).css('transform', 'rotate(' + htmlData.angle + 'deg)');
-					     $("qv-thumbnails-page-" + pageNumber).css("zoom", "1.3");
-					}
-		        },
-		        error: function(xhr, status, error) {
-		          var err = eval("(" + xhr.responseText + ")");
-		          console.log(err.Message);
-		        }
-		    });
-		}
-	}
-
-	/**
-	* Get document format (type)
-	* @param {string} filename - document name
-	*/
-	function getDocumentFormat(filename){
-	    if(typeof map[filename.split('.').pop().toLowerCase()] == "undefined"){
-		return map["folder"];
-	    } else {
-		return map[filename.split('.').pop().toLowerCase()];
+/**
+* Load file tree
+* @param {string} dir - files location directory
+*/
+function loadFileTree(dir) {
+    var data = {path: dir};
+    currentDirectory = dir;
+    // show loading spinner
+    $('#qv-modal-spinner').show();
+    // get data
+    $.ajax({
+	type: 'POST',
+	url: getApplicationPath('loadFileTree'),
+	data: JSON.stringify(data),
+	contentType: "application/json",
+	success: function(returnedData) {
+	    if(returnedData.error != undefined){
+		// open error popup
+		printMessage(returnedData.error);
+		return;
 	    }
-	}
-
-	/**
-	* Get application path for GET/POST requests
-	* @param {string} context - application context
-	*/
-	function getApplicationPath(context){
-		if(applicationPath != null){
-			if(applicationPath.slice(-1) == '/'){
-				return applicationPath + context;
-			}else{
-				return applicationPath + "/" + context;
-			}
-		}else{
-			return context;
+	    // hide loading spinner
+	    $('#qv-modal-spinner').hide();
+	    // clear tree list from previous data
+	    $('#qv-modal-filebroswer tbody').html(
+		'<tr>'+
+		    '<td class="text-center"><i class="fa fa-level-up"></i></td>'+
+		    '<td class="qv-filetree-up">...</td>'+
+		    '<td></td>'+
+		    '<td></td>'+
+		'</tr>');
+	    // show tree list wrapper
+	    $('#qv-modal-filebroswer').show();
+	    // append files to tree list
+	    $.each(returnedData, function(index, elem){
+		// document name
+		var name = elem.name;
+		// document guid
+		var guid = elem.guid;
+		// document size
+		var size = elem.size;
+		// convert to proper size
+		var new_size = size + ' Bytes';
+		if((size / 1024 / 1024) > 1){
+			new_size = (Math.round((size / 1024 / 1024) * 100) / 100) + ' MB';
+		}else if((size / 1024) > 1){
+			new_size = (Math.round((size / 1024) * 100) / 100) + ' KB';
 		}
-	}
-
-	/**
-	* Search for element by class (recursive)
-	* @param {object} target - object where to search for an id
-	* @param {string} class_id - class id
-	*/
-	function getElementByClass(target, class_id){
-		var elem = target.find(class_id);
-		if(!elem.hasClass(class_id.slice(1))){
-			return getElementByClass(target.parent(), class_id);
-		}else{
-			return elem;
-		}
-	}
-
-	/**
-	* Toggle modal dialog
-	* @param {boolean} open - open/close value
-	* @param {string} title - title to display in modual dialog (popup)
-	*/
-	function toggleModalDialog(open, title){
-		if(open){
-			$('#modalDialog .qv-modal-title').text(title);
-			$('#modalDialog')
-				.css('opacity', 0)
-				.fadeIn('fast')
-				.animate(
-					{ opacity: 1 },
-					{ queue: false, duration: 'fast' }
-				);
-			$('#modalDialog').addClass('in');
-		}else{
-			$('#modalDialog').removeClass('in');
-			$('#modalDialog')
-				.css('opacity', 1)
-				.fadeIn('fast')
-				.animate(
-					{ opacity: 0 },
-					{ queue: false, duration: 'fast' }
-				)
-				.css('display', 'none');
-			// hide all contents
-			$('#qv-modal-filebroswer').hide();
-			$('#qv-modal-spinner').hide();
-			$('#qv-modal-error').hide();			
-		}
-	}
-
-	/**
-	* Toggle top navigation menus (zoom, search)
-	* @param {object} target - dropdown target to be opened/closed
-	*/
-	function toggleNavDropdown(target){
-		var isOpened = target.hasClass('opened');
-		if(!isOpened){
-			$(target).addClass('opened');
-			$(target)
-				.css('opacity', 0)
-				.slideDown('fast')
-				.animate(
-					{ opacity: 1 },
-					{ queue: false, duration: 'fast' }
-				);
-		}else{
-			$(target).removeClass('opened');
-			$(target)
-				.css('opacity', 1)
-				.slideUp('fast')
-				.animate(
-					{ opacity: 0 },
-					{ queue: false, duration: 'fast' }
-				);
-		}
-	}
-
-	/**
-	* Highlight search results
-	* @param {string} text - text to search
-	*/
-	function highlightSearch(text) {
-		clearHighlightSearch();
-		if(text.length > 1){
-			var textNodes = $('#qv-pages .qv-wrapper div').find('*').contents().filter(function() { 
-				return this.nodeType === 3;
-			});
-			textNodes.each(function() {
-				var $this = $(this);
-				var content = $this.text();
-				// ignor upper/lower cases
-				var regEx = new RegExp(text, "ig");
-				// find mattching string
-				var str_start = content.search(regEx);
-				var originalString = 'did not worked!';
-				if(str_start >= 0){
-					var originalString = content.substring(str_start, str_start + text.length);
-				}
-				// add highlight
-				content = content.replace(regEx, '<span class="qv-highlight">' + originalString + '</span>');
-				// update to new content
-				$this.replaceWith(content);
-			});
-			var totalSearchMatches = getTotalSearchMatches();
-			setSearchMatchCount(0, totalSearchMatches);
-			if(totalSearchMatches > 0){
-				$('#qv-nav-search-next').click();
-			}
-  		}
-	}
-
-	/**
-	* Zoom document
-	* @param {int} zoom_val - zoom value from 0 to 100
-	*/
-	function setZoomValue(zoom_val){
-		// adapt value for css
-		var zoom_val_non_webkit = zoom_val / 100;
-		var zoom_val_webkit = Math.round(zoom_val) + '%';
-		// display zoom value
-		setNavigationZoomValues(zoom_val_webkit);
-		// set css zoom values
-		var style = [
-			'zoom: ' + zoom_val_webkit,
-			'zoom: ' + zoom_val_non_webkit, // for non webkit browsers
-			'-moz-transform: (' + zoom_val_non_webkit + ', ' + zoom_val_non_webkit + ')' // for mozilla browser
-		].join(';');
-		// add style
-		$('#qv-panzoom').attr('style', style);
-	}
-
-	/**
-	* Get currently set zoom value
-	*/
-	function getZoomValue(){
-		return parseInt($('#qv-zoom-value').text().slice(0, -1));
-	}
-
-	/**
-	* Get total matches count from search
-	*/
-	function getTotalSearchMatches(){
-		return $('.qv-highlight').length;
-	}
-
-	/**
-	* Set number of currently selected match
-	* @param {int} index - current searched result position
-	* @param {int} totalCound - total search matches
-	*/
-	function setSearchMatchCount(index, totalCount){
-		$('#qv-search-count').text(index + " of " + totalCount);
-	}
-
-	/**
-	* Set zoom values on navigation panel
-	* @param {int} value - zoom value from 0 to 100
-	*/
-	function setNavigationZoomValues(value){
-		$('#qv-zoom-value').text(value);
-	}
-
-	/**
-	* Set page values on navigation panel
-	* @param {int} firstPageNumber - first page number
-	* @param {int} lastPageNumber - last page number or total pages
-	*/
-	function setNavigationPageValues(firstPageNumber, lastPageNumber){
-		$('#qv-page-num').text(firstPageNumber + '/' + lastPageNumber);
-	}
-
-	/**
-	* Clear search input
-	*/
-	function clearSearch(){
-		$('#qv-nav-search-container :input').val('');
-		setSearchMatchCount(0, 0);
-		clearHighlightSearch();
-	}
-
-	/**
-	* Clear previously highlighted search
-	*/
-	function clearHighlightSearch(){
-	    //remove highlights
-	    $('#qv-pages .qv-highlight').contents().unwrap();
-	    // normalize text
-	    $('#qv-pages').each(function(index, element){
-	    	element.normalize();
-	    });
-	    search_position = 0;
-	}
-
-	/**
-	* Clear all data from peviously loaded document
-	*/
-	function clearPageContents(){
-		// set zoom to default
-		setZoomValue(100);
-		// set page number and total pages to zero
-		setNavigationPageValues('0', '0');
-		// remove previously rendered document pages
-		$('#qv-panzoom').html('');
-		$('#qv-thumbnails-panzoom').html('');
-		// go to top
-		$('#qv-pages').scrollTo(0, {
-			duration: 0
-		});
-	}
-
-	/**
-	* Clear all data from peviously loaded document
-	* @param {string} message - message to diplay in popup
-	*/
-	function printMessage(message){
-		$('#qv-modal-error').show();
-		$('#qv-modal-error').text(message);
-		toggleModalDialog(true, 'Error');		
-	}
-
-	/**
-	* Scroll to page
-	* @param {int} pageNumber - page number where to scroll
-	*/
-	function scrollToPage(pageNumber){
-		// get zoom value
-		var zoomValue = $('#qv-panzoom').css('zoom');
-		if(zoomValue == 'undefined'){
-			zoomValue = 100;
-		}else{
-			zoomValue = zoomValue * 100;
-		}
-		// scroll
-		$('#qv-pages').scrollTo('#qv-page-' + pageNumber, {
-			zoom: zoomValue
-		});
-	}
-
-	/**
-	* Rotate document pages
-	* @param {int} angle - document page rotation angle
-	*/
-	function rotatePages(angle){
-        // Get current page number
-	    var pagesAttr = $('#qv-page-num').text().split('/');
-	    var currentPageNumber = parseInt(pagesAttr[0]);
-        // Prepare pages numbers array
-	    var pages = [];
-	    pages[0] = currentPageNumber;
-	    // Prepare ajax data
-	    var data = {guid: documentGuid, angle: angle, pages: pages};
-	    $.ajax({
-	        type: 'POST',
-	        url: getApplicationPath('rotateDocumentPages'),
-	        data: JSON.stringify(data),
-	        contentType: "application/json",
-	        success: function(returnedData) {
-			    if(returnedData.error != undefined){
-					// open error popup
-					printMessage(returnedData.error);
-					return;
-		    	}
-			    $.each(returnedData, function(index, elem){
-			        // Rotate the page
-			        $('#qv-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');
-				// rotate page thumbnail
-                                $('#qv-thumbnails-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');					
-			    });
-                            // set correct zoom value
-			    $("#qv-panzoom").css("zoom", "1.3");
-			    $("#qv-thumbnails-panzoom").css("zoom", "23%");
-			},
-	        error: function(xhr, status, error) {
-	          var err = eval("(" + xhr.responseText + ")");
-	          console.log(err.Message);
-	        }
-	    });
-	}
-	
-	/**
-	* Download current document
-	*/
-	function downloadDocument(){
-		if(documentGuid != "" && typeof documentGuid != "undefined"){
-		    // Open download dialog
-		    window.location.assign(getApplicationPath('downloadDocument/?path=') + documentGuid);
-		} else {
-		    // open error popup
-		    printMessage("Please open document first");
-	    }
-	}
-	
-	/**
-	* Add file to the upload list
-	* @param {file[]} uploadFiles - Files array for uploading
-	* @param {string} url - URL of the file
-	*/
-	function addFileForUpload(uploadFiles, url) {
-	    // get table in which files will be added
-	    var table = $("#qv-upload-files-table");
-	    // get current count of table rows
-	    var tableRowsNumber = $('#qv-upload-files-table > tbody > tr').length;
-	    if(url){
-	        // append URL
-	        table.append(
+		// document format
+		var docFormat = (getDocumentFormat(name) == undefined)? 'fa-folder' : getDocumentFormat(name);
+		// append document
+		$('.qv-modal-table tbody').append(
 		    '<tr>'+
-			'<td><i class="fa ' + getDocumentFormat(url.split('/').pop()).icon + '"></i></td>'+
-			'<td class="qv-filetree-name" data-value="' + url + '" data-uploaded="false"><div class="qv-file-name">' + url.split('/').pop() + '</div>'+ 
-			    '<span id="qv-upload-size"> type: ' + url.split('/').pop().split('.').pop() +'</span>'+
-			'</td>'+
-			'<td>'+
-			    '<div class="progress qv-progress">'+
-			        '<div id="qv-pregress-bar-' + tableRowsNumber + '" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'+
-			        '</div>'+
-			    '</div>'+
-			'</td>'+
-			'<td class="files-table-remove">'+
-			    '<button class="btn qv-cancel-button"><i class="fa fa-trash-o"></i></button>'+
-			'</td>'+
-		    '</tr>');
-	        // increase table rows counter after adding new record
-	        tableRowsNumber++			
-	    } else {
-	        // append files
-	        $.each(uploadFiles, function(index, file){
-		    uploadFilesList.push(file);
-		    // document format
-		    var docFormat = getDocumentFormat(file.name);
-		    // convert to proper size
-		    var new_size = file.size + ' Bytes';
-		    if((file.size / 1024 / 1024) > 1){
-			new_size = (Math.round((file.size / 1024 / 1024) * 100) / 100) + ' MB';
-		    }else if((file.size / 1024) > 1){
-			new_size = (Math.round((file.size / 1024) * 100) / 100) + ' KB';
-		    }
-		    // append document
-		    table.append(
-			'<tr>'+
-			    '<td><i class="fa ' + docFormat.icon + '"></i></td>'+
-			    '<td class="qv-filetree-name" data-uploaded="false"><div class="qv-file-name">' + file.name + '</div>'+ 
-				'<span id="qv-upload-size">size: ' + new_size +'</span>'+
-				'<span id="qv-upload-size"> type: ' + file.name.split('.').pop() +'</span>'+
-			    '</td>'+
-			    '<td>'+
-				'<div class="progress qv-progress">'+
-				    '<div id="qv-pregress-bar-' + tableRowsNumber + '" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'+
-				    '</div>'+
-				'</div>'+
-			    '</td>'+
-			    '<td class="files-table-remove">'+
-				    '<button class="btn qv-cancel-button"><i class="fa fa-trash-o"></i></button>'+
-			    '</td>'+
-			'</tr>');
-		    // increase table rows counter after adding new record
-		    tableRowsNumber++	
-	        });
-	    }		
-	    $("#qv-upload-button").prop("disabled", false);
-	}
-	
-	/**
-	* Upload document
-	* @param {file} file - File for uploading
-	* @param {int} index - Number of the file to upload
-	* @param {string} url - URL of the file, set it if URL used instead of file
-	*/
-	function uploadDocument(file, index, url = ''){
-	    // prepare form data for uploading
-	    var formData = new FormData();    
-	    // add local file for uploading
-	    formData.append("file", file);
-	    // add URL if set
-	    formData.append("url", url);
-	    $.ajax({
-	        // callback function which updates upload progress bar
-	        xhr: function()
-	        {
-	            var xhr = new window.XMLHttpRequest();
-	            // upload progress
-	            xhr.upload.addEventListener("progress", function(event){
-		        if (event.lengthComputable) {
-			    $(".qv-modal-close-action").off('click');
-			    $("#qv-open-document").prop("disabled", true);
-		            // increase progress
-		            $("#qv-pregress-bar-" + index).css("width",  event.loaded / event.total * 100+"%");
-			    if(event.loaded == event.total){
-			        $('<div class="qv-upload-complete">Upload Complete</div>').insertBefore($("#qv-pregress-bar-" + index).parent());
-			        $("#qv-pregress-bar-" + index).parent().remove();
-			        $('.qv-modal-close-action').on('click', closeModal);
-			        $("#qv-open-document").prop("disabled", false);
-			    }
-		        }
-	            }, false);
-	            return xhr;
-	        },
-	        type: 'POST',
-	        url: getApplicationPath('uploadDocument'), 
-	        data: formData,   
-	        cache: false,
-	        contentType: false,
-	        processData: false,			                      
-	        success: function(returnedData) {
-	            if(returnedData.error != undefined){
-		        // open error popup
-		        printMessage(returnedData.error);
-		        return;
-	            }
-	            // update files tree
-	            loadFileTree('');
-	        },
-	        error: function(xhr, status, error) {
-	          var err = eval("(" + xhr.responseText + ")");
-	          console.log(err.Message);
-	        }
-	    });		
-	}
-	
-	/**
-	* Print current document
-	*/
-	function printDocument(){
-	    // get current document content
-	    var documentContainer = $("#qv-panzoom");
-	    // force each document page to be printed as a new page
-	    var cssPrint = '<style>'+
-			    '@media print'+
-			    '{.qv-wrapper {page-break-after:always;}';
-	    // set correct page orientation if page were rotated						
-	    documentContainer.find(".qv-page").each(function(index, page){
-		if($(page).css("transform") != "none"){
-		    cssPrint = cssPrint + "#" + $(page).attr("id") + "{transform: rotate(0deg) !important;}";
-		}
+		    '<td><i class="fa ' + docFormat.icon + '"></i></td>'+
+		    '<td class="qv-filetree-name" data-guid="' + guid + '"><div class="qv-file-name">' + name + '</div></td>'+
+		    '<td>' + docFormat.format + '</td>'+
+		    '<td>' + new_size + '</td>'+
+		'</tr>');
 	    });
-	    cssPrint = cssPrint + '}</style>';	
-	    // open print dialog 
-	    var windowObject = window.open('', "PrintWindow", "width=750,height=650,top=50,left=50,toolbars=yes,scrollbars=yes,status=yes,resizable=yes");
-	    // add current document into the print window
-	    windowObject.document.writeln(cssPrint);
-	    // add current document into the print window
-	    windowObject.document.writeln(documentContainer[0].innerHTML);
-	    windowObject.document.close();
-	    windowObject.focus();
-	    windowObject.print();
-	    windowObject.close();
+	},
+	error: function(xhr, status, error) {
+	  var err = eval("(" + xhr.responseText + ")");
+	  console.log(err.Message);
 	}
-		
-	/**
-	* Close modal
-	*/
-	function closeModal(){
-	    // remove all files from the upload list
-	    uploadFilesList = [];
-	    var tableRows = $('#qv-upload-files-table > tbody > tr');
-	    for(var n = 0; n < tableRows.length; n++){
-	        $(tableRows[n]).remove();
+    });
+}
+
+/**
+* Open/Load document
+* @param {object} callback - document pages array
+*/
+function loadDocument(callback){
+    // get document description
+    var data = {guid: documentGuid};
+    $.ajax({
+	type: 'POST',
+	url: getApplicationPath('loadDocumentDescription'),
+	data: JSON.stringify(data),
+	contentType: "application/json",
+	success: function(returnedData) {
+	    if(returnedData.error != undefined){
+		// open error popup
+		printMessage(returnedData.error);
+		return;
 	    }
-	    $("#qv-upload-input").val('');
-	    toggleModalDialog(false, '');
+	    // get total page number
+	    var totalPageNumber = returnedData.length;
+	    // set total page number on navigation panel
+	    setNavigationPageValues('1', totalPageNumber);
+	    // render pages
+	    generatePagesTemplate(returnedData);
+	},
+	error: function(xhr, status, error) {
+	    var err = eval("(" + xhr.responseText + ")");
+	    console.log(err.Message);
 	}
-//
-// END of document ready function
-});
+    }).done(function(data){
+	// return POST data
+	callback(data);
+    });
+}
+
+/**
+* Generate empty pages temples before the actual get pages request
+* @param {object} data - document pages array
+* @param {string} prefix - elements id prefix
+*/
+function generatePagesTemplate(data, prefix){
+    // set empty for undefined of null
+    prefix = prefix || '';
+    // loop though pages
+    $.each(data, function(index, elem){
+	// set document description
+	var pageNumber = elem.number;
+	var pageWidth = elem.width;
+	var pageHeight = elem.height;
+	// append empty page
+	$('#qv-' + prefix + 'panzoom').append(
+	    '<div id="qv-' + prefix + 'page-' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + '; min-height: ' + pageHeight + ';">'+
+	    '<div class="qv-page-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
+	    '</div>'
+	);
+	// check if preload page count is set
+	if((preloadPageCount == 0) || (index <= (preloadPageCount - 1))){
+	    appendHtmlContent(pageNumber, documentGuid, prefix);
+	}
+    });
+}
+
+/**
+* Append html content to an empty page
+* @param {int} pageNumber - page number
+* @param {string} documentName - document name/id
+* @param {string} prefix - elements id prefix
+*/
+function appendHtmlContent(pageNumber, documentName, prefix){
+    // set empty for undefined of null
+    prefix = prefix || '';
+    // initialize data
+    var qv_prefix_page = $('#qv-' + prefix + 'page-' + pageNumber);
+    var qv_page = $('#qv-page-' + pageNumber);
+
+    if(!qv_prefix_page.hasClass('loaded')){
+	qv_prefix_page.addClass('loaded');
+	// get document description
+	var data = {guid: documentGuid, page: pageNumber};
+	$.ajax({
+	    type: 'POST',
+	    url: getApplicationPath('loadDocumentPage'),
+	    data: JSON.stringify(data),
+	    contentType: "application/json",
+	    success: function(htmlData) {
+		if(htmlData.error != undefined){
+		    // open error popup
+		    printMessage(htmlData.error);
+		    return;
+		}
+		// apend page content
+		qv_prefix_page.append('<div class="qv-wrapper">' + htmlData.pageHtml + '</div>');
+		qv_prefix_page.find('.qv-page-spinner').hide();
+		// fix zoom in/out scaling
+		var zoomValue = 1;
+		// check if page is horizontaly displayed
+		if(qv_page.innerWidth() > qv_page.innerHeight()){
+		    zoomValue = 0.79;
+		}
+		qv_prefix_page.css('width', qv_page.innerWidth());
+		qv_prefix_page.css('height', qv_page.innerHeight());
+		qv_prefix_page.css('zoom', zoomValue);
+		if(documentName.substr((documentName.lastIndexOf('.') +1)) == "one"){
+		    $(".qv-wrapper").css("width", "initial");
+		}
+	        // rotate page if it were rotated earlier
+		if(htmlData.angle != 0){
+		     $('#qv-page-' + pageNumber).css('transform', 'rotate(' + htmlData.angle + 'deg)');
+		     $("#qv-panzoom").css("zoom", "1.3");
+		     $('#qv-thumbnails-page-' + pageNumber).css('transform', 'rotate(' + htmlData.angle + 'deg)');
+		     $("qv-thumbnails-page-" + pageNumber).css("zoom", "1.3");
+		}
+	    },
+	    error: function(xhr, status, error) {
+	        var err = eval("(" + xhr.responseText + ")");
+	        console.log(err.Message);
+	    }
+	});
+    }
+}
+
+/**
+* Get document format (type)
+* @param {string} filename - document name
+*/
+function getDocumentFormat(filename){
+    if(typeof map[filename.split('.').pop().toLowerCase()] == "undefined"){
+        return map["folder"];
+    } else {
+        return map[filename.split('.').pop().toLowerCase()];
+    }
+}
+
+/**
+* Get application path for GET/POST requests
+* @param {string} context - application context
+*/
+function getApplicationPath(context){
+    if(applicationPath != null){
+	if(applicationPath.slice(-1) == '/'){
+	    return applicationPath + context;
+	}else{
+	    return applicationPath + "/" + context;
+	}
+    }else{
+        return context;
+    }
+}
+
+/**
+* Search for element by class (recursive)
+* @param {object} target - object where to search for an id
+* @param {string} class_id - class id
+*/
+function getElementByClass(target, class_id){
+    var elem = target.find(class_id);
+    if(!elem.hasClass(class_id.slice(1))){
+	return getElementByClass(target.parent(), class_id);
+    }else{
+	return elem;
+    }
+}
+
+/**
+* Toggle modal dialog
+* @param {boolean} open - open/close value
+* @param {string} title - title to display in modual dialog (popup)
+*/
+function toggleModalDialog(open, title){
+    if(open){
+	$('#modalDialog .qv-modal-title').text(title);
+	$('#modalDialog')
+	    .css('opacity', 0)
+	    .fadeIn('fast')
+	    .animate(
+		{ opacity: 1 },
+		{ queue: false, duration: 'fast' }
+	    );
+	$('#modalDialog').addClass('in');
+    }else{
+	$('#modalDialog').removeClass('in');
+	$('#modalDialog')
+	    .css('opacity', 1)
+	    .fadeIn('fast')
+	    .animate(
+		{ opacity: 0 },
+		{ queue: false, duration: 'fast' }
+	    )
+	    .css('display', 'none');
+	// hide all contents
+	$('#qv-modal-filebroswer').hide();
+	$('#qv-modal-spinner').hide();
+	$('#qv-modal-error').hide();			
+    }
+}
+
+/**
+* Toggle top navigation menus (zoom, search)
+* @param {object} target - dropdown target to be opened/closed
+*/
+function toggleNavDropdown(target){
+    var isOpened = target.hasClass('opened');
+    if(!isOpened){
+	$(target).addClass('opened');
+	$(target)
+	    .css('opacity', 0)
+	    .slideDown('fast')
+	    .animate(
+		{ opacity: 1 },
+		{ queue: false, duration: 'fast' }
+	    );
+    }else{
+	$(target).removeClass('opened');
+	$(target)
+	    .css('opacity', 1)
+	    .slideUp('fast')
+	    .animate(
+		{ opacity: 0 },
+		{ queue: false, duration: 'fast' }
+	    );
+    }
+}
+
+/**
+* Highlight search results
+* @param {string} text - text to search
+*/
+function highlightSearch(text) {
+    clearHighlightSearch();
+    if(text.length > 1){
+	var textNodes = $('#qv-pages .qv-wrapper div').find('*').contents().filter(function() { 
+		return this.nodeType === 3;
+	});
+	textNodes.each(function() {
+	    var $this = $(this);
+	    var content = $this.text();
+	    // ignor upper/lower cases
+	    var regEx = new RegExp(text, "ig");
+	    // find mattching string
+	    var str_start = content.search(regEx);
+	    var originalString = 'did not worked!';
+	    if(str_start >= 0){
+		var originalString = content.substring(str_start, str_start + text.length);
+	    }
+	    // add highlight
+	    content = content.replace(regEx, '<span class="qv-highlight">' + originalString + '</span>');
+	    // update to new content
+	    $this.replaceWith(content);
+	});
+	var totalSearchMatches = getTotalSearchMatches();
+	setSearchMatchCount(0, totalSearchMatches);
+	if(totalSearchMatches > 0){
+	    $('#qv-nav-search-next').click();
+	}
+    }
+}
+
+/**
+* Zoom document
+* @param {int} zoom_val - zoom value from 0 to 100
+*/
+function setZoomValue(zoom_val){
+    // adapt value for css
+    var zoom_val_non_webkit = zoom_val / 100;
+    var zoom_val_webkit = Math.round(zoom_val) + '%';
+    // display zoom value
+    setNavigationZoomValues(zoom_val_webkit);
+    // set css zoom values
+    var style = [
+	'zoom: ' + zoom_val_webkit,
+	'zoom: ' + zoom_val_non_webkit, // for non webkit browsers
+	'-moz-transform: (' + zoom_val_non_webkit + ', ' + zoom_val_non_webkit + ')' // for mozilla browser
+    ].join(';');
+    // add style
+    $('#qv-panzoom').attr('style', style);
+}
+
+/**
+* Get currently set zoom value
+*/
+function getZoomValue(){
+    return parseInt($('#qv-zoom-value').text().slice(0, -1));
+}
+
+/**
+* Get total matches count from search
+*/
+function getTotalSearchMatches(){
+    return $('.qv-highlight').length;
+}
+
+/**
+* Set number of currently selected match
+* @param {int} index - current searched result position
+* @param {int} totalCound - total search matches
+*/
+function setSearchMatchCount(index, totalCount){
+    $('#qv-search-count').text(index + " of " + totalCount);
+}
+
+/**
+* Set zoom values on navigation panel
+* @param {int} value - zoom value from 0 to 100
+*/
+function setNavigationZoomValues(value){
+    $('#qv-zoom-value').text(value);
+}
+
+/**
+* Set page values on navigation panel
+* @param {int} firstPageNumber - first page number
+* @param {int} lastPageNumber - last page number or total pages
+*/
+function setNavigationPageValues(firstPageNumber, lastPageNumber){
+    $('#qv-page-num').text(firstPageNumber + '/' + lastPageNumber);
+}
+
+/**
+* Clear search input
+*/
+function clearSearch(){
+    $('#qv-nav-search-container :input').val('');
+    setSearchMatchCount(0, 0);
+    clearHighlightSearch();
+}
+
+/**
+* Clear previously highlighted search
+*/
+function clearHighlightSearch(){
+    //remove highlights
+    $('#qv-pages .qv-highlight').contents().unwrap();
+    // normalize text
+    $('#qv-pages').each(function(index, element){
+	element.normalize();
+    });
+    search_position = 0;
+}
+
+/**
+* Clear all data from peviously loaded document
+*/
+function clearPageContents(){
+    // set zoom to default
+    setZoomValue(100);
+    // set page number and total pages to zero
+    setNavigationPageValues('0', '0');
+    // remove previously rendered document pages
+    $('#qv-panzoom').html('');
+    $('#qv-thumbnails-panzoom').html('');
+    // go to top
+    $('#qv-pages').scrollTo(0, {
+	duration: 0
+    });
+}
+
+/**
+* Clear all data from peviously loaded document
+* @param {string} message - message to diplay in popup
+*/
+function printMessage(message){
+    $('#qv-modal-error').show();
+    $('#qv-modal-error').text(message);
+    toggleModalDialog(true, 'Error');		
+}
+
+/**
+* Scroll to page
+* @param {int} pageNumber - page number where to scroll
+*/
+function scrollToPage(pageNumber){
+    // get zoom value
+    var zoomValue = $('#qv-panzoom').css('zoom');
+    if(zoomValue == 'undefined'){
+	zoomValue = 100;
+    }else{
+	zoomValue = zoomValue * 100;
+    }
+    // scroll
+    $('#qv-pages').scrollTo('#qv-page-' + pageNumber, {
+	zoom: zoomValue
+    });
+}
+
+/**
+* Rotate document pages
+* @param {int} angle - document page rotation angle
+*/
+function rotatePages(angle){
+    // Get current page number
+    var pagesAttr = $('#qv-page-num').text().split('/');
+    var currentPageNumber = parseInt(pagesAttr[0]);
+    // Prepare pages numbers array
+    var pages = [];
+    pages[0] = currentPageNumber;
+    // Prepare ajax data
+    var data = {guid: documentGuid, angle: angle, pages: pages};
+    $.ajax({
+	type: 'POST',
+	url: getApplicationPath('rotateDocumentPages'),
+	data: JSON.stringify(data),
+	contentType: "application/json",
+	success: function(returnedData) {
+	    if(returnedData.error != undefined){
+		// open error popup
+		printMessage(returnedData.error);
+		return;
+	    }
+	    $.each(returnedData, function(index, elem){
+		// Rotate the page
+		$('#qv-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');
+	        // rotate page thumbnail
+	        $('#qv-thumbnails-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');					
+	    });
+	    // set correct zoom value
+	    $("#qv-panzoom").css("zoom", "1.3");
+	    $("#qv-thumbnails-panzoom").css("zoom", "23%");
+	},
+	error: function(xhr, status, error) {
+	  var err = eval("(" + xhr.responseText + ")");
+	  console.log(err.Message);
+	}
+    });
+}
+
+/**
+* Download current document
+*/
+function downloadDocument(){
+    if(documentGuid != "" && typeof documentGuid != "undefined"){
+	// Open download dialog
+	window.location.assign(getApplicationPath('downloadDocument/?path=') + documentGuid);
+    } else {
+	// open error popup
+	printMessage("Please open document first");
+    }
+}
+
+/**
+* Add file to the upload list
+* @param {file[]} uploadFiles - Files array for uploading
+* @param {string} url - URL of the file
+*/
+function addFileForUpload(uploadFiles, url) {
+    // get table in which files will be added
+    var table = $("#qv-upload-files-table");
+    // get current count of table rows
+    var tableRowsNumber = $('#qv-upload-files-table > tbody > tr').length;
+    if(url){
+	// append URL
+	table.append(
+	'<tr>'+
+	'<td><i class="fa ' + getDocumentFormat(url.split('/').pop()).icon + '"></i></td>'+
+	'<td class="qv-filetree-name" data-value="' + url + '" data-uploaded="false"><div class="qv-file-name">' + url.split('/').pop() + '</div>'+ 
+		'<span id="qv-upload-size"> type: ' + url.split('/').pop().split('.').pop() +'</span>'+
+	'</td>'+
+	'<td>'+
+	    '<div class="progress qv-progress">'+
+		'<div id="qv-pregress-bar-' + tableRowsNumber + '" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'+
+		'</div>'+
+	    '</div>'+
+	'</td>'+
+	'<td class="files-table-remove">'+
+	    '<button class="btn qv-cancel-button"><i class="fa fa-trash-o"></i></button>'+
+	'</td>'+
+	'</tr>');
+	// increase table rows counter after adding new record
+	tableRowsNumber++			
+    } else {
+	// append files
+	$.each(uploadFiles, function(index, file){
+	uploadFilesList.push(file);
+	// document format
+	var docFormat = getDocumentFormat(file.name);
+	// convert to proper size
+	var new_size = file.size + ' Bytes';
+	if((file.size / 1024 / 1024) > 1){
+	new_size = (Math.round((file.size / 1024 / 1024) * 100) / 100) + ' MB';
+	}else if((file.size / 1024) > 1){
+	new_size = (Math.round((file.size / 1024) * 100) / 100) + ' KB';
+	}
+	// append document
+	table.append(
+	'<tr>'+
+	    '<td><i class="fa ' + docFormat.icon + '"></i></td>'+
+	    '<td class="qv-filetree-name" data-uploaded="false"><div class="qv-file-name">' + file.name + '</div>'+ 
+	    '<span id="qv-upload-size">size: ' + new_size +'</span>'+
+	    '<span id="qv-upload-size"> type: ' + file.name.split('.').pop() +'</span>'+
+	    '</td>'+
+	    '<td>'+
+	    '<div class="progress qv-progress">'+
+		'<div id="qv-pregress-bar-' + tableRowsNumber + '" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'+
+		'</div>'+
+	    '</div>'+
+	    '</td>'+
+	    '<td class="files-table-remove">'+
+		'<button class="btn qv-cancel-button"><i class="fa fa-trash-o"></i></button>'+
+	    '</td>'+
+	'</tr>');
+	// increase table rows counter after adding new record
+	tableRowsNumber++	
+	});
+    }		
+    $("#qv-upload-button").prop("disabled", false);
+}
+
+/**
+* Upload document
+* @param {file} file - File for uploading
+* @param {int} index - Number of the file to upload
+* @param {string} url - URL of the file, set it if URL used instead of file
+*/
+function uploadDocument(file, index, url = ''){
+    // prepare form data for uploading
+    var formData = new FormData();    
+    // add local file for uploading
+    formData.append("file", file);
+    // add URL if set
+    formData.append("url", url);
+    $.ajax({
+	// callback function which updates upload progress bar
+	xhr: function()
+	{
+	    var xhr = new window.XMLHttpRequest();
+	    // upload progress
+	    xhr.upload.addEventListener("progress", function(event){
+	        if (event.lengthComputable) {
+	            $(".qv-modal-close-action").off('click');
+	            $("#qv-open-document").prop("disabled", true);
+		        // increase progress
+		        $("#qv-pregress-bar-" + index).css("width",  event.loaded / event.total * 100+"%");
+	            if(event.loaded == event.total){
+		        $('<div class="qv-upload-complete">Upload Complete</div>').insertBefore($("#qv-pregress-bar-" + index).parent());
+		        $("#qv-pregress-bar-" + index).parent().remove();
+		        $('.qv-modal-close-action').on('click', closeModal);
+		        $("#qv-open-document").prop("disabled", false);
+	            }
+	        }
+	    }, false);
+	    return xhr;
+	},
+	type: 'POST',
+	url: getApplicationPath('uploadDocument'), 
+	data: formData,   
+	cache: false,
+	contentType: false,
+	processData: false,			                      
+	success: function(returnedData) {
+	    if(returnedData.error != undefined){
+	        // open error popup
+	        printMessage(returnedData.error);
+	        return;
+	    }
+	    // update files tree
+	    loadFileTree('');
+	},
+	error: function(xhr, status, error) {
+	  var err = eval("(" + xhr.responseText + ")");
+	  console.log(err.Message);
+	}
+    });		
+}
+
+/**
+* Print current document
+*/
+function printDocument(){
+    // get current document content
+    var documentContainer = $("#qv-panzoom");
+    // force each document page to be printed as a new page
+    var cssPrint = '<style>'+
+		    '@media print'+
+		    '{.qv-wrapper {page-break-after:always;}';
+    // set correct page orientation if page were rotated						
+    documentContainer.find(".qv-page").each(function(index, page){
+        if($(page).css("transform") != "none"){
+	    cssPrint = cssPrint + "#" + $(page).attr("id") + "{transform: rotate(0deg) !important;}";
+        }
+    });
+    cssPrint = cssPrint + '}</style>';	
+    // open print dialog 
+    var windowObject = window.open('', "PrintWindow", "width=750,height=650,top=50,left=50,toolbars=yes,scrollbars=yes,status=yes,resizable=yes");
+    // add current document into the print window
+    windowObject.document.writeln(cssPrint);
+    // add current document into the print window
+    windowObject.document.writeln(documentContainer[0].innerHTML);
+    windowObject.document.close();
+    windowObject.focus();
+    windowObject.print();
+    windowObject.close();
+}
+	
+/**
+* Close modal
+*/
+function closeModal(){
+    // remove all files from the upload list
+    uploadFilesList = [];
+    var tableRows = $('#qv-upload-files-table > tbody > tr');
+    for(var n = 0; n < tableRows.length; n++){
+	    $(tableRows[n]).remove();
+    }
+    $("#qv-upload-input").val('');
+    toggleModalDialog(false, '');
+}
 
 /*
 ******************************************************************
@@ -1273,8 +1269,9 @@ METHODS
 				thumbnails: true,
 				rotate: true,
 				download: true,
-                               upload: true,
-				print: true
+                upload: true,
+				print: true,
+				defaultDocument: null
 			};
 			options = $.extend(defaults, options);
 
@@ -1321,7 +1318,14 @@ METHODS
 			}
 			if(options.thumbnails){
 				$(qv_navbar).append(getHtmlNavThumbTogglePanel);
-			}					
+			}	
+			if(options.defaultDocument){
+			    documentGuid = options.defaultDocument;
+			    loadDocument(function(data){
+				// Generate thumbnails
+				generatePagesTemplate(data, 'thumbnails-');
+			    });
+			}			
 		}
 	};
 	
@@ -1460,14 +1464,14 @@ HTML MARKUP
 	function getHtmlNavSearchPanel(){
 		return '<li class="qv-nav-toggle">'+
 					'<i class="fa fa-search"></i>'+
+					'<span class="qv-tooltip">Search</span>'+
 					'<div id="qv-nav-search-container" class="qv-nav-dropdown">'+
 						'<input type="text" id="qv-search-input"/>'+
 						'<div id="qv-search-count">0 of 0</div>'+
 						'<div class="qv-nav-search-btn" id="qv-nav-search-prev"><i class="fa fa-chevron-left"></i></div>'+
 						'<div class="qv-nav-search-btn" id="qv-nav-search-next"><i class="fa fa-chevron-right"></i></div>'+
 						'<div class="qv-nav-search-btn" id="qv-nav-search-cancel"><i class="fa fa-times"></i></div>'+
-					'</div>'+
-					'<span class="qv-tooltip">Search</span>'+
+					'</div>'+					
 				'</li>';
 	}
 
