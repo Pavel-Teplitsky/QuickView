@@ -723,7 +723,7 @@ FUNCTIONS
 		        		return;
 		        	}
 		        	// apend page content
-					qv_prefix_page.append('<div class="qv-wrapper">' + htmlData + '</div>');
+					qv_prefix_page.append('<div class="qv-wrapper">' + htmlData.pageHtml + '</div>');
 					qv_prefix_page.find('.qv-page-spinner').hide();
 					// fix zoom in/out scaling
 		        	var zoomValue = 1;
@@ -736,6 +736,13 @@ FUNCTIONS
 		        	qv_prefix_page.css('zoom', zoomValue);
 					if(documentName.substr((documentName.lastIndexOf('.') +1)) == "one"){
 						$(".qv-wrapper").css("width", "initial");
+					}
+                                        // rotate page if it were rotated earlier
+					if(htmlData.angle != 0){
+					     $('#qv-page-' + pageNumber).css('transform', 'rotate(' + htmlData.angle + 'deg)');
+					     $("#qv-panzoom").css("zoom", "1.3");
+					     $('#qv-thumbnails-page-' + pageNumber).css('transform', 'rotate(' + htmlData.angle + 'deg)');
+					     $("qv-thumbnails-page-" + pageNumber).css("zoom", "1.3");
 					}
 		        },
 		        error: function(xhr, status, error) {
@@ -1036,7 +1043,12 @@ FUNCTIONS
 			    $.each(returnedData, function(index, elem){
 			        // Rotate the page
 			        $('#qv-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');
+				// rotate page thumbnail
+                                $('#qv-thumbnails-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');					
 			    });
+                            // set correct zoom value
+			    $("#qv-panzoom").css("zoom", "1.3");
+			    $("#qv-thumbnails-panzoom").css("zoom", "23%");
 			},
 	        error: function(xhr, status, error) {
 	          var err = eval("(" + xhr.responseText + ")");
@@ -1189,8 +1201,21 @@ FUNCTIONS
 	function printDocument(){
 	    // get current document content
 	    var documentContainer = $("#qv-panzoom");
+	    // force each document page to be printed as a new page
+	    var cssPrint = '<style>'+
+			    '@media print'+
+			    '{.qv-wrapper {page-break-after:always;}';
+	    // set correct page orientation if page were rotated						
+	    documentContainer.find(".qv-page").each(function(index, page){
+		if($(page).css("transform") != "none"){
+		    cssPrint = cssPrint + "#" + $(page).attr("id") + "{transform: rotate(0deg) !important;}";
+		}
+	    });
+	    cssPrint = cssPrint + '}</style>';	
 	    // open print dialog 
-	    var windowObject = window.open('', "PrintWindow", "width=750,height=650,top=50,left=50,toolbars=no,scrollbars=yes,status=no,resizable=yes");
+	    var windowObject = window.open('', "PrintWindow", "width=750,height=650,top=50,left=50,toolbars=yes,scrollbars=yes,status=yes,resizable=yes");
+	    // add current document into the print window
+	    windowObject.document.writeln(cssPrint);
 	    // add current document into the print window
 	    windowObject.document.writeln(documentContainer[0].innerHTML);
 	    windowObject.document.close();
