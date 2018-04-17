@@ -115,16 +115,6 @@ NAV BAR CONTROLS
 	});
 
 	//////////////////////////////////////////////////
-	// Open modal dialog (file browser) event
-	//////////////////////////////////////////////////
-	$('#qv-header-logo').on('click', function(e){
-		$("#qv-browse-section").show();
-		$("#qv-upload-section").hide();
-		toggleModalDialog(true, 'Open Document');
-		loadFileTree('');
-	});
-
-	//////////////////////////////////////////////////
 	// Close modal dialog event
 	//////////////////////////////////////////////////
 	$('.qv-modal-close-action').on('click', closeModal);
@@ -1265,6 +1255,13 @@ function closeModal(){
     toggleModalDialog(false, '');
 }
 
+function openBrowseModal(){
+	$("#qv-browse-section").show();
+	$("#qv-upload-section").hide();
+	toggleModalDialog(true, 'Open Document');
+	loadFileTree('');
+}
+
 /*
 ******************************************************************
 ******************************************************************
@@ -1299,7 +1296,8 @@ METHODS
 				download: true,
                 upload: true,
 				print: true,
-				defaultDocument: null
+				defaultDocument: null,
+				browse: true
 			};
 			options = $.extend(defaults, options);
 
@@ -1354,6 +1352,9 @@ METHODS
 				generatePagesTemplate(data, 'thumbnails-');
 			    });
 			}			
+			if(options.browse){
+				$("#qv-header-logo").on('click', openBrowseModal);
+			}
 		}
 	};
 	
