@@ -246,12 +246,14 @@ NAV BAR CONTROLS
 		// scroll to page
 		if(currentPageNumber > 0 && currentPageNumber <= lastPageNumber){
 			scrollToPage(currentPageNumber);
+			setNavigationPageValues(currentPageNumber, lastPageNumber);
 		}
 	});
 
 	//////////////////////////////////////////////////
 	// Page scrolling event
 	//////////////////////////////////////////////////
+	var previousScroll = 0;
 	$('#qv-pages').scroll(function() {
 		var pagesAttr = $('#qv-page-num').text().split('/');
 		// get current page number
@@ -260,24 +262,27 @@ NAV BAR CONTROLS
     	var lastPageNumber = parseInt(pagesAttr[1]);
     	// get zoom value
 		var zoomValue = getZoomValue()/100;
-		// get scroll position
-	    var scrollPosition = $(this).scrollTop();
-	    // get current page height
-	    var pageHeight = $('#qv-page-' + currentPageNumber).height() + 20 /* plus margin */;
-	    // get scroll relative position to current page
-	    var pagePosition = parseInt(Math.floor(scrollPosition / pageHeight / zoomValue)) + 1;
-	    // update values and perform page lazy load
-	    if((pagePosition > 0) && (pagePosition <= lastPageNumber)){
-		    // change current page value
-		    if(pagePosition != currentPageNumber){
-				// set current page number
-				setNavigationPageValues(pagePosition, lastPageNumber);
+		var pagePosition = 0;
+		var currentScroll = $(this).scrollTop();
+		if (currentScroll > previousScroll){
+		   pagePosition = currentPageNumber + 1;
+	   } else {
+		   pagePosition = currentPageNumber - 1;
+	   }
+		previousScroll = currentScroll;
+		if($('#qv-page-' + pagePosition).isOnScreen(0.5, 0.5)){
+			if((currentPageNumber > 0) && (currentPageNumber <= lastPageNumber)){
+				// change current page value
+				if(pagePosition != currentPageNumber){
+					// set current page number
+					setNavigationPageValues(pagePosition, lastPageNumber);
+				}
+				// load next page
+				if((pagePosition == currentPageNumber) && (pagePosition != lastPageNumber)){
+					appendHtmlContent(currentPageNumber + 1);
+				}
 			}
-			// load next page
-			if((pagePosition == currentPageNumber) && (pagePosition != lastPageNumber)){
-		  		appendHtmlContent(currentPageNumber + 1);
-			}
-		}
+		}	    
 	});
 
 	//////////////////////////////////////////////////
@@ -554,6 +559,17 @@ NAV BAR CONTROLS
 	    loadFileTree('');	
 	});
 	
+	//////////////////////////////////////////////////
+	// Open search event
+	//////////////////////////////////////////////////
+	$('#qv-btn-search').on('click', function(e){
+	    if($("#qv-nav-search-container").parent().find("span").is(":visible")){
+			$("#qv-nav-search-container").parent().find("span").hide();
+		} else {
+			$("#qv-nav-search-container").parent().find("span").show();
+		}
+	});
+	
 	//
 // END of document ready function
 });
@@ -738,10 +754,16 @@ function appendHtmlContent(pageNumber, documentName, prefix){
 		}
 	        // rotate page if it were rotated earlier
 		if(htmlData.angle != 0){
-		     $('#qv-page-' + pageNumber).css('transform', 'rotate(' + htmlData.angle + 'deg)');
-		     $("#qv-panzoom").css("zoom", "1.3");
-		     $('#qv-thumbnails-page-' + pageNumber).css('transform', 'rotate(' + htmlData.angle + 'deg)');
-		     $("qv-thumbnails-page-" + pageNumber).css("zoom", "1.3");
+		    $('#qv-page-' + pageNumber).css('transform', 'rotate(' + htmlData.angle + 'deg)');
+			if(htmlData.angle == 90 || htmlData.angle == 270){
+				$('#qv-page-' + pageNumber).addClass("qv-landscape");
+				$('#qv-thumbnails-page-' + pageNumber).addClass("qv-thumbnails-landscape");		
+			} else {
+				$('#qv-page-' + pageNumber).removeClass("qv-landscape");
+				$('#qv-thumbnails-page-' + pageNumber).removeClass("qv-thumbnails-landscape");				
+			}
+		    $('#qv-thumbnails-page-' + pageNumber).css('transform', 'rotate(' + htmlData.angle + 'deg)');
+		    $("qv-thumbnails-page-" + pageNumber).css("zoom", "1.3");
 		}
 	    },
 	    error: function(xhr, status, error) {
@@ -1040,13 +1062,19 @@ function rotatePages(angle){
 		return;
 	    }
 	    $.each(returnedData, function(index, elem){
-		// Rotate the page
-		$('#qv-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');
+			// Rotate the page
+			$('#qv-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');
+			if(elem.angle == 90 || elem.angle == 270){
+				$('#qv-page-' + elem.pageNumber).addClass("qv-landscape");
+				$('#qv-thumbnails-page-' + elem.pageNumber).addClass("qv-thumbnails-landscape")
+			} else {
+				$('#qv-page-' + elem.pageNumber).removeClass("qv-landscape");
+				$('#qv-thumbnails-page-' + elem.pageNumber).removeClass("qv-thumbnails-landscape")
+			}
 	        // rotate page thumbnail
 	        $('#qv-thumbnails-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');					
 	    });
-	    // set correct zoom value
-	    $("#qv-panzoom").css("zoom", "1.3");
+	    // set correct zoom value for thumbnails
 	    $("#qv-thumbnails-panzoom").css("zoom", "23%");
 	},
 	error: function(xhr, status, error) {
@@ -1462,7 +1490,7 @@ HTML MARKUP
 	}
 
 	function getHtmlNavSearchPanel(){
-		return '<li class="qv-nav-toggle">'+
+		return '<li id="qv-btn-search" class="qv-nav-toggle">'+
 					'<i class="fa fa-search"></i>'+
 					'<span class="qv-tooltip">Search</span>'+
 					'<div id="qv-nav-search-container" class="qv-nav-dropdown">'+
@@ -1582,3 +1610,51 @@ $.fn.scrollTo = function( target, options, callback ){
 		});
 	});
 }
+
+/*
+******************************************************************
+******************************************************************
+JQUERY CHECK IF IN VIEWPORT PLUGIN
+******************************************************************
+******************************************************************
+*/
+$.fn.isOnScreen = function(x, y){
+    
+    if(x == null || typeof x == 'undefined') x = 1;
+    if(y == null || typeof y == 'undefined') y = 1;
+    
+    var win = $(window);
+    
+    var viewport = {
+        top : win.scrollTop(),
+        left : win.scrollLeft()
+    };
+    viewport.right = viewport.left + win.width();
+    viewport.bottom = viewport.top + win.height();
+    
+    var height = this.outerHeight();
+    var width = this.outerWidth();
+ 
+    if(!width || !height){
+        return false;
+    }
+    
+    var bounds = this.offset();
+    bounds.right = bounds.left + width;
+    bounds.bottom = bounds.top + height;
+    
+    var visible = (!(viewport.right < bounds.left || viewport.left > bounds.right || viewport.bottom < bounds.top || viewport.top > bounds.bottom));
+    
+    if(!visible){
+        return false;   
+    }
+    
+    var deltas = {
+        top : Math.min( 1, ( bounds.bottom - viewport.top ) / height),
+        bottom : Math.min(1, ( viewport.bottom - bounds.top ) / height),
+        left : Math.min(1, ( bounds.right - viewport.left ) / width),
+        right : Math.min(1, ( viewport.right - bounds.left ) / width)
+    };
+    
+    return (deltas.left * deltas.right) >= x && (deltas.top * deltas.bottom) >= y;
+};

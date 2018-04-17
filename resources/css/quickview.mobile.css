@@ -232,4 +232,10 @@
 	#qv-pages {
 		padding-top: 94px;
 	}
+	.qv-page{
+		margin: 10px 0px;
+	}
+	.qv-landscape{
+		margin: -111px;
+	}
 }
