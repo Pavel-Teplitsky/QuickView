@@ -455,7 +455,7 @@ MODAL
     position: relative;
     right: 0px;
     bottom: 20px;
-    width: 265px;
+    width: 267px;
     background-color: #3e4e5a;
     border: none;
     height: 33px;
@@ -516,6 +516,8 @@ MODAL
     transition: width .6s ease;
 }
 .qv-upload-complete {
+    font-size: 10px;
+    text-transform: uppercase;
     text-align: center;
     color: #8c8c8c;
 }
@@ -570,10 +572,11 @@ URL field
     padding-left: 12px;
     margin-left: 35px;
     width: 454px;
-    height: 34px;
+    height: 32px;
     color: #585858;
 }
 #qv-url-cancel {
+    background: transparent;
     position: absolute;
     left: 0;
     top: 0;
@@ -585,7 +588,7 @@ URL field
 }
 #qv-add-url {
     position: absolute;
-    top: 1px;
+    top: 0;
     color: #fff;
     background-color: #3e4d59;
     padding: 7px 16px 6px;
