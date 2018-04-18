@@ -139,7 +139,7 @@ NAV BAR CONTROLS
 			documentGuid = $(this).attr('data-guid');
 			loadDocument(function(data){
 				// Generate thumbnails
-				generatePagesTemplate(data, 'thumbnails-');
+				generatePagesTemplate(data, data.length, 'thumbnails-');
 			});
 		}
 	});
@@ -218,6 +218,7 @@ NAV BAR CONTROLS
 		var pagesAttr = $('#qv-page-num').text().split('/');
 		var currentPageNumber = parseInt(pagesAttr[0]);
 		var lastPageNumber = parseInt(pagesAttr[1]);
+		var prevPage = false;
 		// get clicked id
 		switch($(this).attr('id')){
 			case 'qv-btn-page-first':
@@ -225,6 +226,7 @@ NAV BAR CONTROLS
 			break;
 			case 'qv-btn-page-prev':
 				currentPageNumber = currentPageNumber - 1;
+				prevPage = true;
 			break;
 			case 'qv-btn-page-next':
 				currentPageNumber = currentPageNumber + 1;
@@ -236,7 +238,27 @@ NAV BAR CONTROLS
 		// scroll to page
 		if(currentPageNumber > 0 && currentPageNumber <= lastPageNumber){
 			scrollToPage(currentPageNumber);
+			// set navigation to current page
 			setNavigationPageValues(currentPageNumber, lastPageNumber);
+			// load next page
+			if(preloadPageCount > 0){
+				// check if next page number is not bigger than total page number
+				if(currentPageNumber + 1 <= lastPageNumber){
+					if(prevPage){
+						// load previous page
+						appendHtmlContent(currentPageNumber, documentGuid);
+						appendHtmlContent(currentPageNumber, documentGuid, 'thumbnails-');
+					} else {
+						// load next page
+						appendHtmlContent(currentPageNumber + 1, documentGuid);
+						appendHtmlContent(currentPageNumber + 1, documentGuid, 'thumbnails-');								
+					}
+				} else {
+					// load last page if to jump to it via last page button
+					appendHtmlContent(currentPageNumber, documentGuid);
+					appendHtmlContent(currentPageNumber, documentGuid, 'thumbnails-');	
+				}
+			}
 		}
 	});
 
@@ -253,13 +275,18 @@ NAV BAR CONTROLS
     	// get zoom value
 		var zoomValue = getZoomValue()/100;
 		var pagePosition = 0;
+		// get scroll direction
+		var scrollDown = true;
 		var currentScroll = $(this).scrollTop();
 		if (currentScroll > previousScroll){
 		   pagePosition = currentPageNumber + 1;
-	   } else {
+	    } else {
 		   pagePosition = currentPageNumber - 1;
-	   }
+		   scrollDown = false;
+	    }
+		// set scroll direction
 		previousScroll = currentScroll;
+		// check if page is visible in the view port more than 50%
 		if($('#qv-page-' + pagePosition).isOnScreen(0.5, 0.5)){
 			if((currentPageNumber > 0) && (currentPageNumber <= lastPageNumber)){
 				// change current page value
@@ -268,11 +295,23 @@ NAV BAR CONTROLS
 					setNavigationPageValues(pagePosition, lastPageNumber);
 				}
 				// load next page
-				if((pagePosition == currentPageNumber) && (pagePosition != lastPageNumber)){
-					appendHtmlContent(currentPageNumber + 1);
+				if(preloadPageCount > 0){
+					// if scroll down load next page
+					if(scrollDown){
+						if(pagePosition + 1 <= lastPageNumber){
+							appendHtmlContent(pagePosition + 1, documentGuid);
+							appendHtmlContent(pagePosition + 1, documentGuid, 'thumbnails-');
+						}				
+					} else {
+						// if scroll up load previous page
+						if(currentPageNumber - 1 >= 1){
+							appendHtmlContent(currentPageNumber - 1, documentGuid);
+							appendHtmlContent(currentPageNumber - 1, documentGuid, 'thumbnails-');
+						}
+					}
 				}
 			}
-		}	    
+		}		
 	});
 
 	//////////////////////////////////////////////////
@@ -659,8 +698,8 @@ function loadDocument(callback){
 	    var totalPageNumber = returnedData.length;
 	    // set total page number on navigation panel
 	    setNavigationPageValues('1', totalPageNumber);
-	    // render pages
-	    generatePagesTemplate(returnedData);
+	    // render pages		
+		generatePagesTemplate(returnedData, totalPageNumber);			
 	},
 	error: function(xhr, status, error) {
 	    var err = eval("(" + xhr.responseText + ")");
@@ -675,28 +714,45 @@ function loadDocument(callback){
 /**
 * Generate empty pages temples before the actual get pages request
 * @param {object} data - document pages array
+* @param {int} totalPageNumber - total number of document pages
 * @param {string} prefix - elements id prefix
 */
-function generatePagesTemplate(data, prefix){
+function generatePagesTemplate(data, totalPageNumber, prefix){
     // set empty for undefined of null
     prefix = prefix || '';
-    // loop though pages
-    $.each(data, function(index, elem){
-	// set document description
-	var pageNumber = elem.number;
-	var pageWidth = elem.width;
-	var pageHeight = elem.height;
-	// append empty page
-	$('#qv-' + prefix + 'panzoom').append(
-	    '<div id="qv-' + prefix + 'page-' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + '; min-height: ' + pageHeight + ';">'+
-	    '<div class="qv-page-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
-	    '</div>'
-	);
-	// check if preload page count is set
-	if((preloadPageCount == 0) || (index <= (preloadPageCount - 1))){
-	    appendHtmlContent(pageNumber, documentGuid, prefix);
-	}
-    });
+    // loop though pages	
+	$.each(data, function(index, elem){
+		// set document description
+		var pageNumber = elem.number;
+		var pageWidth = elem.width;
+		var pageHeight = elem.height;
+		// append empty page		
+		$('#qv-' + prefix + 'panzoom').append(
+			'<div id="qv-' + prefix + 'page-' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + '; min-height: ' + pageHeight + ';">'+
+			'<div class="qv-page-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
+			'</div>'
+		);		
+		
+	});	
+	var counter = 0;
+	// check pre-load page number is bigger than total pages number
+	if(preloadPageCount > totalPageNumber){
+		counter = totalPageNumber;
+	} else {
+		counter = preloadPageCount;
+	}	
+	// get page according to the pre-load page number
+	if(preloadPageCount > 0){
+		for(var i = 0; i < counter; i++){
+			// render page
+			appendHtmlContent(i + 1, documentGuid, prefix);								
+		}
+	} else {
+		// get all pages
+		for(var i = 0; i < totalPageNumber; i++){
+			appendHtmlContent(i + 1, documentGuid, prefix);						
+		}
+	}		
 }
 
 /**
@@ -722,39 +778,37 @@ function appendHtmlContent(pageNumber, documentName, prefix){
 	    data: JSON.stringify(data),
 	    contentType: "application/json",
 	    success: function(htmlData) {
-		if(htmlData.error != undefined){
-		    // open error popup
-		    printMessage(htmlData.error);
-		    return;
-		}
-		// apend page content
-		qv_prefix_page.append('<div class="qv-wrapper">' + htmlData.pageHtml + '</div>');
-		qv_prefix_page.find('.qv-page-spinner').hide();
-		// fix zoom in/out scaling
-		var zoomValue = 1;
-		// check if page is horizontaly displayed
-		if(qv_page.innerWidth() > qv_page.innerHeight()){
-		    zoomValue = 0.79;
-		}
-		qv_prefix_page.css('width', qv_page.innerWidth());
-		qv_prefix_page.css('height', qv_page.innerHeight());
-		qv_prefix_page.css('zoom', zoomValue);
-		if(documentName.substr((documentName.lastIndexOf('.') +1)) == "one"){
-		    $(".qv-wrapper").css("width", "initial");
-		}
-	        // rotate page if it were rotated earlier
-		if(htmlData.angle != 0){
-		    $('#qv-page-' + pageNumber).css('transform', 'rotate(' + htmlData.angle + 'deg)');
-			if(htmlData.angle == 90 || htmlData.angle == 270){
-				$('#qv-page-' + pageNumber).addClass("qv-landscape");
-				$('#qv-thumbnails-page-' + pageNumber).addClass("qv-thumbnails-landscape");		
-			} else {
-				$('#qv-page-' + pageNumber).removeClass("qv-landscape");
-				$('#qv-thumbnails-page-' + pageNumber).removeClass("qv-thumbnails-landscape");				
+			if(htmlData.error != undefined){
+				// open error popup
+				printMessage(htmlData.error);
+				return;
 			}
-		    $('#qv-thumbnails-page-' + pageNumber).css('transform', 'rotate(' + htmlData.angle + 'deg)');
-		    $("qv-thumbnails-page-" + pageNumber).css("zoom", "1.3");
-		}
+			// apend page content
+			qv_prefix_page.append('<div class="qv-wrapper">' + htmlData.pageHtml + '</div>');
+			qv_prefix_page.find('.qv-page-spinner').hide();
+			// fix zoom in/out scaling
+			var zoomValue = 1;
+			// check if page is horizontaly displayed
+			if(qv_page.innerWidth() > qv_page.innerHeight()){
+				zoomValue = 0.79;
+			}
+			qv_prefix_page.css('width', qv_page.innerWidth());
+			qv_prefix_page.css('height', qv_page.innerHeight());
+			qv_prefix_page.css('zoom', zoomValue);
+			if(documentName.substr((documentName.lastIndexOf('.') +1)) == "one"){
+				$(".qv-wrapper").css("width", "initial");
+			}
+			// rotate page if it were rotated earlier
+			if(htmlData.angle != 0){
+				qv_prefix_page.css('transform', 'rotate(' + htmlData.angle + 'deg)');
+				if(htmlData.angle == 90 || htmlData.angle == 270){
+					qv_page.addClass("qv-landscape");
+					qv_prefix_page.addClass("qv-thumbnails-landscape");		
+				} else {
+					qv_page.removeClass("qv-landscape");
+					qv_prefix_page.removeClass("qv-thumbnails-landscape");				
+				}				
+			}
 	    },
 	    error: function(xhr, status, error) {
 	        var err = eval("(" + xhr.responseText + ")");
@@ -1065,7 +1119,6 @@ function rotatePages(angle){
 	        $('#qv-thumbnails-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');					
 	    });
 	    // set correct zoom value for thumbnails
-	    $("#qv-thumbnails-panzoom").css("zoom", "23%");
 	},
 	error: function(xhr, status, error) {
 	  var err = eval("(" + xhr.responseText + ")");
@@ -1349,7 +1402,7 @@ METHODS
 			    documentGuid = options.defaultDocument;
 			    loadDocument(function(data){
 				// Generate thumbnails
-				generatePagesTemplate(data, 'thumbnails-');
+				generatePagesTemplate(data, data.length, 'thumbnails-');
 			    });
 			}			
 			if(options.browse){
