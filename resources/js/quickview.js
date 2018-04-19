@@ -783,15 +783,10 @@ function appendHtmlContent(pageNumber, documentName, prefix){
 				// open error popup
 				printMessage(htmlData.error);
 				return;
-			}
+			}			
 			// append page content in HTML mode
 			if(htmlMode){
 				qv_prefix_page.append('<div class="qv-wrapper">' + htmlData.pageHtml + '</div>');
-			} else {
-				// append page content in image mode
-				qv_prefix_page.append('<div class="qv-wrapper">'+
-										'<image class="qv-page-image" src="data:image/png;base64,' + htmlData.pageImage + '" alt></image>'+
-									'</div>');
 			}
 			qv_prefix_page.find('.qv-page-spinner').hide();
 			// fix zoom in/out scaling
@@ -799,10 +794,19 @@ function appendHtmlContent(pageNumber, documentName, prefix){
 			// check if page is horizontaly displayed
 			if(qv_page.innerWidth() > qv_page.innerHeight()){
 				zoomValue = 0.79;
+			} else if(!htmlMode) {
+				zoomValue = 1.2;
 			}
 			qv_prefix_page.css('width', qv_page.innerWidth());
 			qv_prefix_page.css('height', qv_page.innerHeight());
 			qv_prefix_page.css('zoom', zoomValue);
+			// append page content in image mode
+			if(!htmlMode) {				
+				qv_prefix_page.append('<div class="qv-wrapper">'+
+										'<image style="width: inherit !important" class="qv-page-image" src="data:image/png;base64,' + htmlData.pageImage + '" alt></image>'+
+									'</div>');
+			}
+			// set correct width and hight for OneNote format
 			if(documentName.substr((documentName.lastIndexOf('.') +1)) == "one"){
 				if(htmlMode){
 					$(".qv-wrapper").css("width", "initial");
@@ -815,16 +819,25 @@ function appendHtmlContent(pageNumber, documentName, prefix){
 			if(htmlData.angle != 0){
 				qv_prefix_page.css('transform', 'rotate(' + htmlData.angle + 'deg)');
 				if(htmlData.angle == 90 || htmlData.angle == 270){
+					// set styles for HTML mode
 					if(htmlMode){
 						qv_page.addClass("qv-landscape");
-						qv_prefix_page.addClass("qv-thumbnails-landscape");		
+						if(prefix == "thumbnails-"){
+							qv_prefix_page.addClass("qv-thumbnails-landscape");
+						}
 					} else {
-						qv_page.addClass("qv-landscape-image");						
+						// set style for image mode
+						qv_page.addClass("qv-landscape-image");	
+						if(prefix == "thumbnails-"){
+							qv_prefix_page.addClass("qv-thumbnails-landscape-image");	
+							qv_prefix_page.find("img").removeClass("qv-page-image");							
+						}
 					}
 				} else {
 					qv_page.removeClass("qv-landscape");
 					qv_prefix_page.removeClass("qv-thumbnails-landscape");				
 					qv_page.removeClass("qv-landscape-image");
+					qv_prefix_page.removeClass("qv-thumbnails-landscape-image");
 				}				
 			}
 	    },
@@ -1129,15 +1142,18 @@ function rotatePages(angle){
 			if(elem.angle == 90 || elem.angle == 270){
 				if(htmlMode){
 					$('#qv-page-' + elem.pageNumber).addClass("qv-landscape");
-					$('#qv-thumbnails-page-' + elem.pageNumber).addClass("qv-thumbnails-landscape")
+					$('#qv-thumbnails-page-' + elem.pageNumber).addClass("qv-thumbnails-landscape");	
 				} else {
-					$('#qv-page-' + elem.pageNumber).addClass("qv-landscape-image");
+					$('#qv-page-' + elem.pageNumber).addClass("qv-landscape-image");	
+					$('#qv-thumbnails-page-' + elem.pageNumber).addClass("qv-thumbnails-landscape-image");	
+					$('#qv-thumbnails-page-' + elem.pageNumber).find("img").removeClass("qv-page-image");							
 				}
 			} else {
 				$('#qv-page-' + elem.pageNumber).removeClass("qv-landscape");
+				$('#qv-thumbnails-page-' + elem.pageNumber).removeClass("qv-thumbnails-landscape");				
 				$('#qv-page-' + elem.pageNumber).removeClass("qv-landscape-image");
-				$('#qv-thumbnails-page-' + elem.pageNumber).removeClass("qv-thumbnails-landscape")
-			}
+				$('#qv-thumbnails-page-' + elem.pageNumber).removeClass("qv-thumbnails-landscape-image");
+			}	
 	        // rotate page thumbnail
 	        $('#qv-thumbnails-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');					
 	    });

@@ -339,10 +339,13 @@ Thumbnails sidebar
     left: 0;
 }
 #qv-thumbnails .qv-page-image{
-	width: inherit !important;
 	height: inherit;
-    margin-left: 167px !important;
+    margin-left: 153px !important;
 }
+.qv-thumbnails-landscape-image{
+	margin: -127px 0 -23px !important;
+}
+
 /*
 ******************************************
 MODAL
