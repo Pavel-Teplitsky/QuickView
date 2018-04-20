@@ -284,7 +284,7 @@ PAGES
 	margin: -111px 254px;
 }
 .qv-landscape-image{
-	margin: 10px 97px;
+	margin: -72px 100px -79px ;
 }
 /* Fix for image files */
 #qv-pages .qv-wrapper > img {
@@ -343,7 +343,7 @@ Thumbnails sidebar
     margin-left: 153px !important;
 }
 .qv-thumbnails-landscape-image{
-	margin: -127px 0 -23px !important;
+	margin: -90px 0 -23px !important;
 }
 
 /*
