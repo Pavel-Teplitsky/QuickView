@@ -185,15 +185,15 @@
 	    width: 85px;
 	    margin-top: 5px;
 	}
-	.qv-url-wrap{
+	.qv-url-wrap, .qv-password-wrap{
 	    height: 91px;
 	    margin: 8px 0px 47px !important;
 	}
 	.qv-url-wrap > input {
 	    margin-left: 66px;
-	    width: 92%;
-	    height: 89px;
-	    font-size: -webkit-xxx-large;
+		width: 77%;
+		height: 89px;
+		font-size: -webkit-xxx-large;
 	}
 	.qv-url-wrap > .btn-danger {
 	    position: absolute;
@@ -207,23 +207,38 @@
 	    font-size: -webkit-xxx-large;
 	}
 	#qv-add-url {
-	    right: -91px;
-	    height: 89px;
-	    border-radius: 0px;
-	    width: 152px;
-	    font-size: 51px;
+	    right: -7px;
+		height: 89px;
+		border-radius: 0px;
+		width: 152px;
+		font-size: 51px;
 	}
 	#qv-url-cancel{
 	    position: inherit;
-	    top: -12px;
-	    left: -835px;
-	    width: 83px;
-	    height: 90px;
+		top: -12px;
+		left: -800px;
+		width: 83px;
+		height: 90px;
 	}
 	.qv-file-name {
 	    width: 530px;
 	}
-	
+	.qv-password-wrap > input {
+	    margin-left: 66px;
+	    width: 76%;
+	    height: 89px;
+	    font-size: -webkit-xxx-large;
+	}
+	#qv-password-submit {
+		right: 9px;
+		height: 89px;
+		border-radius: 0px;
+		width: 201px;
+		font-size: 51px;
+	}
+	#qv-url-cancel i {
+		font-size: 53px;		
+	}
 	/*
 	******************************************
 	PAGES

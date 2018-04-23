@@ -20,6 +20,7 @@ var uploadFilesList = [];
 var documentGuid;
 var htmlMode = true;
 var documentData = [];
+var password = "";
 var map = {};
 // add supported formats
 map['folder'] = { 'format': '', 'icon': 'fa-folder' };
@@ -305,7 +306,10 @@ NAV BAR CONTROLS
 						if(pagePosition + 1 <= lastPageNumber){
 							appendHtmlContent(pagePosition + 1, documentGuid, '', documentData[pagePosition].width, documentData[pagePosition].height);
 							appendHtmlContent(pagePosition + 1, documentGuid, 'thumbnails-', documentData[pagePosition].width, documentData[pagePosition].height);
-						}				
+						} else if(pagePosition == lastPageNumber){
+							appendHtmlContent(pagePosition, documentGuid, '', documentData[pagePosition - 1].width, documentData[pagePosition - 1].height);
+							appendHtmlContent(pagePosition, documentGuid, 'thumbnails-', documentData[pagePosition - 1].width, documentData[pagePosition - 1].height);
+						}							
 					} else {
 						// if scroll up load previous page
 						if(currentPageNumber - 1 >= 1){
@@ -322,6 +326,7 @@ NAV BAR CONTROLS
 	// Clear search input
 	//////////////////////////////////////////////////
 	$('#qv-nav-search-cancel').on('click', function(e){
+		clearSearch();
 		$(this).parent().parent().click();
 		
 	});
@@ -588,6 +593,7 @@ NAV BAR CONTROLS
 	$('#qv-btn-upload').on('click', function(e){
 	    $("#qv-upload-section").show();
 	    $("#qv-browse-section").hide();
+		$("#qv-password-section").hide();
 	    toggleModalDialog(true, 'Upload Document');		
 	});
 	
@@ -597,6 +603,7 @@ NAV BAR CONTROLS
 	$('#qv-open-document').on('click', function(e){
 	    $("#qv-browse-section").show();
 	    $("#qv-upload-section").hide();
+		$("#qv-password-section").hide();
 	    toggleModalDialog(true, 'Open Document');
 	    loadFileTree('');	
 	});
@@ -610,6 +617,20 @@ NAV BAR CONTROLS
 		} else {
 			$("#qv-nav-search-container").parent().find("span").css("display", "initial");
 		}
+	});
+	
+	//////////////////////////////////////////////////
+	// Submit password button click (password required modal)
+	//////////////////////////////////////////////////
+	$('#qv-password-submit').on('click', function(e){
+	    toggleModalDialog(false, ''); 
+	    $("#qv-browse-section").show();
+		$("#qv-password-section").hide();
+		password = $("#qv-password-input").val();
+		loadDocument(function(data){
+			// Generate thumbnails
+			generatePagesTemplate(data, data.length, 'thumbnails-');
+		});		
 	});
 	
 	//
@@ -674,11 +695,11 @@ function loadFileTree(dir) {
 		var docFormat = (getDocumentFormat(name) == undefined)? 'fa-folder' : getDocumentFormat(name);
 		// append document
 		$('.qv-modal-table tbody').append(
-		    '<tr>'+
-		    '<td><i class="fa ' + docFormat.icon + '"></i></td>'+
-		    '<td class="qv-filetree-name" data-guid="' + guid + '"><div class="qv-file-name">' + name + '</div></td>'+
-		    '<td>' + docFormat.format + '</td>'+
-		    '<td>' + new_size + '</td>'+
+			'<tr>'+
+			'<td><i class="fa ' + docFormat.icon + '"></i></td>'+
+			'<td class="qv-filetree-name" data-guid="' + guid + '"><div class="qv-file-name">' + name + '</div></td>'+
+			'<td>' + docFormat.format + '</td>'+
+			'<td>' + new_size + '</td>'+
 		'</tr>');
 	    });
 	},
@@ -696,36 +717,44 @@ function loadFileTree(dir) {
 function loadDocument(callback){
 	// clear global documentData array from previous document info
 	documentData = [];
-    // get document description
-    var data = {guid: documentGuid, htmlMode: htmlMode};
-    $.ajax({
+	// get document description
+	var data = {guid: documentGuid, htmlMode: htmlMode, password: password};
+	$.ajax({
 	type: 'POST',
 	url: getApplicationPath('loadDocumentDescription'),
 	data: JSON.stringify(data),
 	contentType: "application/json",
 	success: function(returnedData) {
-	    if(returnedData.error != undefined){
-		// open error popup
-		printMessage(returnedData.error);
-		return;
-	    }
-	    // get total page number
-	    var totalPageNumber = returnedData.length;
-	    // set total page number on navigation panel
-	    setNavigationPageValues('1', totalPageNumber);
+		if(returnedData.error != undefined){
+			if(returnedData.error.indexOf("Null") > 0){
+				if(password != ""){
+					// open error popup
+				printMessage("Incorrect password");
+				}
+				openPasswordModal();
+			} else {			
+				// open error popup
+				printMessage(returnedData.error);
+			}
+			return;
+		}
+		// get total page number
+		var totalPageNumber = returnedData.length;
+		// set total page number on navigation panel
+		setNavigationPageValues('1', totalPageNumber);
 		// set current document data globally
-		documentData = returnedData;
+		documentData = returnedData;		
 		// render pages		
 		generatePagesTemplate(returnedData, totalPageNumber);			
 	},
 	error: function(xhr, status, error) {
-	    var err = eval("(" + xhr.responseText + ")");
-	    console.log(err.Message);
+		var err = eval("(" + xhr.responseText + ")");
+		console.log(err.Message);
 	}
-    }).done(function(data){
+	}).done(function(data){
 	// return POST data
 	callback(data);
-    });
+	});	
 }
 
 /**
@@ -735,41 +764,46 @@ function loadDocument(callback){
 * @param {string} prefix - elements id prefix
 */
 function generatePagesTemplate(data, totalPageNumber, prefix){
-    // set empty for undefined of null
-    prefix = prefix || '';
-    // loop though pages	
-	$.each(data, function(index, elem){
-		// set document description
-		var pageNumber = elem.number;
-		var pageWidth = elem.width;
-		var pageHeight = elem.height;
-		// append empty page		
-		$('#qv-' + prefix + 'panzoom').append(
-			'<div id="qv-' + prefix + 'page-' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + '; min-height: ' + pageHeight + ';">'+
-			'<div class="qv-page-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
-			'</div>'
-		);		
-		
-	});	
-	var counter = 0;
-	// check pre-load page number is bigger than total pages number
-	if(preloadPageCount > totalPageNumber){
-		counter = totalPageNumber;
-	} else {
-		counter = preloadPageCount;
+	if(data.error == undefined){
+		// set empty for undefined of null
+		prefix = prefix || '';
+		// loop though pages	
+		$.each(data, function(index, elem){
+			// set document description
+			var pageNumber = elem.number;
+			var pageWidth = elem.width;
+			var pageHeight = elem.height;
+			// append empty page		
+			$('#qv-' + prefix + 'panzoom').append(
+				'<div id="qv-' + prefix + 'page-' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + 'px; min-height: ' + pageHeight + 'px;">'+
+				'<div class="qv-page-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
+				'</div>'
+			);
+			index++;
+			$('#qv-' + prefix + 'page-' + index).css('width', pageWidth);
+			$('#qv-' + prefix + 'page-' + index).css('height', pageHeight);
+			
+		});	
+		var counter = 0;
+		// check pre-load page number is bigger than total pages number
+		if(preloadPageCount > totalPageNumber){
+			counter = totalPageNumber;
+		} else {
+			counter = preloadPageCount;
+		}	
+		// get page according to the pre-load page number
+		if(preloadPageCount > 0){
+			for(var i = 0; i < counter; i++){
+				// render page
+				appendHtmlContent(i + 1, documentGuid, prefix, data[i].width, data[i].height);								
+			}
+		} else {
+			// get all pages
+			for(var i = 0; i < totalPageNumber; i++){
+				appendHtmlContent(i + 1, documentGuid, prefix, data[i].width, data[i].height);						
+			}
+		}	
 	}	
-	// get page according to the pre-load page number
-	if(preloadPageCount > 0){
-		for(var i = 0; i < counter; i++){
-			// render page
-			appendHtmlContent(i + 1, documentGuid, prefix, data[i].width, data[i].height);								
-		}
-	} else {
-		// get all pages
-		for(var i = 0; i < totalPageNumber; i++){
-			appendHtmlContent(i + 1, documentGuid, prefix, data[i].width, data[i].height);						
-		}
-	}		
 }
 
 /**
@@ -790,7 +824,7 @@ function appendHtmlContent(pageNumber, documentName, prefix, width, height){
     if(!qv_prefix_page.hasClass('loaded')){
 	qv_prefix_page.addClass('loaded');
 	// get document description
-	var data = {guid: documentGuid, page: pageNumber, htmlMode: htmlMode};
+	var data = {guid: documentGuid, page: pageNumber, htmlMode: htmlMode, password: password};
 	$.ajax({
 	    type: 'POST',
 	    url: getApplicationPath('loadDocumentPage'),
@@ -811,7 +845,7 @@ function appendHtmlContent(pageNumber, documentName, prefix, width, height){
 				// remove spinner
 				qv_prefix_page.find('.qv-page-spinner').hide();
 				// fix to avoid using the spinner DIV size
-				if(qv_page.innerWidth() >= width &&  qv_page.innerHeight() >= height){
+				if(qv_page.innerWidth() >= width - 1 &&  qv_page.innerHeight() >= height - 1){
 					width = qv_page.innerWidth();
 					height =  qv_page.innerHeight();
 				}
@@ -942,33 +976,33 @@ function getElementByClass(target, class_id){
 /**
 * Toggle modal dialog
 * @param {boolean} open - open/close value
-* @param {string} title - title to display in modual dialog (popup)
+* @param {string} title - title to display in modal dialog (popup)
 */
 function toggleModalDialog(open, title){
-    if(open){
-	$('#modalDialog .qv-modal-title').text(title);
-	$('#modalDialog')
-	    .css('opacity', 0)
-	    .fadeIn('fast')
-	    .animate(
-		{ opacity: 1 },
-		{ queue: false, duration: 'fast' }
-	    );
-	$('#modalDialog').addClass('in');
+	if(open){
+		$('#modalDialog .qv-modal-title').text(title);
+		$('#modalDialog')
+			.css('opacity', 0)
+			.fadeIn('fast')
+			.animate(
+			{ opacity: 1 },
+			{ queue: false, duration: 'fast' }
+			);
+		$('#modalDialog').addClass('in');		
     }else{
-	$('#modalDialog').removeClass('in');
-	$('#modalDialog')
-	    .css('opacity', 1)
-	    .fadeIn('fast')
-	    .animate(
-		{ opacity: 0 },
-		{ queue: false, duration: 'fast' }
-	    )
-	    .css('display', 'none');
-	// hide all contents
-	$('#qv-modal-filebroswer').hide();
-	$('#qv-modal-spinner').hide();
-	$('#qv-modal-error').hide();			
+		$('#modalDialog').removeClass('in');
+		$('#modalDialog')
+			.css('opacity', 1)
+			.fadeIn('fast')
+			.animate(
+			{ opacity: 0 },
+			{ queue: false, duration: 'fast' }
+			)
+			.css('display', 'none');
+		// hide all contents
+		$('#qv-modal-filebroswer').hide();
+		$('#qv-modal-spinner').hide();
+		$('#qv-modal-error').hide();		
     }
 }
 
@@ -1031,6 +1065,15 @@ function highlightSearch(text) {
 	    $('#qv-nav-search-next').click();
 	}
     }
+}
+
+/**
+* Clear search input
+*/
+function clearSearch(){
+    $('#qv-nav-search-container :input').val('');
+    setSearchMatchCount(0, 0);
+    clearHighlightSearch();
 }
 
 /**
@@ -1163,7 +1206,7 @@ function rotatePages(angle){
     var pages = [];
     pages[0] = currentPageNumber;
     // Prepare ajax data
-    var data = {guid: documentGuid, angle: angle, pages: pages, htmlMode: htmlMode};
+    var data = {guid: documentGuid, angle: angle, pages: pages, htmlMode: htmlMode, password: password};
     $.ajax({
 	type: 'POST',
 	url: getApplicationPath('rotateDocumentPages'),
@@ -1389,8 +1432,16 @@ function closeModal(){
 function openBrowseModal(){
 	$("#qv-browse-section").show();
 	$("#qv-upload-section").hide();
+	$("#qv-password-section").hide();
 	toggleModalDialog(true, 'Open Document');
 	loadFileTree('');
+}
+
+function openPasswordModal(){
+	$("#qv-browse-section").hide();
+	$("#qv-upload-section").hide();
+	$("#qv-password-section").show();
+	toggleModalDialog(true, 'Password required');
 }
 
 /*
@@ -1444,6 +1495,9 @@ METHODS
 			
 			// assembly modal html
 			$(".qv-modal-body").append(getHtmlFileBrowser);
+			
+			// assembly password modal html
+			getHtmlPassword();
 
 			// assembly nav bar
 			if(options.zoom){
@@ -1712,6 +1766,18 @@ HTML MARKUP
 	    // add upload section
 	    $(uploadSection).insertAfter($("#qv-browse-section"));
 	    $("#qv-upload-section").hide();
+	}
+	
+	function getHtmlPassword(){
+	    var passwordSection = '<section id="qv-password-section" class="tab-slider-body">'+		       
+								'<div class="inner-addon left-addon btn qv-password-wrap" id="qv-password-wrap">'+
+									'<input type="password" class="form-control" id="qv-password-input" placeholder="Enter password">'+
+									'<button class="btn btn-primary" id="qv-password-submit">Submit</button>'+
+							    '</div>'+
+							'</section>';	
+		// add password section
+	    $(".qv-modal-body").append(passwordSection);
+	    $("#qv-password-section").hide();			
 	}
 	
 })(jQuery);
