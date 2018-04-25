@@ -21,6 +21,7 @@ var documentGuid;
 var htmlMode = true;
 var documentData = [];
 var password = "";
+var rewrite;
 var map = {};
 // add supported formats
 map['folder'] = { 'format': '', 'icon': 'fa-folder' };
@@ -778,11 +779,7 @@ function generatePagesTemplate(data, totalPageNumber, prefix){
 				'<div id="qv-' + prefix + 'page-' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + 'px; min-height: ' + pageHeight + 'px;">'+
 				'<div class="qv-page-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+
 				'</div>'
-			);
-			index++;
-			$('#qv-' + prefix + 'page-' + index).css('width', pageWidth);
-			$('#qv-' + prefix + 'page-' + index).css('height', pageHeight);
-			
+			);			
 		});	
 		var counter = 0;
 		// check pre-load page number is bigger than total pages number
@@ -1342,6 +1339,7 @@ function uploadDocument(file, index, url = ''){
     formData.append("file", file);
     // add URL if set
     formData.append("url", url);
+	formData.append("rewrite", rewrite);
     $.ajax({
 	// callback function which updates upload progress bar
 	xhr: function()
@@ -1480,7 +1478,8 @@ METHODS
 				print: true,
 				defaultDocument: null,
 				browse: true,
-				htmlMode: true
+				htmlMode: true,
+				rewrite: true
 			};
 			options = $.extend(defaults, options);
 
@@ -1488,6 +1487,7 @@ METHODS
 			applicationPath = options.applicationPath;
 			preloadPageCount = options.preloadPageCount;
 			htmlMode = options.htmlMode;
+			rewrite = options.rewrite;
 			
 			// assembly html base
 			this.append(getHtmlBase);
@@ -1541,7 +1541,7 @@ METHODS
 			}			
 			if(options.browse){
 				$("#qv-header-logo").on('click', openBrowseModal);
-			}			
+			}
 		}
 	};
 	
