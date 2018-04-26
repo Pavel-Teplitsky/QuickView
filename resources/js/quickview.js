@@ -641,9 +641,7 @@ NAV BAR CONTROLS
 	$('#qv-modal-content').on('click', function(e){
 		if(isMobile()){
 			if($("#qv-upload-files-table > div").length > 0){
-			    var swiper = new Swiper(".swiper-container",{
-					width: 84
-				});
+			    var swiper = new Swiper(".swiper-container");
 				if(typeof swiper.length == "undefined"){
 				   swiper.slideNext();
 				   swiper.slidePrev();
@@ -1351,7 +1349,7 @@ function addFileForUpload(uploadFiles, url) {
 						'</div>'+	
 						'<div class="swiper-slide qv-desktop swiper-slide-cancel">'+
 							'<div class="files-table-remove">'+
-								'<button class="btn qv-cancel-button"><i class="fa fa-trash-o"></i></button>'+
+								'<button class="btn qv-cancel-button"><i class="fa fa-trash-o"></i> Remove</button>'+
 							'</div>'+
 						'</div>'+
 					'</div>'+
@@ -1366,9 +1364,7 @@ function addFileForUpload(uploadFiles, url) {
 			$(slide).removeClass("qv-desktop");
 		});
 		//initialize swiper when document ready
-		var swiper = new Swiper ('.swiper-container',{
-			width: 84
-		});
+		var swiper = new Swiper ('.swiper-container');
 	} else {
 		$.each($(".swiper-slide"), function(index, slide){
 			$(slide).removeClass("swiper-slide-cancel");
