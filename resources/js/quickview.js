@@ -505,7 +505,7 @@ NAV BAR CONTROLS
             // get selected files
             var button = $(this);
             // get file name which will be deleted
-            var fileName = button.closest("tr").find("div")[0].innerHTML;
+            var fileName = button.closest("div").parent().parent().find("div.qv-file-name")[0].innerHTML;
             // find its index in the array
             for(var i = 0; i < uploadFilesList.length; i++){
               if(uploadFilesList[i].name == fileName){
@@ -514,10 +514,10 @@ NAV BAR CONTROLS
               }
             }
             // remove table row
-       	    button.closest("tr").remove();
+       	   button.closest("div").parent().parent().parent().remove();
 	    $('#qv-upload-input').val('');
 	    // recalculate indexes in the files table
-	    var tableRows = $('#qv-upload-files-table > tbody > tr');
+	    var tableRows = $('#qv-upload-files-table > div');
 	    for(var n = 0; n < tableRows.length; n++){
 		$(tableRows[n]).find("div.progress-bar").attr("id", "qv-pregress-bar-" + n);
 	    }
@@ -532,25 +532,25 @@ NAV BAR CONTROLS
 	//////////////////////////////////////////////////
 	$("#qv-upload-button").on('click', function(e){
             // get current number of table rows
-            var tableRows = $('#qv-upload-files-table > tbody > tr');
+            var tableRows = $('#qv-upload-files-table > div');
             // initiate URL counter required for proper calculating of the uploaded files in case local files uploaded with URLs
             var urlCounter = 0;
             // upload file one by one
             for (var i = 0; i < tableRows.length; i++) {
 	        // check if current table row contains URL instead of file
-	        if($(tableRows[i]).find("td[data-value]").length > 0) {
+	        if($(tableRows[i]).find("div[data-value]").length > 0) {
 		        // upload URL
-		        uploadDocument(null, i, $(tableRows[i]).find("td.qv-filetree-name").data().value);
+		        uploadDocument(null, i, $(tableRows[i]).find("div.qv-filetree-name").data().value);
 		        // increase URL counter
 		        urlCounter++;
 	        } else {
-                    // check if the current file already uploaded
-		    var isUploaded = $(tableRows[i]).find("td.qv-filetree-name").data().uploaded;
+            // check if the current file already uploaded
+		    var isUploaded = $(tableRows[i]).find("div.qv-filetree-name").data().uploaded;
 		    if(!isUploaded){
                         // upload local file
 			uploadDocument(uploadFilesList[i - urlCounter], i);
                         // mark file as uploaded		
-			$(tableRows[i]).find("td.qv-filetree-name").data().uploaded = true;
+			$(tableRows[i]).find("div.qv-filetree-name").data().uploaded = true;
 		    } else {	
 			continue;
 		    }				
@@ -628,10 +628,32 @@ NAV BAR CONTROLS
 	    $("#qv-browse-section").show();
 		$("#qv-password-section").hide();
 		password = $("#qv-password-input").val();
+		$("#qv-password-input").val('');
 		loadDocument(function(data){
 			// Generate thumbnails
 			generatePagesTemplate(data, data.length, 'thumbnails-');
 		});		
+	});
+	
+	//////////////////////////////////////////////////
+	// Click on modal body event (used to change slide in swiper)
+	//////////////////////////////////////////////////
+	$('#qv-modal-content').on('click', function(e){
+		if(isMobile()){
+			if($("#qv-upload-files-table > div").length > 0){
+			    var swiper = new Swiper(".swiper-container",{
+					width: 84
+				});
+				if(typeof swiper.length == "undefined"){
+				   swiper.slideNext();
+				   swiper.slidePrev();
+			    }
+			    for(var i = 0; i < swiper.length; i++){
+				   swiper[i].slideNext();
+				   swiper[i].slidePrev();
+			    }
+			}
+	   	}	   
 	});
 	
 	//
@@ -651,6 +673,8 @@ FUNCTIONS
 function loadFileTree(dir) {
     var data = {path: dir};
     currentDirectory = dir;
+	// clear previously entered password
+	clearPassword();
     // show loading spinner
     $('#qv-modal-spinner').show();
     // get data
@@ -660,9 +684,9 @@ function loadFileTree(dir) {
 	data: JSON.stringify(data),
 	contentType: "application/json",
 	success: function(returnedData) {
-	    if(returnedData.error != undefined){
+	    if(returnedData.message != undefined){
 		// open error popup
-		printMessage(returnedData.error);
+		printMessage(returnedData.message);
 		return;
 	    }
 	    // hide loading spinner
@@ -719,23 +743,22 @@ function loadDocument(callback){
 	// clear global documentData array from previous document info
 	documentData = [];
 	// get document description
-	var data = {guid: documentGuid, htmlMode: htmlMode, password: password};
+	var data = {guid: documentGuid, htmlMode: htmlMode, password: password};	
 	$.ajax({
 	type: 'POST',
 	url: getApplicationPath('loadDocumentDescription'),
 	data: JSON.stringify(data),
 	contentType: "application/json",
 	success: function(returnedData) {
-		if(returnedData.error != undefined){
-			if(returnedData.error.indexOf("Null") > 0){
-				if(password != ""){
-					// open error popup
-				printMessage("Incorrect password");
-				}
+		if(returnedData.message != undefined){
+			if(returnedData.message == "Password Required"){							
 				openPasswordModal();
+			} else if(returnedData.message == "Incorrect password"){
+				openPasswordModal(returnedData.message);
+				return;	
 			} else {			
 				// open error popup
-				printMessage(returnedData.error);
+				printMessage(returnedData.message);
 			}
 			return;
 		}
@@ -765,15 +788,15 @@ function loadDocument(callback){
 * @param {string} prefix - elements id prefix
 */
 function generatePagesTemplate(data, totalPageNumber, prefix){
-	if(data.error == undefined){
+	if(data.message == undefined){
 		// set empty for undefined of null
 		prefix = prefix || '';
 		// loop though pages	
 		$.each(data, function(index, elem){
 			// set document description
-			var pageNumber = elem.number;
-			var pageWidth = elem.width;
-			var pageHeight = elem.height;
+			var pageNumber = elem.Number;
+			var pageWidth = elem.Width;
+			var pageHeight = elem.Height;
 			// append empty page		
 			$('#qv-' + prefix + 'panzoom').append(
 				'<div id="qv-' + prefix + 'page-' + pageNumber + '" class="qv-page" style="min-width: ' + pageWidth + 'px; min-height: ' + pageHeight + 'px;">'+
@@ -781,7 +804,7 @@ function generatePagesTemplate(data, totalPageNumber, prefix){
 				'</div>'
 			);			
 		});	
-		var counter = 0;
+		var counter = 0;		
 		// check pre-load page number is bigger than total pages number
 		if(preloadPageCount > totalPageNumber){
 			counter = totalPageNumber;
@@ -792,13 +815,13 @@ function generatePagesTemplate(data, totalPageNumber, prefix){
 		if(preloadPageCount > 0){
 			for(var i = 0; i < counter; i++){
 				// render page
-				appendHtmlContent(i + 1, documentGuid, prefix, data[i].width, data[i].height);								
-			}
+				appendHtmlContent(i + 1, documentGuid, prefix, data[i].Width, data[i].Height);		
+			}			
 		} else {
 			// get all pages
 			for(var i = 0; i < totalPageNumber; i++){
-				appendHtmlContent(i + 1, documentGuid, prefix, data[i].width, data[i].height);						
-			}
+				appendHtmlContent(i + 1, documentGuid, prefix, data[i].Width, data[i].Height);	
+			}			
 		}	
 	}	
 }
@@ -833,6 +856,7 @@ function appendHtmlContent(pageNumber, documentName, prefix, width, height){
 				printMessage(htmlData.error);
 				return;
 			}			
+			
 			// fix zoom in/out scaling
 			var zoomValue = 1;
 			// append page content in HTML mode
@@ -918,7 +942,7 @@ function appendHtmlContent(pageNumber, documentName, prefix, width, height){
 					qv_page.removeClass("qv-landscape-image");
 					qv_prefix_page.removeClass("qv-thumbnails-landscape-image");
 				}				
-			}
+			}			
 	    },
 	    error: function(xhr, status, error) {
 	        var err = eval("(" + xhr.responseText + ")");
@@ -1210,13 +1234,15 @@ function rotatePages(angle){
 	data: JSON.stringify(data),
 	contentType: "application/json",
 	success: function(returnedData) {
-	    if(returnedData.error != undefined){
+	    if(returnedData.message != undefined){
 		// open error popup
-		printMessage(returnedData.error);
+		printMessage(returnedData.message);
 		return;
 	    }
 	    $.each(returnedData, function(index, elem){
 			// Rotate the page
+			$('#qv-page-' + elem.pageNumber).css('animation', 'none'); 
+			$('#qv-page-' + elem.pageNumber).css('transition-property', 'none');
 			$('#qv-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');
 			// set correct styles when page has landscape orientation
 			if(elem.angle == 90 || elem.angle == 270){
@@ -1235,6 +1261,8 @@ function rotatePages(angle){
 				$('#qv-thumbnails-page-' + elem.pageNumber).removeClass("qv-thumbnails-landscape-image");
 			}	
 	        // rotate page thumbnail
+			$('#qv-thumbnails-page-' + elem.pageNumber).css('animation', 'none'); 
+			$('#qv-thumbnails-page-' + elem.pageNumber).css('transition-property', 'none');
 	        $('#qv-thumbnails-page-' + elem.pageNumber).css('transform', 'rotate(' + elem.angle + 'deg)');					
 	    });	   
 	},
@@ -1267,27 +1295,32 @@ function addFileForUpload(uploadFiles, url) {
     // get table in which files will be added
     var table = $("#qv-upload-files-table");
     // get current count of table rows
-    var tableRowsNumber = $('#qv-upload-files-table > tbody > tr').length;
+    var tableRowsNumber = $('#qv-upload-files-table > div').length;
+	
     if(url){
-	// append URL
-	table.append(
-	'<tr>'+
-	'<td><i class="fa ' + getDocumentFormat(url.split('/').pop()).icon + '"></i></td>'+
-	'<td class="qv-filetree-name" data-value="' + url + '" data-uploaded="false"><div class="qv-file-name">' + url.split('/').pop() + '</div>'+ 
-		'<span id="qv-upload-size"> type: ' + url.split('/').pop().split('.').pop() +'</span>'+
-	'</td>'+
-	'<td>'+
-	    '<div class="progress qv-progress">'+
-		'<div id="qv-pregress-bar-' + tableRowsNumber + '" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'+
-		'</div>'+
-	    '</div>'+
-	'</td>'+
-	'<td class="files-table-remove">'+
-	    '<button class="btn qv-cancel-button"><i class="fa fa-trash-o"></i></button>'+
-	'</td>'+
-	'</tr>');
-	// increase table rows counter after adding new record
-	tableRowsNumber++			
+		// append URL
+		table.append('<div class="swiper-container">'+	
+						'<div class="swiper-wrapper">'+	
+							'<div class="swiper-slide">'+
+								'<i class="fa ' + getDocumentFormat(url.split('/').pop()).icon + '"></i>'+
+								'<div class="qv-filetree-name" data-uploaded="false" data-value="' + url + '">'+
+									'<div class="qv-file-name">' + url.split('/').pop() + '</div>'+ 
+									'<span id="qv-upload-size"> type: ' + url.split('/').pop().split('.').pop() +'</span>'+
+								'</div>'+
+								'<div class="progress qv-progress">'+
+								'<div id="qv-pregress-bar-' + tableRowsNumber + '" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'+
+								'</div>'+
+								'</div>'+
+							'</div>'+	
+							'<div class="swiper-slide qv-desktop swiper-slide-cancel">'+
+								'<div class="files-table-remove">'+
+									'<button class="btn qv-cancel-button"><i class="fa fa-trash-o"></i></button>'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+					'</div>');
+		// increase table rows counter after adding new record
+		tableRowsNumber++			
     } else {
 	// append files
 	$.each(uploadFiles, function(index, file){
@@ -1302,28 +1335,45 @@ function addFileForUpload(uploadFiles, url) {
 	new_size = (Math.round((file.size / 1024) * 100) / 100) + ' KB';
 	}
 	// append document
-	table.append(
-	'<tr>'+
-	    '<td><i class="fa ' + docFormat.icon + '"></i></td>'+
-	    '<td class="qv-filetree-name" data-uploaded="false"><div class="qv-file-name">' + file.name + '</div>'+ 
-	    '<span id="qv-upload-size">size: ' + new_size +'</span>'+
-	    '<span id="qv-upload-size"> type: ' + file.name.split('.').pop() +'</span>'+
-	    '</td>'+
-	    '<td>'+
-	    '<div class="progress qv-progress">'+
-		'<div id="qv-pregress-bar-' + tableRowsNumber + '" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'+
-		'</div>'+
-	    '</div>'+
-	    '</td>'+
-	    '<td class="files-table-remove">'+
-		'<button class="btn qv-cancel-button"><i class="fa fa-trash-o"></i></button>'+
-	    '</td>'+
-	'</tr>');
+	table.append('<div class="swiper-container">'+	
+					'<div class="swiper-wrapper">'+	
+						'<div class="swiper-slide">'+
+							'<i class="fa ' + docFormat.icon + '"></i>'+
+							'<div class="qv-filetree-name" data-uploaded="false">'+
+								'<div class="qv-file-name">' + file.name + '</div>'+ 
+								'<span id="qv-upload-size">size: ' + new_size +'</span>'+
+								'<span id="qv-upload-size"> type: ' + file.name.split('.').pop() +'</span>'+
+							'</div>'+
+							'<div class="progress qv-progress">'+
+							'<div id="qv-pregress-bar-' + tableRowsNumber + '" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'+
+							'</div>'+
+							'</div>'+
+						'</div>'+	
+						'<div class="swiper-slide qv-desktop swiper-slide-cancel">'+
+							'<div class="files-table-remove">'+
+								'<button class="btn qv-cancel-button"><i class="fa fa-trash-o"></i></button>'+
+							'</div>'+
+						'</div>'+
+					'</div>'+
+				'</div>');
 	// increase table rows counter after adding new record
 	tableRowsNumber++	
 	});
     }		
     $("#qv-upload-button").prop("disabled", false);
+	if(isMobile()){
+		$.each($(".swiper-slide"), function(index, slide){
+			$(slide).removeClass("qv-desktop");
+		});
+		//initialize swiper when document ready
+		var swiper = new Swiper ('.swiper-container',{
+			width: 84
+		});
+	} else {
+		$.each($(".swiper-slide"), function(index, slide){
+			$(slide).removeClass("swiper-slide-cancel");
+		});
+	}
 }
 
 /**
@@ -1369,9 +1419,9 @@ function uploadDocument(file, index, url = ''){
 	contentType: false,
 	processData: false,			                      
 	success: function(returnedData) {
-	    if(returnedData.error != undefined){
+	    if(returnedData.message != undefined){
 	        // open error popup
-	        printMessage(returnedData.error);
+	        printMessage(returnedData.message);
 	        return;
 	    }
 	    // update files tree
@@ -1435,11 +1485,42 @@ function openBrowseModal(){
 	loadFileTree('');
 }
 
-function openPasswordModal(){
+/**
+* Open password modal
+* @param {string} error - error message
+**/
+function openPasswordModal(error){
 	$("#qv-browse-section").hide();
 	$("#qv-upload-section").hide();
+	$("#qv-modal-error").hide();
 	$("#qv-password-section").show();
-	toggleModalDialog(true, 'Password required');
+	toggleModalDialog(true, 'Password required');	
+	if(error != "" && typeof error != "undefined"){
+		$(".qv-password-error")[0].innerHTML = error;
+		$(".qv-password-error").show();	
+	} else {
+		$(".qv-password-error").hide();	
+	}		
+}
+
+/**
+* Check if all document pages are loaded and clear the password
+**/
+function clearPassword(){
+	if(password != "" && typeof password != "undefined"){
+		var totalPagesNumber = $('#qv-panzoom > div').length;
+		var loadedPages = [];
+		if(totalPagesNumber > 0){
+			$('#qv-panzoom > div').each(function(index, page){
+					if($(page).has(".qv-wrapper").length){
+						loadedPages.push(true);
+					}		
+			});
+			if(loadedPages.length == totalPagesNumber){
+				password = "";
+			}
+		}
+	}
 }
 
 /*
@@ -1607,7 +1688,7 @@ HTML MARKUP
 	function getHtmlModalDialog(){
 		return 	'<div class="qv-modal fade" id="modalDialog">'+
 			      '<div class="qv-modal-dialog">'+
-			        '<div class="qv-modal-content">'+
+			        '<div class="qv-modal-content" id="qv-modal-content">'+
 			            // header
 			            '<div class="qv-modal-header">'+
 							'<div class="qv-modal-close qv-modal-close-action"><span>x</span></div>'+
@@ -1755,17 +1836,17 @@ HTML MARKUP
 									'<button class="btn" id="qv-url-cancel"><i class="fa fa-trash-o"></i></button>'+
 									'<button class="btn btn-primary" id="qv-add-url">Add</button>'+
 							    '</div>'+
-							    '<table id="qv-upload-files-table" class="table table-striped">'+
-									'<tbody>'+
+							    '<div id="qv-upload-files-table">'+									
 									// list of files
-									'</tbody>'+
-							    '</table>'+
+							    '</div>'+
 							    '<button id="qv-upload-button" type="button" class="btn btn-success" disabled>Upload</button>'+
 							    '<button id="qv-open-document" type="button" class="btn">Browse files</button>'+
 						    '</section>';
 	    // add upload section
 	    $(uploadSection).insertAfter($("#qv-browse-section"));
 	    $("#qv-upload-section").hide();
+		
+		
 	}
 	
 	function getHtmlPassword(){
@@ -1773,6 +1854,7 @@ HTML MARKUP
 								'<div class="inner-addon left-addon btn qv-password-wrap" id="qv-password-wrap">'+
 									'<input type="password" class="form-control" id="qv-password-input" placeholder="Enter password">'+
 									'<button class="btn btn-primary" id="qv-password-submit">Submit</button>'+
+									'<span class="qv-password-error" style="display: none;"></span>'+
 							    '</div>'+
 							'</section>';	
 		// add password section
@@ -1857,4 +1939,16 @@ $.fn.isOnScreen = function(x, y){
     };
     
     return (deltas.left * deltas.right) >= x && (deltas.top * deltas.bottom) >= y;
+};
+
+/*
+******************************************************************
+******************************************************************
+CHECK IF MOBILE
+******************************************************************
+******************************************************************
+*/
+var isMobile = function(){
+  return 'ontouchstart' in window // works on most browsers 
+	  || 'onmsgesturechange' in window; // works on ie10	
 };
