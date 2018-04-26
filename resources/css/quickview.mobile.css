@@ -159,41 +159,51 @@
 	#qv-upload-section label > i {
 		font-size: 26px;
 	}
-	#qv-upload-section tr{
+	#qv-upload-section div{
 	    font-size: 38px;
 	}
-	#qv-upload-files-table tbody tr td {
-	    height: 185px;
+	#qv-upload-files-table > div {
+	    height: 185px !important;
 	}
-	#qv-upload-files-table tbody tr td > i {
-        font-size: 40px;
-        margin-top: -38px;
+	#qv-upload-files-table div > i {
+        font-size: 40px !important;
+		top: 16px !important;
  	}
+	#qv-upload-files-table .qv-filetree-name {
+        padding-left: 61px;
+		width: 433px;
+	}
 	#qv-upload-files-table .qv-filetree-name > span{
 		font-size: 30px;
 		padding-left: 0;
 	}
 	.qv-progress {
-	    margin-top: 8px;
-	    height: 22px;
+	    margin-top: -32px;
+		margin-left: 651px;
+		height: 22px;
 	 }
+	 .qv-upload-complete {
+		margin-top: -46px;
+		margin-left: 536px;
+		font-size: 24px !important;
+	}
 	.files-table-remove i{
-		font-size: 40px;
+		font-size: 74px;
 	}
 	.qv-cancel-button {
 	    height: 90px;
 	    width: 85px;
 	    margin-top: 5px;
 	}
-	.qv-url-wrap{
+	.qv-url-wrap, .qv-password-wrap{
 	    height: 91px;
 	    margin: 8px 0px 47px !important;
 	}
 	.qv-url-wrap > input {
-	    margin-left: 66px;
-	    width: 92%;
-	    height: 89px;
-	    font-size: -webkit-xxx-large;
+	    margin-left: 67px;
+		width: 78%;
+		height: 91px;
+		font-size: -webkit-xxx-large;
 	}
 	.qv-url-wrap > .btn-danger {
 	    position: absolute;
@@ -207,23 +217,44 @@
 	    font-size: -webkit-xxx-large;
 	}
 	#qv-add-url {
-	    right: -91px;
-	    height: 89px;
-	    border-radius: 0px;
-	    width: 152px;
-	    font-size: 51px;
+	    right: -7px;
+		height: 89px;
+		border-radius: 0px;
+		width: 152px;
+		font-size: 51px;
 	}
 	#qv-url-cancel{
 	    position: inherit;
-	    top: -12px;
-	    left: -835px;
-	    width: 83px;
-	    height: 90px;
+		top: -12px;
+		left: -800px;
+		width: 83px;
+		height: 90px;
 	}
 	.qv-file-name {
 	    width: 530px;
 	}
-	
+	.qv-password-wrap > input {
+	    margin-left: 79px;
+		margin-top: 3px;
+		width: 69%;
+		height: 89px;
+		font-size: -webkit-xxx-large;
+	}
+	#qv-password-submit {
+		right: 9px;
+		height: 89px;
+		border-radius: 0px;
+		width: 201px;
+		font-size: 51px;
+	}
+	.qv-password-error {
+		top: 96px;
+		left: 83px;
+		font-size: -webkit-xxx-large;
+	}
+	#qv-url-cancel i {
+		font-size: 53px;		
+	}
 	/*
 	******************************************
 	PAGES
@@ -237,5 +268,17 @@
 	}
 	.qv-landscape{
 		margin: -111px;
+	}
+	
+	/*
+	******************************************
+	Swiper
+	******************************************
+	*/
+	.swiper-slide-cancel{
+		left: 831px !important;
+		background-color: red;
+		height: 96px !important;
+		width: 84px !important;
 	}
 }

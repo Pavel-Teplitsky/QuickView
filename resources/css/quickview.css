@@ -494,15 +494,15 @@ MODAL
 #qv-upload-files-table>tbody>tr:nth-of-type(odd) {
     background-color: #f9f9f9;
 }
-#qv-upload-files-table tbody tr td > i {
+#qv-upload-files-table div div > i {
     font-size: 21px;
-}
-#qv-upload-files-table tbody tr td {
-    height: 70px;
-    padding-left: 14px;
+	position: absolute;
+    top: 7px;
 }
 #qv-upload-files-table .qv-filetree-name {
     padding-top: 0px;
+	height: 70px;
+    padding-left: 36px;
 }
 #qv-upload-files-table .qv-filetree-name > span {
     font-size: 12px;
@@ -510,6 +510,8 @@ MODAL
     color: #9a9a9a;
 }
 .qv-progress {
+	margin-left: 255px;
+    margin-top: -62px;
     width: 200px;
     height: 10px;
     overflow: hidden;
@@ -538,10 +540,14 @@ MODAL
     text-transform: uppercase;
     text-align: center;
     color: #8c8c8c;
+	margin-top: -57px;
+    margin-left: 246px;
+
 }
 .qv-cancel-button {
     padding: 5px;
     background: none;
+	background-color: #ff0000;
 }
 .qv-cancel-button i {
     font-size: 21px;
@@ -577,7 +583,9 @@ section {
     background-image: none;
     border: 1px solid transparent;
 }
-
+.qv-desktop{
+	margin-left: -43px;
+}
 /*
 ******************************************
 URL field
@@ -604,13 +612,45 @@ URL field
     margin-top: 5px;
     margin-left: 6px;
 }
-#qv-add-url {
+#qv-add-url{
     position: absolute;
     top: 0;
     color: #fff;
     background-color: #3e4d59;
     padding: 7px 16px 6px;
     font-size: 12px;
+}
+
+/*
+******************************************
+Password field
+******************************************
+*/
+.qv-password-wrap {
+    position: relative;
+	margin-left: -18px;
+    margin-top: 118px;
+}
+.qv-password-wrap > input {
+    padding-left: 12px;
+    margin-left: 35px;
+    width: 454px;
+    height: 32px;
+    color: #585858;
+}
+#qv-password-submit{
+    position: absolute;
+    top: 0;
+    color: #fff;
+    background-color: #3e4d59;
+    padding: 7px 16px 6px;
+    font-size: 12px;
+}
+.qv-password-error{
+	position: absolute;
+    top: 38px;
+    left: 35px;
+    color: #ff0000;
 }
 
 /*
@@ -719,4 +759,13 @@ Fade annimation
     -ms-transform: translate(0, 0);
     -o-transform: translate(0, 0);
     transform: translate(0, 0);
+}
+
+/*
+******************************************
+Swipe elements
+******************************************
+*/
+.swiper-wrapper{
+	height: 74px !important;
 }
