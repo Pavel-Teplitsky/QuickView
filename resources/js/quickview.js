@@ -18,7 +18,7 @@ var preloadPageCount;
 var currentDirectory;
 var uploadFilesList = [];
 var documentGuid;
-var htmlMode = true;
+var htmlMode = false;
 var documentData = [];
 var password = "";
 var rewrite;
@@ -87,6 +87,7 @@ map['webp'] = { 'format': 'Compressed Image', 'icon': 'fa-file-image-o' };
 map['mobi'] = { 'format': 'Mobipocket eBook', 'icon': 'fa-file-pdf-o' };
 map['tex'] = { 'format': 'LaTeX Source Document', 'icon': 'fa-file-pdf-o' };
 map['djvu'] = { 'format': 'Multi-Layer Raster Image', 'icon': 'fa-file-text' };
+map['unknown'] = { 'format': 'This format is not supported', 'icon': 'fa-file-o' };
 
 $(document).ready(function(){
 		
@@ -251,17 +252,15 @@ NAV BAR CONTROLS
 					if(prevPage){
 						// load previous page
 						// to set correct page size we use global array documentData which contains all info about current document
-						appendHtmlContent(currentPageNumber, documentGuid, '', documentData[currentPageNumber - 1].width, documentData[currentPageNumber - 1].height);
-						appendHtmlContent(currentPageNumber, documentGuid, 'thumbnails-', documentData[currentPageNumber - 1].width, documentData[currentPageNumber - 1].height);
+						appendHtmlContent(currentPageNumber, documentGuid, '', documentData[currentPageNumber - 1].Width, documentData[currentPageNumber - 1].Height);						
 					} else {
 						// load next page
-						appendHtmlContent(currentPageNumber + 1, documentGuid, '', documentData[currentPageNumber].width, documentData[currentPageNumber].height);
-						appendHtmlContent(currentPageNumber + 1, documentGuid, 'thumbnails-', documentData[currentPageNumber].width, documentData[currentPageNumber].height);						
+						appendHtmlContent(currentPageNumber + 1, documentGuid, '', documentData[currentPageNumber].Width, documentData[currentPageNumber].Height);									
 					}
 				} else {
 					// load last page if to jump to it via last page button
-					appendHtmlContent(currentPageNumber, documentGuid, '', documentData[currentPageNumber - 1].width, documentData[currentPageNumber - 1].height);
-					appendHtmlContent(currentPageNumber, documentGuid, 'thumbnails-', documentData[currentPageNumber - 1].width, documentData[currentPageNumber - 1].height);	
+					appendHtmlContent(currentPageNumber, documentGuid, '', documentData[currentPageNumber - 1].Width, documentData[currentPageNumber - 1].Height);	
+					appendHtmlContent(currentPageNumber - 1, documentGuid, '', documentData[currentPageNumber - 2].Width, documentData[currentPageNumber - 2].Height);						
 				}
 			}
 		}
@@ -305,17 +304,14 @@ NAV BAR CONTROLS
 					// if scroll down load next page
 					if(scrollDown){
 						if(pagePosition + 1 <= lastPageNumber){
-							appendHtmlContent(pagePosition + 1, documentGuid, '', documentData[pagePosition].width, documentData[pagePosition].height);
-							appendHtmlContent(pagePosition + 1, documentGuid, 'thumbnails-', documentData[pagePosition].width, documentData[pagePosition].height);
+							appendHtmlContent(pagePosition + 1, documentGuid, '', documentData[pagePosition].Width, documentData[pagePosition].Height);
 						} else if(pagePosition == lastPageNumber){
-							appendHtmlContent(pagePosition, documentGuid, '', documentData[pagePosition - 1].width, documentData[pagePosition - 1].height);
-							appendHtmlContent(pagePosition, documentGuid, 'thumbnails-', documentData[pagePosition - 1].width, documentData[pagePosition - 1].height);
+							appendHtmlContent(pagePosition, documentGuid, '', documentData[pagePosition - 1].Width, documentData[pagePosition - 1].height);
 						}							
 					} else {
 						// if scroll up load previous page
 						if(currentPageNumber - 1 >= 1){
-							appendHtmlContent(currentPageNumber - 1, documentGuid, '', documentData[pagePosition - 1].width, documentData[pagePosition - 1].height);
-							appendHtmlContent(currentPageNumber - 1, documentGuid, 'thumbnails-', documentData[pagePosition - 1].width, documentData[pagePosition - 1].height);
+							appendHtmlContent(currentPageNumber - 1, documentGuid, '', documentData[pagePosition - 1].Width, documentData[pagePosition - 1].Height);							
 						}
 					}
 				}
@@ -427,10 +423,12 @@ NAV BAR CONTROLS
 	//////////////////////////////////////////////////
 	$('#qv-thumbnails-panzoom').on('click', '.qv-page',function(){
 	    // get clicked thumbnail page number
-		var page = $(this).attr('id').split('-')[3];
+		var page = parseInt($(this).attr('id').split('-')[3]);
 		var pagesAttr = $('#qv-page-num').text().split('/');
 		// get last page number
     	var lastPageNumber = parseInt(pagesAttr[1]);
+		appendHtmlContent(page, documentGuid, "", documentData[page - 1].Width, documentData[page - 1].Height);
+		appendHtmlContent(page + 1, documentGuid, "", documentData[page].Width, documentData[page].Height);
 		// set navigation to current page
 		setNavigationPageValues(page, lastPageNumber);
 		scrollToPage(page);
@@ -519,7 +517,8 @@ NAV BAR CONTROLS
 	    // recalculate indexes in the files table
 	    var tableRows = $('#qv-upload-files-table > div');
 	    for(var n = 0; n < tableRows.length; n++){
-		$(tableRows[n]).find("div.progress-bar").attr("id", "qv-pregress-bar-" + n);
+		$(tableRows[n]).find("div.qv-pregress").attr("id", "qv-pregress-bar-" + n);
+		$(tableRows[n]).find("div.qv-upload-complete").attr("id", "qv-upload-complete-" + n);
 	    }
 	    // if table is empty disable upload button
 	    if(tableRows.length == 0){
@@ -809,18 +808,29 @@ function generatePagesTemplate(data, totalPageNumber, prefix){
 		} else {
 			counter = preloadPageCount;
 		}	
-		// get page according to the pre-load page number
-		if(preloadPageCount > 0){
-			for(var i = 0; i < counter; i++){
-				// render page
-				appendHtmlContent(i + 1, documentGuid, prefix, data[i].Width, data[i].Height);		
-			}			
+		if(prefix == ""){
+			// get page according to the pre-load page number
+			if(preloadPageCount > 0){
+				for(var i = 0; i < counter; i++){
+					// render page
+					appendHtmlContent(i + 1, documentGuid, "", data[i].Width, data[i].Height);		
+				}	
+							
+			} else {
+				// get all pages
+				for(var i = 0; i < totalPageNumber; i++){
+					appendHtmlContent(i + 1, documentGuid, "", data[i].Width, data[i].Height);	
+				}							
+			}	
 		} else {
-			// get all pages
-			for(var i = 0; i < totalPageNumber; i++){
-				appendHtmlContent(i + 1, documentGuid, prefix, data[i].Width, data[i].Height);	
-			}			
-		}	
+			// load all thumbnails only when any of document pages is loaded.
+			// this is required to fix issue with thumbnails resolution
+			isPageLoaded($("#qv-page-1")).then(function(element) {
+				for(var i = 0; i < totalPageNumber; i++){
+					appendHtmlContent(i + 1, documentGuid, "thumbnails-", data[i].Width, data[i].Height);	
+				}
+			});
+		}
 	}	
 }
 
@@ -864,10 +874,31 @@ function appendHtmlContent(pageNumber, documentName, prefix, width, height){
 				// remove spinner
 				qv_prefix_page.find('.qv-page-spinner').hide();
 				// fix to avoid using the spinner DIV size
-				if(qv_page.innerWidth() >= width - 1 &&  qv_page.innerHeight() >= height - 1){
-					width = qv_page.innerWidth();
-					height =  qv_page.innerHeight();
-				}
+				if(preloadPageCount == 0){
+					if(qv_page.innerWidth() >= width - 1 &&  qv_page.innerHeight() >= height - 1){
+						width = qv_page.innerWidth();
+						height =  qv_page.innerHeight();
+					}
+				} else {
+					// set correct width and height for document pages
+					if(prefix == ""){
+						if(qv_page.innerWidth() >= width - 1 &&  qv_page.innerHeight() >= height - 1){
+							width = qv_page.innerWidth();
+							height =  qv_page.innerHeight();
+						}
+					} else {
+						// set correct width and height for thumbnails
+						if(width > height && htmlData.angle == 0){
+							// change the width and height in places if page is landscape oriented
+							width = $("#qv-page-1").innerHeight();
+							height = $("#qv-page-1").innerWidth();
+						} else {
+							// use first document page sezie to fix thumbnails size issue
+							width = $("#qv-page-1").innerWidth();
+							height = $("#qv-page-1").innerHeight();
+						}
+					}
+				}			
 				// check if page is horizontally displayed
 				if(width > height || width >= $(window).width()){
 					zoomValue = 0.79;
@@ -918,6 +949,8 @@ function appendHtmlContent(pageNumber, documentName, prefix, width, height){
 			}			
 			// rotate page if it were rotated earlier
 			if(htmlData.angle != 0){
+				qv_prefix_page.css('animation', 'none'); 
+				qv_prefix_page.css('transition-property', 'none');
 				qv_prefix_page.css('transform', 'rotate(' + htmlData.angle + 'deg)');
 				if(htmlData.angle == 90 || htmlData.angle == 270){
 					// set styles for HTML mode
@@ -956,7 +989,11 @@ function appendHtmlContent(pageNumber, documentName, prefix, width, height){
 */
 function getDocumentFormat(filename){
     if(typeof map[filename.split('.').pop().toLowerCase()] == "undefined"){
-        return map["folder"];
+		if(filename.split('.').length > 1){
+			return map["unknown"];
+		} else {
+			return map["folder"];
+		}
     } else {
         return map[filename.split('.').pop().toLowerCase()];
     }
@@ -1305,10 +1342,13 @@ function addFileForUpload(uploadFiles, url) {
 									'<div class="qv-file-name">' + url.split('/').pop() + '</div>'+ 
 									'<span id="qv-upload-size"> type: ' + url.split('/').pop().split('.').pop() +'</span>'+
 								'</div>'+
-								'<div class="progress qv-progress">'+
-								'<div id="qv-pregress-bar-' + tableRowsNumber + '" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'+
+								'<div id="qv-pregress-bar-' + tableRowsNumber + '" class="qv-pregress p0 small green">'+
+									'<div class="slice">'+
+										'<div class="bar"></div>'+
+										'<div class="fill"></div>'+
+									'</div>'+
 								'</div>'+
-								'</div>'+
+								'<div id="qv-upload-complete-' + tableRowsNumber + '" class="qv-upload-complete"><i class="fa fa-check-circle-o"></i></div>'+
 							'</div>'+	
 							'<div class="swiper-slide qv-desktop swiper-slide-cancel">'+
 								'<div class="files-table-remove">'+
@@ -1342,10 +1382,13 @@ function addFileForUpload(uploadFiles, url) {
 								'<span id="qv-upload-size">size: ' + new_size +'</span>'+
 								'<span id="qv-upload-size"> type: ' + file.name.split('.').pop() +'</span>'+
 							'</div>'+
-							'<div class="progress qv-progress">'+
-							'<div id="qv-pregress-bar-' + tableRowsNumber + '" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'+
+							'<div id="qv-pregress-bar-' + tableRowsNumber + '" class="qv-pregress p0 small green">'+
+								'<div class="slice">'+
+									'<div class="bar"></div>'+
+									'<div class="fill"></div>'+
+								'</div>'+
 							'</div>'+
-							'</div>'+
+							'<div id="qv-upload-complete-' + tableRowsNumber + '" class="qv-upload-complete"><i class="fa fa-check-circle-o"></i></div>'+
 						'</div>'+	
 						'<div class="swiper-slide qv-desktop swiper-slide-cancel">'+
 							'<div class="files-table-remove">'+
@@ -1397,12 +1440,12 @@ function uploadDocument(file, index, url = ''){
 	            $(".qv-modal-close-action").off('click');
 	            $("#qv-open-document").prop("disabled", true);
 		        // increase progress
-		        $("#qv-pregress-bar-" + index).css("width",  event.loaded / event.total * 100+"%");
+		        $("#qv-pregress-bar-" + index).addClass("p"+ Math.round(event.loaded / event.total * 100));
 	            if(event.loaded == event.total){
-		        $('<div class="qv-upload-complete">Upload Complete</div>').insertBefore($("#qv-pregress-bar-" + index).parent());
-		        $("#qv-pregress-bar-" + index).parent().remove();
-		        $('.qv-modal-close-action').on('click', closeModal);
-		        $("#qv-open-document").prop("disabled", false);
+					$("#qv-pregress-bar-" + index).fadeOut();
+					$("#qv-upload-complete-" + index).fadeIn();
+					$('.qv-modal-close-action').on('click', closeModal);
+					$("#qv-open-document").prop("disabled", false);
 	            }
 	        }
 	    }, false);
@@ -1519,6 +1562,35 @@ function clearPassword(){
 	}
 }
 
+/**
+* On-promise function which waits until the element is loaded
+* @param {Object} selector - element to wait for
+**/
+function isPageLoaded(selector) {
+	return new Promise((resolve, reject) => {
+		// check if loaded
+		const waitForEl = (selector, count = 0) => {
+			const el = selector.find(".qv-wrapper");
+			// check if element is loaded
+			if (el.length > 0) {
+				resolve(el);
+			} else {
+				// wait 100 milliseconds and check again
+				setTimeout(() => {
+					count++;
+
+					if (count < 60) {
+						waitForEl(selector, count);
+					} else {
+						reject();
+					}
+				}, 1000);
+			}
+		};
+		waitForEl(selector);
+	});
+}
+
 /*
 ******************************************************************
 ******************************************************************
@@ -1555,7 +1627,7 @@ METHODS
 				print: true,
 				defaultDocument: null,
 				browse: true,
-				htmlMode: true,
+				htmlMode: false,
 				rewrite: true
 			};
 			options = $.extend(defaults, options);

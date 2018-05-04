@@ -20,7 +20,7 @@
 	}
 	#qv-navbar > li {
 		font-size: 30px;
-		padding: 32px 17px;
+		padding: 32px 15px;
 	}
 	#qv-navbar li:hover .qv-tooltip, #qv-header-logo:hover .qv-tooltip{
 		visibility: hidden;
@@ -178,15 +178,16 @@
 		font-size: 30px;
 		padding-left: 0;
 	}
-	.qv-progress {
-	    right: 25px;
-	    top: 80px;
-	    height: 22px;
-	 }
+	.qv-pregress {
+		width: 39px !important;
+		height: 39px !important;
+		left: calc(100% - 135px) !important;
+		top: Calc(100% - 91px) !important;
+	}
 	 .qv-upload-complete {
-		margin-top: -46px;
-		margin-left: 536px;
 		font-size: 24px !important;
+		left: calc(100% - 136px) !important;
+		top: Calc(100% - 166px) !important;
 	}
 	.files-table-remove i{
 		position: absolute;
@@ -238,8 +239,6 @@
 		left: -800px;
 		width: 83px;
 		height: 90px;
-	}
-	.qv-file-name {
 	}
 	.qv-password-wrap > input {
 	    margin-left: 79px;
