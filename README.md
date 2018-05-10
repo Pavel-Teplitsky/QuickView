@@ -4,11 +4,12 @@
 
 
 ## Description
-Simple, elegant and modern front-end jQuery plugin which allows users to preview documents online in HTML 5.
-It can be easily integrated into any platform (Java, .NET, etc). Simple and flexible configuration makes integration process quite easy and intuitive.
+QuickView is simple, elegant and modern UI written in JavaScript which allows users to open and view over 50 different document types.
+QuickView can be easily integrated into any platform such as Java, .NET, etc (check Java and .NET samples at the bottom of this document).
+Simple and flexible configuration makes integration process quite easy and intuitive.
 
-**Note** QuickView doesn't provide any document conversion engine. QuickView is developed to support document conversion engines and is able only to preview already converted documents (documents must be converted into HTML page by page).
-To convert documents into proper format use [GroupDocs.Viewer for Java](http://www.groupdocs.com/java/document-viewer-library) or [GroupDocs.Viewer for .NET](http://www.groupdocs.com/dot-net/document-viewer-library).
+**Note** QuickView doesn't provide any document conversion engine. QuickView is developed to support document conversion engines and is able only to preview already converted documents (documents must be converted into HTML or images page by page).
+To convert documents into proper format use [GroupDocs.Viewer for Java](https://products.groupdocs.com/viewer/java) or [GroupDocs.Viewer for .NET](https://products.groupdocs.com/viewer/net).
 
 
 ## Demo Video
@@ -18,16 +19,23 @@ https://www.youtube.com/watch?v=Gm7oJ2gJOJM
 ## Features
 - Clean, modern and intuitive design
 - Easily switchable color theme (create your own color theme in 5 minutes)
+- Responsive design
+- Mobile support (open application on any mobile device)
 - Support over 50 documents and image formats
-- Protecting documents with a passwords
-- Open password protected documents
-- Multi-language support for displaying errors (in modern popup)
-- Zoom in and zoom out documents without quality loss
-- Document search & text highlighting
-- Smonth document scrolling
-- Go to next, previous, first and last page actions
+- HTML and image modes
 - Fully customizable navigation panel
-- Add watermarks to any document
+- Open password protected documents
+- Text searching & highlighting
+- Download documents
+- Upload documents
+- Print document
+- Rotate pages
+- Zoom in/out documents without quality loss in HTML mode
+- Thumbnails
+- Smooth page navigation
+- Smooth document scrolling
+- Preload pages for faster document rendering
+- Multi-language support for displaying errors
 - Display two or more pages side by side (when zooming out)
 - More features coming soon
 
@@ -35,7 +43,7 @@ https://www.youtube.com/watch?v=Gm7oJ2gJOJM
 ## Requirements
 ###### Java
 - Basic knowledge of Java programming
-- Java 6 or higher
+- Java 8 or higher
 - Maven 3 or higher
 - GroupDocs.Viewer for Java 3.0.0 or higher
 
@@ -46,5 +54,5 @@ https://www.youtube.com/watch?v=Gm7oJ2gJOJM
 
 
 ## Samples
-- [Dropwizard Java Sample](https://github.com/LilAlex/QuickView-Java-Dropwizard)
-- MVC .NET Sample (coming soon)
+- [Dropwizard Java Sample](https://github.com/bobkovalex/QuickView-Java-Dropwizard)
+- [MVC .NET Sample](https://github.com/bobkovalex/QuickView-.NET-MVC)
