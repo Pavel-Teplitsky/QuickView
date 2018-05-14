@@ -675,17 +675,10 @@ function loadFileTree(dir) {
 		return;
 	    }
 		// assembly modal html
+		$('.qv-modal-body').html(''); // clear previous data
 		toggleModalDialog(true, "Open Document", getHtmlFileBrowser());
 	    // hide loading spinner
 	    $('#qv-modal-spinner').hide();
-	    // clear tree list from previous data
-	    $('#qv-modal-filebroswer tbody').html(
-		'<tr>'+
-		    '<td class="text-center qv-go-up"><i class="fa fa-level-up"></i></td>'+
-		    '<td class="qv-filetree-up qv-go-up">...</td>'+
-		    '<td></td>'+
-		    '<td></td>'+
-		'</tr>');	    
 	    // append files to tree list
 	    $.each(returnedData, function(index, elem){
 		// document name
@@ -1583,21 +1576,27 @@ function isPageLoaded(selector) {
 **/
 function getHtmlFileBrowser(){
 	return '<section id="qv-browse-section" class="tab-slider-body">'+
-			'<div id="qv-modal-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+					        
-			'<table id="qv-modal-filebroswer" class="qv-modal-table">'+
-			'<thead>'+
-				'<tr>'+
-				'<th class="col-md-1"> </th>'+
-				'<th class="col-md-5">Document</th>'+
-				'<th class="col-md-3">Format</th>'+
-				'<th class="col-md-3">Size</th>'+
-				'</tr>'+
-			'</thead>'+
-			'<tbody>'+
-			// list of files
-			'</tbody>'+
-			'</table>'+
-		'</section>';		
+				'<div id="qv-modal-spinner"><i class="fa fa-circle-o-notch fa-spin"></i> &nbsp;Loading... Please wait.</div>'+					        
+				'<table id="qv-modal-filebroswer" class="qv-modal-table">'+
+					'<thead>'+
+						'<tr>'+
+							'<th class="col-md-1"> </th>'+
+							'<th class="col-md-5">Document</th>'+
+							'<th class="col-md-3">Format</th>'+
+							'<th class="col-md-3">Size</th>'+
+						'</tr>'+
+					'</thead>'+
+					'<tbody>'+
+						'<tr>'+
+						    '<td class="text-center qv-go-up"><i class="fa fa-level-up"></i></td>'+
+						    '<td class="qv-filetree-up qv-go-up">...</td>'+
+						    '<td></td>'+
+						    '<td></td>'+
+						'</tr>'
+						// list of files
+					'</tbody>'+
+				'</table>'+
+			'</section>';		
 }
 	
 /**
