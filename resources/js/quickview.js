@@ -3,7 +3,7 @@
  * Copyright (c) 2016 Alexandr Bobkov <lilalex85@gmail.com>
  * Licensed under MIT.
  * @author Alexandr Bobkov
- * @version 1.0.1
+ * @version 1.0.2
  */
 
  /*
