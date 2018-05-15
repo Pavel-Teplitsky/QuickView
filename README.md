@@ -1,6 +1,6 @@
 ![Alt text](https://raw.githubusercontent.com/bobkovalex/QuickView/master/resources/images/banner.png "QuickView")
 # QuickView
-###### version 1.0.0
+###### version 1.0.2
 
 
 ## Description
